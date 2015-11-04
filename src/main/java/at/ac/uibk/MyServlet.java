@@ -14,4 +14,5 @@ public class MyServlet extends HttpServlet {
         response.getWriter().println("<h1>Hello Servlet</h1>");
         response.getWriter().println("<p>Built with gradle!</p>");
     }
+
 }
