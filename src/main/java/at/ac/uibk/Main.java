@@ -5,10 +5,10 @@ import org.eclipse.jetty.annotations.AnnotationParser;
 import org.eclipse.jetty.io.RuntimeIOException;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
+public class Main {
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +33,8 @@ public class Main{
         // will be assigned that you can either look in the logs for the port,
         // or programmatically obtain it for use in test cases.
         Server server = new Server(8001);
+        ServletHandler h = new ServletHandler();
+        server.setHandler(h);
 
         // The WebAppContext is the entity that controls the environment in
         // which a web application lives and breathes. In this example the
@@ -62,4 +64,5 @@ public class Main{
         server.start();
         server.join();
     }
+
 }
