@@ -16,6 +16,12 @@ dependencies {
     // Heroku Settings
     runtimeOnly "org.mortbay.jetty:jetty-runner:8.1.1.v20120215"
     runtimeOnly "com.newrelic.agent.java:newrelic-agent:2.18.0"
+	
+	//PostgreSQL
+	compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
+	
+	//Hibernate
+	compile 'org.hibernate:hibernate-core:4.3.8.Final'
 }
 
 task copyToLib << {
