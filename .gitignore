@@ -1,24 +1,14 @@
-# Created by .ignore support plugin (hsz.mobi)
-### Java template
-*.class
+# Intellij sepcific
+/.idea/
+/out/
+/myShop.iml
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-/JettyEm.iml
-/out
-/.idea
-
-/.settings
+#Eclipse specific
+/.settings/
 /.classpath
 /.project
-/.gradle
-/build
-/myShop.iml
+
+#Common
+/.gradle/
+/build/
+
