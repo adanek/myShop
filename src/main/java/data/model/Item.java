@@ -1,14 +1,20 @@
 package data.model;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "Item")
@@ -24,7 +30,12 @@ public class Item {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date changeDate = new Date();
 	@ManyToOne
+	private Category category;
+	@ManyToOne
 	private SavedUser author;
+	@OneToMany(mappedBy = "item")
+	@Cascade({ CascadeType.DELETE })
+	private Collection<ItemComment> comments = new LinkedList<>();
 	
 	public int getId() {
 		return id;
@@ -72,6 +83,22 @@ public class Item {
 
 	public void setAuthor(SavedUser author) {
 		this.author = author;
+	}
+
+	public Collection<ItemComment> getComments() {
+		return comments;
+	}
+
+	public void setComments(Collection<ItemComment> comments) {
+		this.comments = comments;
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 
 }

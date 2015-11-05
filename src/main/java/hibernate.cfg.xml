@@ -28,12 +28,13 @@
     <property name="show_sql">true</property>
 
     <!-- Drop and re-create the database schema on startup (for production: validate)-->
-    <property name="hbm2ddl.auto">update</property>
+    <property name="hbm2ddl.auto">create</property>
     
     <!-- Names the annotations -->
-    <mapping class="data.model.Item" />
-    <mapping class="data.model.SavedUser" />
     <mapping class="data.model.Category" />
+    <mapping class="data.model.SavedUser" />
+    <mapping class="data.model.Item" />
+    <mapping class="data.model.ItemComment" />
     
   </session-factory>
 </hibernate-configuration> 
