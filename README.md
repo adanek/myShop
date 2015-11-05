@@ -1,3 +1,8 @@
+#Anleitung
+
+Um das Projekt lokal zu starten verwende
+gradle jettyRunWar
+
 # Task 5:
 
 Abgabedatum - 09.11.2015 bis 12:00 Uhr
