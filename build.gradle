@@ -11,7 +11,8 @@ repositories {
 }
 
 dependencies {
-    compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.1.v20150714'
+    // Jersey
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet-core:2.22.1'
 
     // Heroku Settings
     runtimeOnly "org.mortbay.jetty:jetty-runner:8.1.1.v20120215"
@@ -26,6 +27,8 @@ dependencies {
 	//Hashing
 	compile 'commons-codec:commons-codec:1.10'
 }
+
+// Tasks for heroku deployment
 
 task copyToLib << {
     copy {
