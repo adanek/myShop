@@ -4,7 +4,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -93,7 +95,7 @@ public class DataHandler {
 			throw new IllegalStateException("closing connection not possible");
 		}
 	}
-	
+
 	/**
 	 * save an object to the database, when it is an entity
 	 * 
@@ -170,14 +172,14 @@ public class DataHandler {
 
 	}
 
-	public Item createItem(String title, String description, int category, int author) 
-			throws IllegalStateException, IllegalArgumentException{
-		
+	public Item createItem(String title, String description, int category, int author)
+			throws IllegalStateException, IllegalArgumentException {
+
 		SavedUser user;
 		Category cat;
-		
+
 		Session session = openSession();
-		
+
 		try {
 			Criteria cr = session.createCriteria(SavedUser.class);
 			cr.add(Restrictions.eq("id", author));
@@ -190,7 +192,7 @@ public class DataHandler {
 			session.close();
 			throw new IllegalArgumentException("authorID: not in database found", e);
 		}
-		
+
 		try {
 			Criteria cr = session.createCriteria(Category.class);
 			cr.add(Restrictions.eq("id", category));
@@ -203,27 +205,28 @@ public class DataHandler {
 			session.close();
 			throw new IllegalArgumentException("category: not in database found", e);
 		}
-		
-		//create item instance
+
+		// create item instance
 		Item item = new Item();
 		item.setTitle(title);
 		item.setDescription(description);
 		item.setAuthor(user);
 		item.setCategory(cat);
 		item.setCreationDate(new Date());
-		
+
 		saveObjectToDb(item);
 		return item;
-		
+
 	}
-	
-	public ItemComment createItemComment(String comment, int itemID, int author) throws IllegalStateException, IllegalArgumentException{
-		
+
+	public ItemComment createItemComment(String comment, int itemID, int author)
+			throws IllegalStateException, IllegalArgumentException {
+
 		Item item;
 		SavedUser user;
-		
+
 		Session session = openSession();
-		
+
 		try {
 			Criteria cr = session.createCriteria(Item.class);
 			cr.add(Restrictions.eq("id", itemID));
@@ -236,7 +239,7 @@ public class DataHandler {
 			session.close();
 			throw new IllegalArgumentException("category: not in database found", e);
 		}
-		
+
 		try {
 			Criteria cr = session.createCriteria(SavedUser.class);
 			cr.add(Restrictions.eq("id", author));
@@ -249,15 +252,149 @@ public class DataHandler {
 			session.close();
 			throw new IllegalArgumentException("authorID not in database found", e);
 		}
-		
+
 		ItemComment itemComment = new ItemComment();
-		
+
 		itemComment.setComment(comment);
 		itemComment.setItem(item);
 		itemComment.setAuthor(user);
-		
+
 		saveObjectToDb(itemComment);
 		return itemComment;
+	}
+
+	// get all categories
+	public Collection<Category> getAllCategories() throws IllegalStateException {
+
+		try {
+
+			return (Collection<Category>) getTableData(Category.class);
+
+		} catch (Exception e) {
+			// Exception
+			throw new IllegalStateException("something went wrong by getting the category list");
+		}
+	}
+
+	// get all items
+	public Collection<Item> getAllItems() throws IllegalStateException {
+
+		try {
+
+			return (Collection<Item>) getTableData(Item.class);
+
+		} catch (Exception e) {
+			// Exception
+			throw new IllegalStateException("something went wrong by getting the item list");
+		}
+	}
+
+	// get all item comments
+	public Collection<ItemComment> getAllItemComments() throws IllegalStateException {
+		
+		try {
+
+			return (Collection<ItemComment>) getTableData(ItemComment.class);
+
+		} catch (Exception e) {
+			// Exception
+			throw new IllegalStateException("something went wrong by getting the item comment list");
+		}
+	}
+
+	// get all users
+	public Collection<SavedUser> getAllUsers() throws IllegalStateException {
+		
+		try {
+
+			return (Collection<SavedUser>) getTableData(SavedUser.class);
+
+		} catch (Exception e) {
+			// Exception
+			throw new IllegalStateException("something went wrong by getting the user list");
+		}
+	}
+
+	//search for user by ID
+	public SavedUser getUserByID(int id) throws IllegalArgumentException {
+		return this.<SavedUser> searchForID(id, SavedUser.class);
+	}
+	
+	//search for category by ID
+	public Category getCategoryByID(int id) throws IllegalArgumentException {
+		return this.<Category> searchForID(id, Category.class);
+	}
+	
+	//search for item by ID
+	public Item getItemByID(int id) throws IllegalArgumentException {
+		return this.<Item> searchForID(id, Item.class);
+	}
+	
+	//search for comment by ID
+	public ItemComment getItemCommentByID(int id) throws IllegalArgumentException {
+		return this.<ItemComment> searchForID(id, ItemComment.class);
+	}
+	
+	//select all data from table
+	private Collection<?> getTableData(Class cls) throws IllegalStateException {
+
+		Session session = openSession();
+
+		try {
+
+			// begin transaction
+			session.beginTransaction();
+
+			// get all categories
+			Criteria cr = session.createCriteria(cls);
+			List<?> results = cr.list();
+
+			// commit
+			session.getTransaction().commit();
+
+			return results;
+
+		} catch (Exception e) {
+			// Exception -> rollback
+			session.getTransaction().rollback();
+			throw new IllegalStateException("something went wrong by getting the data");
+		} finally {
+			// close session
+			session.close();
+		}
+
+	}
+	
+	//search for a single dataset by ID
+	private <T> T searchForID(int id, Class<T> typeParameterClass)
+			throws IllegalArgumentException {
+
+		Session session = openSession();
+
+		try {
+
+			// begin transaction
+			session.beginTransaction();
+
+			Criteria cr = session.createCriteria(typeParameterClass);
+			cr.add(Restrictions.eq("id", id));
+			List<T> results = cr.list();
+
+			// commit
+			session.getTransaction().commit();
+
+			// only one element in the list because the id is unique
+			return results.get(0);
+
+		} catch (IndexOutOfBoundsException e) {
+			// Exception -> rollback
+			session.getTransaction().rollback();
+			throw new IllegalArgumentException(
+					"object with this ID is not in the database", e);
+		} finally {
+			// close session
+			session.close();
+		}
 	}
 
 }
