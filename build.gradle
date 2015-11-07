@@ -26,6 +26,10 @@ dependencies {
 	
 	//Hashing
 	compile 'commons-codec:commons-codec:1.10'
+	
+	//Jackson
+	compile 'com.sun.jersey:jersey-json:1.19'
+	compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.22.1'
 }
 
 // Tasks for heroku deployment
