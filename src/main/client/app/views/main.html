@@ -2,8 +2,8 @@
   <div ng-repeat="product in main.products | orderBy: '-price'" class="product">
 
     <product-title></product-title>
-    <button ng-show="product.forSale">Add to chart</button>
-
     <product-panels></product-panels>
+
+    <button class="btn btn-default" ng-show="product.forSale">Add to chart</button>
   </div>
 </div>

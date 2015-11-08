@@ -1,17 +1,8 @@
-(function () {
-  var app = angular.module('myshop-products', []);
-
-  app.directive('productTitle', function () {
-    return {
-      restrict: 'E',
-      templateUrl: 'scripts/directives/product/product-title.html'
-    };
-  });
-
+(function(app){
   app.directive('productPanels', function () {
     return {
       restrict: 'E',
-      templateUrl: 'scripts/directives/product/product-panels.html',
+      templateUrl: 'templates/directives/product/product-panels.html',
       controller: function () {
         this.tab = 1;
 
@@ -26,5 +17,4 @@
       controllerAs: 'panel'
     }
   });
-
-})();
+})(angular.module('myshopApp'));

@@ -1,10 +1,6 @@
 'use strict';
-
-angular.module('myshopApp')
-  .controller('AboutCtrl', function () {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+(function(app){
+  app.controller('AboutCtrl', function(){
+    this.awesomeThings = 3;
+  })
+})(angular.module('myshopApp'));

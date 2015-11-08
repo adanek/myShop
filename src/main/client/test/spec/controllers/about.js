@@ -2,22 +2,24 @@
 
 describe('Controller: AboutCtrl', function () {
 
-  // load the controller's module
-  beforeEach(module('clientApp'));
+  var $controller, AboutCtrl, createController;
 
-  var AboutCtrl,
-    scope;
+  beforeEach(module('myshopApp'));
 
-  // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope) {
-    scope = $rootScope.$new();
-    AboutCtrl = $controller('AboutCtrl', {
-      $scope: scope
-      // place here mocked dependencies
-    });
+  beforeEach(inject(function($injector){
+
+    $controller = $injector.get('$controller');
+    createController = function(){
+      return $controller('Products', {});
+    }
   }));
 
-  it('should attach a list of awesomeThings to the scope', function () {
-    expect(AboutCtrl.awesomeThings.length).toBe(3);
-  });
+  //it('should be green', inject(function($controller){
+  //
+  //  var ctrl = createController();
+  //  expect(true).toBe(true);
+  //}));
+  //
+
+
 });

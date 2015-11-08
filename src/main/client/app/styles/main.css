@@ -92,4 +92,6 @@ body {
 
 .product {
   margin-bottom: 5em;
+  border-bottom: 1px solid darkgray;
+  padding-bottom: 1em;
 }

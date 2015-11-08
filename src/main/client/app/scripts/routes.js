@@ -8,7 +8,7 @@
         controllerAs: 'main'
       })
       .when('/about', {
-        templateUrl: 'views/about.html',
+        templateUrl: 'views/index.html',
         controller: 'AboutCtrl',
         controllerAs: 'about'
       })

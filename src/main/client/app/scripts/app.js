@@ -6,6 +6,5 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch',
-    'myshop-products'
+    'ngTouch'
   ]);
