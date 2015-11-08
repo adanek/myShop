@@ -36,4 +36,11 @@ public class UserService {
 
     	return handler.getUserByID(userid);
     }
+
+    @GET
+    @Path("/test")
+    @Produces("text/plain")
+    public String test(){
+        return "Servlet running!";
+    }
 }
