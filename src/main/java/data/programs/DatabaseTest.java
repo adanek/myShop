@@ -12,14 +12,17 @@ import data.model.SavedUser;
 public class DatabaseTest {
 
 	public static void main(String[] args) {
-		
+
 		DataHandler handler = new DataHandler();
+
+		handler.changeUser(4, "Pat", 2);
+
+		SavedUser user = handler.getUserByID(4);
 		
-		handler.deleteCategory(1);
-		handler.deleteItem(6);
-		
+		System.out.println("User: " + user.getId() + " " + user.getAlias() + " " + user.getRole());
+
 		handler.closeDatabaseConnection();
-		
+
 	}
 
 }

@@ -20,8 +20,8 @@ public class InitialUpload {
 		int categoryID2 = handler.createCategory("IT").getId();
 		
 		//user
-		int userID1 = handler.createUser("Andi", "admin").getId();
-		int userID2 = handler.createUser("Pati", "admin").getId();
+		int userID1 = handler.createUser("Andi", "admin", 1).getId();
+		int userID2 = handler.createUser("Pati", "admin", 1).getId();
 		
 		//items
 		int itemID1 = handler.createItem("Adidas Boost", "Laufschuh", categoryID1, userID2).getId();
