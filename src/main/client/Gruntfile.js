@@ -326,7 +326,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: '<%= yeoman.dist %>',
-          src: ['*.html'],
+          src: ['**/*.html'],
           dest: '<%= yeoman.dist %>'
         }]
       }
@@ -335,12 +335,12 @@ module.exports = function (grunt) {
     ngtemplates: {
       dist: {
         options: {
-          module: 'clientApp',
+          module: 'myshopApp',
           htmlmin: '<%= htmlmin.dist.options %>',
           usemin: 'scripts/scripts.js'
         },
         cwd: '<%= yeoman.app %>',
-        src: 'views/{,*/}*.html',
+        src: ['views/**.html'],
         dest: '.tmp/templateCache.js'
       }
     },
@@ -376,7 +376,7 @@ module.exports = function (grunt) {
           src: [
             '*.{ico,png,txt}',
             '.htaccess',
-            '{,*/}*.html',
+            '**/*.html',
             'images/{,*/}*.{webp}',
             'styles/fonts/{,*/}*.*'
           ]
@@ -410,8 +410,8 @@ module.exports = function (grunt) {
       ],
       dist: [
         'copy:styles',
-        'imagemin'
-        //, 'svgmin'
+        'imagemin',
+        'svgmin'
       ]
     },
 

@@ -3,7 +3,7 @@
   app.directive('productTitle', function () {
     return {
       restrict: 'E',
-      templateUrl: 'templates/directives/product/product-title.html'
+      templateUrl: 'views/directives/product/product-title.html'
     };
   });
 
