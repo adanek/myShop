@@ -1,13 +1,23 @@
 'use strict';
 
 angular.module('myshopApp')
-  .controller('MainCtrl', function () {
+  .controller('MainCtrl', function (Products) {
 
+	this.product = {
+		name:	"Name"
+	}  
+	  
+	var ctrl = this;
+	
+	this.addToCart=function(){
+		Products.put(this.product);
+	}
+	  
     this.products = [
       {
         pid: 1,
         name: "Product 1",
-        description: "This is a awesome product",
+        description: "This is an awesome new product",
         price: 2,
         forSale: true,
         reviews: [
@@ -28,6 +38,7 @@ angular.module('myshopApp')
         name: "Product 2",
         description: "This product is even better than product 1",
         price: 2.7,
+        forSale: true,
         reviews:[]
       }
     ];
