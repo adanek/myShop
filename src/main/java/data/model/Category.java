@@ -1,9 +1,16 @@
 package data.model;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "Category")
@@ -13,6 +20,9 @@ public class Category {
 	@GeneratedValue
 	private int id;
 	private String name;
+	@OneToMany(mappedBy = "category")
+	@Cascade({ CascadeType.DELETE })
+	private Collection<Item> items = new LinkedList<>();
 	
 	public int getId() {
 		return id;
@@ -28,6 +38,14 @@ public class Category {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Collection<Item> getItems() {
+		return items;
+	}
+
+	public void setItems(Collection<Item> items) {
+		this.items = items;
 	}
 	
 }

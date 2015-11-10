@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -135,6 +136,42 @@ public class DataHandler {
 	}
 
 	/**
+	 * deletes an object from the database, when it is an entity
+	 * 
+	 * @param obj
+	 *            the object of an entity
+	 * @throws IllegalArgumentException
+	 *             deletion of object failed
+	 */
+	private void deleteObjectFromDb(Object obj) throws IllegalArgumentException {
+
+		Session session = openSession();
+
+		try {
+
+			// begin transaction
+			session.beginTransaction();
+
+			// save an object
+			session.delete(obj);
+
+			// commit
+			session.getTransaction().commit();
+
+		} catch (Exception e) {
+			// Exception -> rollback
+			session.getTransaction().rollback();
+
+			// deletion failed
+			System.out.println("deletion of object failed");
+			throw new IllegalArgumentException("deletion of object failed", e);
+		} finally {
+			// close session
+			session.close();
+		}
+	}
+	
+	/**
 	 * open a new Session
 	 * 
 	 * @return the session
@@ -218,7 +255,8 @@ public class DataHandler {
 		return item;
 
 	}
-
+	
+	//create item comment
 	public ItemComment createItemComment(String comment, int itemID, int author)
 			throws IllegalStateException, IllegalArgumentException {
 
@@ -263,6 +301,48 @@ public class DataHandler {
 		return itemComment;
 	}
 
+	//delete item comment
+	public void deleteComment(int commentID) throws IllegalArgumentException {
+		try {
+			// get comment
+			ItemComment comment = getItemCommentByID(commentID);
+			// delete comment from database
+			deleteObjectFromDb(comment);
+		} catch (IllegalArgumentException e) {
+			System.out.println("deletion or getting comment from ID failed");
+			throw new IllegalArgumentException(
+					"deletion or getting comment from ID failed", e);
+		}
+	}
+	
+	//delete item
+	public void deleteItem(int itemID) throws IllegalArgumentException {
+		try {
+			// get comment
+			Item item = getItemByID(itemID);
+			// delete item from database
+			deleteObjectFromDb(item);
+		} catch (IllegalArgumentException e) {
+			System.out.println("deletion or getting item from ID failed");
+			throw new IllegalArgumentException(
+					"deletion or getting item from ID failed", e);
+		}
+	}
+	
+	//delete category
+	public void deleteCategory(int categoryID) throws IllegalArgumentException {
+		try {
+			// get category
+			Category category = getCategoryByID(categoryID);
+			// delete category from database
+			deleteObjectFromDb(category);
+		} catch (IllegalArgumentException e) {
+			System.out.println("deletion or getting category from ID failed");
+			throw new IllegalArgumentException(
+					"deletion or getting category from ID failed", e);
+		}
+	}
+	
 	// get all categories
 	public Collection<Category> getAllCategories() throws IllegalStateException {
 
@@ -333,6 +413,94 @@ public class DataHandler {
 	//search for comment by ID
 	public ItemComment getItemCommentByID(int id) throws IllegalArgumentException {
 		return this.<ItemComment> searchForID(id, ItemComment.class);
+	}
+	
+	//get all comments from item
+	public Collection<ItemComment> getCommentsFromItem(int itemID)
+		throws IllegalArgumentException, IllegalStateException {
+		
+		Session session = openSession();	
+		
+		try {
+
+			// begin transaction
+			session.beginTransaction();
+
+			Criteria cr = session.createCriteria(Item.class);
+			cr.add(Restrictions.eq("id", itemID));
+			List<Item> results = cr.list();
+
+			if (results.size() == 0)
+				throw new IllegalArgumentException();
+			// item not found with this id
+
+			Collection<ItemComment> comments = results.get(0)
+					.getComments();
+
+			Collection<ItemComment> ret = new ArrayList<>(comments);
+
+			// commit
+			session.getTransaction().commit();
+
+			return ret;
+
+		} catch (IllegalArgumentException e) { // Exception -> rollback
+			session.getTransaction().rollback();
+			System.out.println("no item with this ID in the database");
+			throw new IllegalArgumentException(
+					"no item with this ID in the database");
+		} catch (Exception e) { // Exception -> rollback
+			session.getTransaction().rollback();
+			throw new IllegalStateException(
+					"something went wrong by getting the item comment list");
+		} finally { // close session
+			session.close();
+		}
+		
+	}
+	
+	//get all items from category
+	public Collection<Item> getItemsFromCategory(int categoryID)
+		throws IllegalArgumentException, IllegalStateException {
+		
+		Session session = openSession();	
+		
+		try {
+
+			// begin transaction
+			session.beginTransaction();
+
+			Criteria cr = session.createCriteria(Category.class);
+			cr.add(Restrictions.eq("id", categoryID));
+			List<Category> results = cr.list();
+
+			if (results.size() == 0)
+				throw new IllegalArgumentException();
+			// category not found with this id
+
+			Collection<Item> items = results.get(0)
+					.getItems();
+
+			Collection<Item> ret = new ArrayList<>(items);
+
+			// commit
+			session.getTransaction().commit();
+
+			return ret;
+
+		} catch (IllegalArgumentException e) { // Exception -> rollback
+			session.getTransaction().rollback();
+			System.out.println("no category with this ID in the database");
+			throw new IllegalArgumentException(
+					"no category with this ID in the database");
+		} catch (Exception e) { // Exception -> rollback
+			session.getTransaction().rollback();
+			throw new IllegalStateException(
+					"something went wrong by getting the item list");
+		} finally { // close session
+			session.close();
+		}
+		
 	}
 	
 	//select all data from table
