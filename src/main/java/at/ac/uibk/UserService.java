@@ -2,10 +2,13 @@ package at.ac.uibk;
 
 import java.util.Collection;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import data.handler.DataHandler;
@@ -23,8 +26,14 @@ public class UserService {
 	
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<SavedUser> getHello() {
-        
+    public Collection<SavedUser> getHello(@Context HttpServletRequest req) {
+
+    	HttpSession session = req.getSession(false);
+    	
+    	if(session == null){
+    		System.out.println("No session");
+    	}
+    	
     	return handler.getAllUsers();
     	
     }
