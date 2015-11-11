@@ -1,8 +1,10 @@
 package at.ac.uibk;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,13 +28,21 @@ public class UserService {
 	
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<SavedUser> getHello(@Context HttpServletRequest req) {
+    public Collection<SavedUser> getHello(@Context HttpServletRequest req, @Context HttpServletResponse response) {
 
-    	HttpSession session = req.getSession(false);
+    	HttpSession session = req.getSession(true);
     	
     	if(session == null){
-    		System.out.println("No session");
+    		try {
+    			System.out.println("No session");
+				response.sendError(401);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     	}
+    	
+    	session.setAttribute("User", "Pati");
     	
     	return handler.getAllUsers();
     	
@@ -52,4 +62,5 @@ public class UserService {
     public String test(){
         return "Servlet running!";
     }
+    
 }
