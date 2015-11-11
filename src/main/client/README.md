@@ -14,6 +14,8 @@ Running `grunt test` will run the unit tests with karma.
 
 API
 
+GET /api/users/{userId}             -> Get UserInfo()
+POST /api/users/login               -> 
 GET /api/categories                 -> List Category
 
 GET /api/items                      -> List Item 

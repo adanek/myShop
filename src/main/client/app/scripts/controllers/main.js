@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('myshopApp')
-  .controller('MainCtrl', function (Products) {
+  .controller('MainCtrl', function (Products, Users) {
 
 	this.product = {
 		name:	"Name"
@@ -10,7 +10,7 @@ angular.module('myshopApp')
 	var ctrl = this;
 	
 	this.addToCart=function(){
-		Products.put(this.product);
+		Users.login("Pati", "ABCDEF");
 	}
 	  
     this.products = [
