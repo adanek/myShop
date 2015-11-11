@@ -5,7 +5,7 @@
             login: function (username, password){
                 var cred = {
                     name: username,
-                    hash: password
+                    hash: Crypto.SHA1(password)
                 }
                 $http.post('api/users/login',cred);
             }
