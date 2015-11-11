@@ -16,6 +16,9 @@ API
 
 GET /api/users/{userId}             -> Get UserInfo()
 POST /api/users/login               -> 
+POST /api/users/register 	        -> register user
+GET /api/users/logout				-> logout user
+
 GET /api/categories                 -> List Category
 
 GET /api/items                      -> List Item 

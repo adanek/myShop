@@ -763,5 +763,51 @@ public class DataHandler {
 			session.close();
 		}
 	}
+	
+	//login user
+	public SavedUser getUserLogin(String alias, String password)
+			throws IllegalStateException {
+		Session session = openSession();
+	
+		try {
+
+			// begin transaction
+			session.beginTransaction();
+
+			//System.out.println("Transaction started");
+			
+			Criteria cr = session.createCriteria(SavedUser.class);
+			cr.add(Restrictions.eq("alias", alias));
+			List<SavedUser> results = cr.list();
+
+			// commit
+			session.getTransaction().commit();
+			
+			// only one element in the list because the id is unique
+			for (SavedUser user : results) {
+				try {
+					//System.out.println("PW check started");
+					if (PasswordHash.check(password, user.getPassword()))
+						//System.out.println("Return user");
+						return user;
+				} catch (Exception e) {
+					//System.out.println("PW check failed");
+					throw new IllegalStateException("Fail by checking the user password");
+				}
+			}
+			//System.out.println("no users found");
+		} catch (HibernateException e) {
+			// Exception -> rollback
+			//System.out.println("Error!!");
+			session.getTransaction().rollback();
+			throw new IllegalStateException(
+					"something went wrong by getting the user");
+		} finally {
+			// close session
+			session.close();
+		}
+		// no appropriate user found in database
+		return null;
+	}
 
 }
