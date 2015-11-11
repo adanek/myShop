@@ -1,0 +1,1 @@
+<div class="row marketing"> <div ng-repeat="product in main.products | orderBy: '-price'" class="product"> <h1>{{main.product.name}}</h1> <product-title></product-title> <product-panels></product-panels> <button class="btn btn-default" ng-show="product.forSale" ng-click="main.addToCart()">Add to chart</button> </div> </div>

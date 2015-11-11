@@ -105,9 +105,8 @@ public class UserService {
     	
     	try {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
-			
-			System.out.println("Name: " + uc.name);
-			System.out.println("Hash: " + uc.hash);
+	
+			//handler.loginUser();
 			
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
@@ -158,6 +157,8 @@ public class UserService {
     	
     	//destroy session
     	session.invalidate(); 	
+    	
+    	response.setHeader("Location", "/");
     }
     
     @POST
