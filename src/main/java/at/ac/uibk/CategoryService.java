@@ -83,20 +83,21 @@ public class CategoryService {
 
 		// Daten richtig gemapped...
 		if (cat == null) {
-			HTTPStatusService.sendError(500, response);
+			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
 		} else {
 
-			data.model.Category category = handler.createCategory(cat.name);
-
+			//data.model.Category category = handler.createCategory(cat.name);
+			data.model.Category category = new data.model.Category();
+			category.setId(cat.id);
+			category.setName(cat.name);
+			
 			if (category == null) {
-				HTTPStatusService.sendError(500, response);
+				HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
 			}
 
 			response.setHeader("Location", "api/categories/" + cat.id);
-			response.setStatus(201);
+			response.setStatus(response.SC_CREATED);
 		}
-
-		// return mapSingleCategory(handler.createCategory(cat.name));
 
 	}
 
@@ -115,7 +116,7 @@ public class CategoryService {
 
 			// Parameter müssen übereinstimmen
 			if (cat.id != category) {
-				HTTPStatusService.sendError(400, response);
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
 			}
 
 		} catch (JsonParseException e) {
@@ -131,11 +132,10 @@ public class CategoryService {
 
 		// Daten richtig gemapped...
 		if (cat == null) {
-			HTTPStatusService.sendError(500, response);
+			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
 		}
 
 		// dummy
-		cat.id = 3;
 		return cat;
 
 		// return mapSingleCategory(handler.changeCategory(category, cat.name));
@@ -152,7 +152,7 @@ public class CategoryService {
 		// delete category
 		//handler.deleteCategory(category);
 
-		response.setStatus(204);
+		response.setStatus(response.SC_NO_CONTENT);
 
 	}
 

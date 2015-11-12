@@ -30,8 +30,7 @@ POST	/api/items/new				-> create new item
 PUT		/api/items/{item}			-> change item
 DELETE 	/api/items/{item}			-> delete item
 
-GET /api/comments/product/{productId}   -> List Comment
-
+GET 	/api/comments/item/{itemID}   -> List Comment
 POST    /api/comments/new             
 GET     /api/comments/{commentID} -> Status 201 Location Header set
 PUT     /api/comments/{commentID} -> 

@@ -184,6 +184,7 @@ public class UserService {
 
 		ui.id = user.getId();
 		ui.alias = user.getAlias();
+		ui.userid = user.getId();
 
 		// fill user role
 		switch (user.getRole()) {
