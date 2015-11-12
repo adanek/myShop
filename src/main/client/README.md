@@ -19,17 +19,23 @@ POST /api/users/login               ->
 POST /api/users/register 	        -> register user
 GET /api/users/logout				-> logout user
 
-GET /api/categories                 -> List Category
+GET 	/api/categories             -> List Category
+POST	/api/categories/new			-> create new category
+PUT		/api/categories/{category}	-> change category
+DELETE	/api/categories/{category}	-> delete category
 
-GET /api/items                      -> List Item 
-GET /api/items/category/{category}          -> List Item in Category
+GET 	/api/items                      -> List Item 
+GET 	/api/items/category/{category}          -> List Item in Category
+POST	/api/items/new				-> create new item
+PUT		/api/items/{item}			-> change item
+DELETE 	/api/items/{item}			-> delete item
 
 GET /api/comments/product/{productId}   -> List Comment
 
-POST    /api/comments             
+POST    /api/comments/new             
 GET     /api/comments/{commentID} -> Status 201 Location Header set
-PUT     /api/comments/{productID} -> 
-DELETE  /api/comments/{productID} -> 
+PUT     /api/comments/{commentID} -> 
+DELETE  /api/comments/{commentID} -> 
 
 Category {
     id: int

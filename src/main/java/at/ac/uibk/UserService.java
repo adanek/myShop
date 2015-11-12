@@ -41,13 +41,7 @@ public class UserService {
 		HttpSession session = req.getSession(true);
 
 		if (session == null) {
-			try {
-				System.out.println("No session");
-				response.sendError(401);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			HTTPStatusService.sendError(401, response);
 		}
 
 		session.setAttribute("User", "Pati");
@@ -71,9 +65,9 @@ public class UserService {
 		user.setId(userid);
 		user.setAlias("Pati");
 		user.setRole(2);
-		
+
 		return mapUserDate(user);
-		
+
 	}
 
 	@GET
@@ -92,17 +86,17 @@ public class UserService {
 
 		ObjectMapper om = new ObjectMapper();
 		SavedUser user = null;
-		
+
 		try {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
-			//user = handler.getUserLogin(uc.name, uc.hash);
+			// user = handler.getUserLogin(uc.name, uc.hash);
 
 			user.setAlias(uc.name);
 			user.setId(3);
 			user.setPassword(uc.hash);
 			user.setRole(2);
-			
+
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,22 +108,17 @@ public class UserService {
 			e.printStackTrace();
 		}
 
-		if(user == null){
-			try {
-				response.sendError(401);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (user == null) {
+			HTTPStatusService.sendError(401, response);
 		}
-		
-		//create session
+
+		// create session
 		HttpSession session = request.getSession(true);
 
-		//write userid to session
+		// write userid to session
 		session.setAttribute("userid", user.getId());
 
-		//map data for output
+		// map data for output
 		return mapUserDate(user);
 
 	}
@@ -179,33 +168,28 @@ public class UserService {
 			e.printStackTrace();
 		}
 
-		//user create failed
+		// user create failed
 		if (user == null) {
-			try {
-				response.sendError(500);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			HTTPStatusService.sendError(500, response);
 		} else {
 			response.setHeader("Location", "api/users/login");
 			response.setStatus(201);
 		}
 	}
-	
-	private UserInfo mapUserDate(SavedUser user){
-		
+
+	private UserInfo mapUserDate(SavedUser user) {
+
 		UserInfo ui = new UserInfo();
 		UserRights ur = new UserRights();
 
 		ui.id = user.getId();
 		ui.alias = user.getAlias();
-		
-		//fill user role
-		switch(user.getRole()){
+
+		// fill user role
+		switch (user.getRole()) {
 		case 1:
 			ui.role = "admin";
-			
+
 			ur.canCreateCategory = true;
 			ur.canCreateItem = true;
 			ur.canCreateComment = true;
@@ -228,9 +212,9 @@ public class UserService {
 			ur.canCreateComment = true;
 			break;
 		}
-		
+
 		ui.rights = ur;
-		
+
 		return ui;
 	}
 
