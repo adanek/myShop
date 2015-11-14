@@ -11,7 +11,8 @@
 angular
   .module('myshopApp', [
     'ngResource',
-    'ngRoute'
+    'ngRoute',
+    'ui.bootstrap.showErrors'
   ])
   .config(function ($routeProvider) {
     $routeProvider
