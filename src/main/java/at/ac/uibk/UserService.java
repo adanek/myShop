@@ -91,6 +91,7 @@ public class UserService {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
 			// user = handler.getUserLogin(uc.name, uc.hash);
+			user = new SavedUser();
 
 			user.setAlias(uc.name);
 			user.setId(3);

@@ -81,17 +81,3 @@ body {
     border-bottom: 0;
   }
 }
-
-.ng-invalid.ng-dirty {
-  border-color: #FA787E;
-}
-
-.ng-valid.ng-dirty {
-  border-color: #78FA89;
-}
-
-.product {
-  margin-bottom: 5em;
-  border-bottom: 1px solid darkgray;
-  padding-bottom: 1em;
-}
