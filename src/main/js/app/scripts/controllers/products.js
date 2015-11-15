@@ -6,6 +6,7 @@
 
     $scope.caption = "Das könnte Ihnen gefallen:";
     $scope.userCanCreateProduct = User.canCreateProduct();
+    $scope.userCanCreateComment = User.canCreateComment();
 
     if(User.isAuthenticated()){
       if(User.isAdmin()){

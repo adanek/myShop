@@ -22,6 +22,14 @@
       return user.rights.canCreateItem;
     }
 
+    srv.canCreateComment = function(){
+      return user.rights.canCreateComment;
+    };
+
+    srv.canEditComment= function(comment){
+      return comment.author === user.alias || user.role === 'admin';
+    };
+
     srv.setAuthenticated = function (newValue) {
 
       if ($rootScope.$root.$$phase != '$apply' && $rootScope.$root.$$phase != '$digest') {
