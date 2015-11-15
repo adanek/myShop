@@ -124,8 +124,8 @@ public class UserService {
 
 	}
 
-	@GET
-	@Path("/login")
+	@POST
+	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void logout(@Context HttpServletRequest request, @Context HttpServletResponse response) {
 

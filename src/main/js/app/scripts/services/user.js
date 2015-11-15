@@ -6,6 +6,7 @@
 
     var srv = this;
     var authenticated = false;
+    var user= {};
 
     srv.isAuthenticated = function () {
       return authenticated;
@@ -23,12 +24,36 @@
       }
     }
 
+    srv.getUsername = function(){
+      console.log('getUsername called: ' + user);
+      return user.alias == undefined ? '': user.alias;
+    }
+
     srv.login = function (username, password) {
-      return $http.post('api/users/login', {name: username, hash: password});
+      return $http.post('api/users/login', {name: username, hash: password}).then(
+        function successCallback(response){
+          user = response.data;
+          srv.setAuthenticated(true);
+
+          $rootScope.$broadcast('user-login');
+          return response;
+        },
+        function errorCallback(response){
+          return response;
+        });
     }
 
     srv.logout = function(){
-      return $http.get('api/users/logout');
+      return $http.post('api/users/logout').then(
+        function successCallback(response){
+          srv.setAuthenticated(false);
+          user = {};
+
+          return response;
+        },
+        function errorCallback(response){
+          return response;
+        });
     };
 
     return srv;

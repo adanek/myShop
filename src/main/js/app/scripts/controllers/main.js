@@ -1,10 +1,11 @@
 'use strict';
 
 (function(app){
-  app.controller('MainCtrl', ['$scope', 'User', function ($scope, User) {
+  app.controller('MainCtrl', ['$scope', '$rootScope', 'User', function ($scope, $rootScope, User) {
 
     $scope.title = "Home"
     $scope.authenticated = User.isAuthenticated();
+    $scope.username = User.getUsername();
 
     $scope.$watch(function () {
       return User.isAuthenticated();
@@ -12,11 +13,12 @@
       $scope.authenticated = newVal;
     });
 
+    $rootScope.$on('user-login', function(){
+      $scope.username = User.getUsername();
+    });
 
     $scope.logout = function(){
-      User.logout().then(function success(){
-        User.setAuthenticated(false);
-      });
+      User.logout();
     };
 
   }]);

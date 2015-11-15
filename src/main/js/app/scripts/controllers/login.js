@@ -16,7 +16,7 @@
 
           User.login($scope.username, $scope.password).then(
             function success(){
-              User.setAuthenticated(true);
+              //User.setAuthenticated(true);
               $location.path("/").replace();
             },
             function error(){
