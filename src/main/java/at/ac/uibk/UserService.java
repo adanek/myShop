@@ -96,7 +96,7 @@ public class UserService {
 			user.setAlias(uc.name);
 			user.setId(3);
 			user.setPassword(uc.hash);
-			user.setRole(2);
+			user.setRole(1);
 
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block

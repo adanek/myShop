@@ -2,15 +2,25 @@
 
 (function (app) {
 
-  app.factory('User', ['$http', '$rootScope', '$q', function UserFactory($http, $rootScope, $q) {
+  app.factory('User', ['$http', '$rootScope', '$q', '$location', function UserFactory($http, $rootScope, $q, $location) {
 
     var srv = this;
     var authenticated = false;
-    var user= {alias: "Tom Riddle", id: 999};
+    var user= {alias: "Tom Riddle", id: 999, rights: {
+      canCreateItem: false
+    }};
 
     srv.isAuthenticated = function () {
       return authenticated;
     };
+
+    srv.isAdmin = function (){
+      return user.role === 'admin';
+    };
+
+    srv.canCreateProduct = function (){
+      return user.rights.canCreateItem;
+    }
 
     srv.setAuthenticated = function (newValue) {
 
@@ -53,7 +63,7 @@
         function successCallback(response){
           srv.setAuthenticated(false);
           user = {};
-
+          $location.path('/#').replace();
           return response;
         },
         function errorCallback(response){

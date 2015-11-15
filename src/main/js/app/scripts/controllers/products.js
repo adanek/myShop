@@ -2,16 +2,25 @@
 
 (function (app) {
 
-  app.controller('ProductsCtrl', ['$scope', 'Products', function ($scope, Products) {
+  app.controller('ProductsCtrl', ['$scope', 'Products', 'User', function ($scope, Products, User) {
 
     $scope.caption = "Das könnte Ihnen gefallen:";
+    $scope.userCanCreateProduct = User.canCreateProduct();
+
+    if(User.isAuthenticated()){
+      if(User.isAdmin()){
+        $scope.adminMode = true;
+      }
+    }
+
+
     var srv = this;
 
     // Demo Daten
     $scope.products = [
       {
         "id": 1,
-        "title": "Adidas Boost",
+        "title": "Demo Adidas Boost",
         "category": "Sport",
         "categoryID": 1,
         "description": "Sportschuh",
@@ -22,7 +31,7 @@
       },
       {
         "id": 2,
-        "title": "Lenovo Thinkpad",
+        "title": "Demo Lenovo Thinkpad",
         "category": "IT",
         "categoryID": 2,
         "description": "Laptop",
@@ -30,7 +39,29 @@
         "changeDate": 1447584696796,
         "author": "Pati",
         "authorID": 3
-      }];
+      }, {
+        "id": 1,
+        "title": "Demo Adidas Boost",
+        "category": "Sport",
+        "categoryID": 1,
+        "description": "Sportschuh",
+        "creationDate": 1447584696796,
+        "changeDate": 1447584696796,
+        "author": "Pati",
+        "authorID": 3
+      },
+      {
+        "id": 2,
+        "title": "Demo Lenovo Thinkpad",
+        "category": "IT",
+        "categoryID": 2,
+        "description": "Laptop",
+        "creationDate": 1447584696796,
+        "changeDate": 1447584696796,
+        "author": "Pati",
+        "authorID": 3
+      }
+    ];
 
     Products.query().then(
       function successCallback(response) {

@@ -1,0 +1,59 @@
+<section>
+  <header>{{ caption }}</header>
+  <form name="productForm" novalidate ng-submit="save()">
+
+    <div class="form-group" show-errors>
+      <label for="product-title">Titel:</label>
+      <input type="text" name="product-title" id="product-title" class="form-control"
+             ng-model="product.title" required>
+      <div class="help-block">Titel ist erforderlich</div>
+    </div>
+
+    <div class="form-group" show-errors>
+      <label for="product-category">Kategorie:</label>
+      <select name="product-category" id="product-category" ng-options="category.name for category in categories"
+              ng-model="category"
+              class="form-control"
+              required></select>
+      <div class="help-block">Kategorie ist erforderlich</div>
+    </div>
+
+    <div class="form-group" show-errors>
+      <label for="product-description">Beschreibung:</label>
+      <textarea ng-model="product.description" name="product-description" id="product-description" rows="10" class="form-control" required></textarea>
+      <div class="help-block">Beschreibung ist erforderlich</div>
+    </div>
+
+    <div class="form-group">
+      <input type="submit" vlaue="Speichern" class="form-control">
+    </div>
+  </form>
+
+  <h4>Vorschau</h4>
+  <section class="product">
+
+    <header>{{ product.title }}</header>
+
+    <section class="product-details" ng-controller="PanelCtrl as panel">
+
+      <ul class="nav nav-pills">
+        <li ng-class="{active:panel.isSelected(1)}"><a href ng-click="panel.selectTab(1)">Description</a></li>
+        <li ng-class="{active:panel.isSelected(2)}"><a href ng-click="panel.selectTab(2)">Reviews</a></li>
+      </ul>
+
+      <section class="product-description" ng-show="panel.isSelected(1)">
+        <p>{{ product.description }}</p>
+      </section>
+
+
+      <section class="product-comments" ng-show="panel.isSelected(2)"
+               ng-controller="CommentCtrl as commentCtrl">
+        </section>
+
+      </section>
+
+      <hr>
+    </section>
+
+  </section>
+</section>

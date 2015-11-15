@@ -41,7 +41,25 @@ angular
         templateUrl: 'views/pages/products.html',
         controller: 'ProductsCtrl'
       })
+      .when('/categories', {
+        templateUrl: 'views/pages/categories.html',
+        controller: 'CategoriesCtrl'
+      })
+      .when('/products/new', {
+        templateUrl: 'views/pages/product-edit.html',
+        controller: 'ProductNewCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
   });
+
+//
+//Categories.query().then(
+//  function successCallback(response){
+//
+//  },
+//  function errorCallback(response){
+//
+//  }
+//)

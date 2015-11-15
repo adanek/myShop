@@ -1,10 +1,7 @@
 package at.ac.uibk;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +59,7 @@ public class CategoryService {
 	@Path("/new")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void createCategory(String catString, @Context HttpServletRequest req,
+	public core.Category createCategory(String catString, @Context HttpServletRequest req,
 			@Context HttpServletResponse response) {
 
 		ObjectMapper om = new ObjectMapper();
@@ -97,7 +94,14 @@ public class CategoryService {
 
 			response.setHeader("Location", "api/categories/" + cat.id);
 			response.setStatus(response.SC_CREATED);
+
+			//TODO: Return  category object
+			cat.id = 42;
+
+			return cat;
 		}
+
+        return null;
 
 	}
 
@@ -114,7 +118,7 @@ public class CategoryService {
 		try {
 			cat = om.readValue(catString, Category.class);
 
-			// Parameter müssen übereinstimmen
+			// Parameter mï¿½ssen ï¿½bereinstimmen
 			if (cat.id != category) {
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
 			}
@@ -179,7 +183,7 @@ public class CategoryService {
 			cats.add(mapSingleCategory(it.next()));
 		}
 
-		// Katzen zurückgeben
+		// Katzen zurï¿½ckgeben
 		return cats;
 
 	}
