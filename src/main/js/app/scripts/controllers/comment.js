@@ -10,6 +10,10 @@
 
     $scope.userCanCreateComment = User.canCreateComment();
 
+    $scope.userCanEditComment = function (comment) {
+      return User.canEditComment(comment);
+    }
+
     $scope.comments = [];
     Comments.formProduct($scope.product.id).then(
       function successCallback(response) {
@@ -38,7 +42,25 @@
       "authorID": 4
     }];
 
+    srv.deleteComment = function (comment) {
+      var ndx = $scope.comments.indexOf(comment);
 
+      if (ndx > -1) {
+        Comments.remove(comment).then(
+          function successCallback() {
+            $scope.comments.splice(ndx, 1);
+          },
+          function successCallback() {
+          }
+        );
+      }
+    };
+
+    srv.editComment = function (comment) {
+      $scope.comment = comment;
+
+      srv.formVisible = true;
+    };
 
     srv.showForm = function () {
       $scope.comment.author = User.getUsername();
@@ -49,21 +71,36 @@
       srv.formVisible = true;
     };
 
-    srv.addComment = function () {
+    srv.saveComment = function () {
 
       $scope.$broadcast('show-errors-check-validity');
 
       if ($scope.commentForm.$valid) {
 
-        Comments.save($scope.comment).then(
-          function successCallback(response) {
-            $scope.comments.push($scope.comment);
-            srv.formVisible = false;
-          },
-          function error(response) {
-            console.log("Fail to save comment: " + response.status);
-          }
-        );
+        if ($scope.comment.commentId) {
+
+          // Update existing comment
+          Comments.update($scope.comment).then(
+            function successCallback(response) {
+              srv.formVisible = false;
+            },
+            function error(response) {
+              console.log("Fail to save comment: " + response.status);
+            }
+          );
+        } else {
+
+          // Create new comment
+          Comments.save($scope.comment).then(
+            function successCallback(response) {
+              $scope.comments.push($scope.comment);
+              srv.formVisible = false;
+            },
+            function error(response) {
+              console.log("Fail to save comment: " + response.status);
+            }
+          );
+        }
       }
     };
 

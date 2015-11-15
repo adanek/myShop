@@ -28,196 +28,202 @@ import data.model.SavedUser;
 @Path("/users")
 public class UserService {
 
-	private DataHandler handler;
+    private DataHandler handler;
 
-	public UserService() {
-		// handler = new DataHandler();
-	}
+    public UserService() {
+        // handler = new DataHandler();
+    }
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Collection<SavedUser> getUsers(@Context HttpServletRequest req, @Context HttpServletResponse response) {
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<SavedUser> getUsers(@Context HttpServletRequest req, @Context HttpServletResponse response) {
 
-		HttpSession session = req.getSession(true);
+        HttpSession session = req.getSession(true);
 
-		if (session == null) {
-			HTTPStatusService.sendError(401, response);
-		}
+        if (session == null) {
+            HTTPStatusService.sendError(401, response);
+        }
 
-		session.setAttribute("User", "Pati");
+        session.setAttribute("User", "Pati");
 
-		return handler.getAllUsers();
+        return handler.getAllUsers();
 
-	}
+    }
 
-	@GET
-	@Path("/{userid}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public UserInfo getUser(@PathParam("userid") int userid, @Context HttpServletRequest request,
-			@Context HttpServletResponse response) {
+    @GET
+    @Path("/{userid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public UserInfo getUser(@PathParam("userid") int userid, @Context HttpServletRequest request,
+                            @Context HttpServletResponse response) {
 
-		// check user rights
-		AuthenticationService.checkGetUserInfo(request, response, userid);
+        // check user rights
+        AuthenticationService.checkGetUserInfo(request, response, userid);
 
-		// SavedUser user = handler.getUserByID(userid);
-		SavedUser user = new SavedUser();
+        // SavedUser user = handler.getUserByID(userid);
+        SavedUser user = new SavedUser();
 
-		user.setId(userid);
-		user.setAlias("Pati");
-		user.setRole(2);
+        user.setId(userid);
+        user.setAlias("Pati");
+        user.setRole(2);
 
-		return mapUserDate(user);
+        return mapUserDate(user);
 
-	}
+    }
 
-	@GET
-	@Path("/test")
-	@Produces("text/plain")
-	public String test() {
-		return "Servlet running!";
-	}
+    @GET
+    @Path("/test")
+    @Produces("text/plain")
+    public String test() {
+        return "Servlet running!";
+    }
 
-	@POST
-	@Path("/login")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public UserInfo login(String credstring, @Context HttpServletRequest request,
-			@Context HttpServletResponse response) {
+    @POST
+    @Path("/login")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public UserInfo login(String credstring, @Context HttpServletRequest request,
+                          @Context HttpServletResponse response) {
 
-		ObjectMapper om = new ObjectMapper();
-		SavedUser user = null;
+        ObjectMapper om = new ObjectMapper();
+        SavedUser user = null;
 
-		try {
-			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
+        try {
+            UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
-			// user = handler.getUserLogin(uc.name, uc.hash);
-			user = new SavedUser();
+            // user = handler.getUserLogin(uc.name, uc.hash);
+            user = new SavedUser();
 
-			user.setAlias(uc.name);
-			user.setId(3);
-			user.setPassword(uc.hash);
-			user.setRole(1);
+            user.setAlias(uc.name);
 
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            if (uc.name.equals("Pati")) {
+                user.setRole(1);
+            } else {
+                user.setRole(2);
+            }
+            user.setId(3);
+            user.setPassword(uc.hash);
 
-		if (user == null) {
-			HTTPStatusService.sendError(401, response);
-		}
 
-		// create session
-		HttpSession session = request.getSession(true);
+        } catch (JsonParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-		// write userid to session
-		session.setAttribute("userid", user.getId());
+        if (user == null) {
+            HTTPStatusService.sendError(401, response);
+        }
 
-		// map data for output
-		return mapUserDate(user);
+        // create session
+        HttpSession session = request.getSession(true);
 
-	}
+        // write userid to session
+        session.setAttribute("userid", user.getId());
 
-	@POST
-	@Path("/logout")
-	@Produces(MediaType.APPLICATION_JSON)
-	public void logout(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+        // map data for output
+        return mapUserDate(user);
 
-		HttpSession session = request.getSession(false);
+    }
 
-		// destroy session
-		session.invalidate();
+    @POST
+    @Path("/logout")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void logout(@Context HttpServletRequest request, @Context HttpServletResponse response) {
 
-		response.setHeader("Location", "/");
-	}
+        HttpSession session = request.getSession(false);
 
-	@POST
-	@Path("/register")
-	@Produces(MediaType.APPLICATION_JSON)
-	public void register(String credstring, @Context HttpServletRequest request,
-			@Context HttpServletResponse response) {
+        // destroy session
+        session.invalidate();
 
-		ObjectMapper om = new ObjectMapper();
-		SavedUser user = null;
+        response.setHeader("Location", "/");
+    }
 
-		try {
-			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
+    @POST
+    @Path("/register")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void register(String credstring, @Context HttpServletRequest request,
+                         @Context HttpServletResponse response) {
 
-			// create user
-			// user = handler.createUser(uc.name, uc.hash, 2); //to-do
+        ObjectMapper om = new ObjectMapper();
+        SavedUser user = null;
 
-			user = new SavedUser();
+        try {
+            UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
-			user.setId(17);
-			user.setAlias("Pati");
-			user.setRole(2);
+            // create user
+            // user = handler.createUser(uc.name, uc.hash, 2); //to-do
 
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            user = new SavedUser();
 
-		// user create failed
-		if (user == null) {
-			HTTPStatusService.sendError(500, response);
-		} else {
-			//response.setHeader("Location", "api/users/login");
-			response.setStatus(201);
-		}
-	}
+            user.setId(17);
+            user.setAlias("Pati");
+            user.setRole(2);
 
-	private UserInfo mapUserDate(SavedUser user) {
+        } catch (JsonParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-		UserInfo ui = new UserInfo();
-		UserRights ur = new UserRights();
+        // user create failed
+        if (user == null) {
+            HTTPStatusService.sendError(500, response);
+        } else {
+            //response.setHeader("Location", "api/users/login");
+            response.setStatus(201);
+        }
+    }
 
-		ui.id = user.getId();
-		ui.alias = user.getAlias();
-		ui.userid = user.getId();
+    private UserInfo mapUserDate(SavedUser user) {
 
-		// fill user role
-		switch (user.getRole()) {
-		case 1:
-			ui.role = "admin";
+        UserInfo ui = new UserInfo();
+        UserRights ur = new UserRights();
 
-			ur.canCreateCategory = true;
-			ur.canCreateItem = true;
-			ur.canCreateComment = true;
-			ur.canDeleteCategory = true;
-			ur.canDeleteItem = true;
-			ur.canDeleteComment = true;
-			ur.canEditCategory = true;
-			ur.canEditItem = true;
-			ur.canEditComment = true;
-			break;
-		case 2:
-			ui.role = "author";
-			ur.canCreateItem = true;
-			ur.canCreateComment = true;
-			ur.canEditItem = true;
-			ur.canEditComment = true;
-			break;
-		case 3:
-			ui.role = "guest";
-			ur.canCreateComment = true;
-			break;
-		}
+        ui.id = user.getId();
+        ui.alias = user.getAlias();
+        ui.userid = user.getId();
 
-		ui.rights = ur;
+        // fill user role
+        switch (user.getRole()) {
+            case 1:
+                ui.role = "admin";
 
-		return ui;
-	}
+                ur.canCreateCategory = true;
+                ur.canCreateItem = true;
+                ur.canCreateComment = true;
+                ur.canDeleteCategory = true;
+                ur.canDeleteItem = true;
+                ur.canDeleteComment = true;
+                ur.canEditCategory = true;
+                ur.canEditItem = true;
+                ur.canEditComment = true;
+                break;
+            case 2:
+                ui.role = "author";
+                ur.canCreateItem = true;
+                ur.canCreateComment = true;
+                ur.canEditItem = true;
+                ur.canEditComment = true;
+                break;
+            case 3:
+                ui.role = "guest";
+                ur.canCreateComment = true;
+                break;
+        }
+
+        ui.rights = ur;
+
+        return ui;
+    }
 
 }

@@ -9,6 +9,14 @@
 
       save: function(comment){
         return $http.post('api/comments/new', comment);
+      },
+
+      update: function (comment){
+        return $http.put('api/comments/'+ comment.commentId, comment);
+      },
+
+      remove: function(comment){
+        return $http.delete('api/comments/'+ comment.commentId, comment);
       }
     };
   }]);

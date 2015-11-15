@@ -8,10 +8,12 @@
     var authenticated = false;
     var user = {
       alias: "Tom Riddle",
+      //alias: "Andi",
       id: 999,
+      role: 'guest',
       rights: {
         canCreateItem: false,
-        canCreateComment: true
+        canCreateComment: false
       }
     };
 
@@ -49,6 +51,10 @@
 
     srv.getUsername = function () {
       return user.alias == undefined ? '' : user.alias;
+    }
+
+    srv.getUserRole = function(){
+      return user.role;
     }
 
     srv.getID = function () {

@@ -43,7 +43,13 @@
           <section class="comment-list">
             <blockquote ng-repeat="comment in comments">
               {{ comment.content }}
-              <footer>{{ comment.author }} am {{ comment.creationDate | date : 'dd. MMMM yyyy'}}</footer>
+              <footer>
+                <span>{{ comment.author }} am {{ comment.creationDate | date : 'dd. MMMM yyyy'}}</span>
+                <span ng-show="userCanEditComment(comment)" class="pull-right">
+                  <a ng-click="commentCtrl.editComment(comment)"><span class="glyphicon glyphicon-edit"></span></a>
+                  <a ng-click="commentCtrl.deleteComment(comment)"><span class="glyphicon glyphicon-trash"></span></a>
+                </span>
+              </footer>
             </blockquote>
           </section>
 
@@ -54,7 +60,7 @@
               Kommentar hinterlassen
             </button>
 
-            <form name="commentForm" novalidate ng-show="commentCtrl.formVisible" ng-submit="commentCtrl.addComment()">
+            <form name="commentForm" novalidate ng-show="commentCtrl.formVisible" ng-submit="commentCtrl.saveComment()">
 
               <div class="form-group" show-errors>
                 <label for="comment">Kommentar:</label>

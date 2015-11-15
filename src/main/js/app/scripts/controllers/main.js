@@ -6,6 +6,7 @@
     $scope.title = "Home"
     $scope.authenticated = User.isAuthenticated();
     $scope.username = User.getUsername();
+    $scope.role = User.getUserRole();
 
     $scope.$watch(function () {
       return User.isAuthenticated();
@@ -15,6 +16,7 @@
 
     $rootScope.$on('user-login', function(){
       $scope.username = User.getUsername();
+      $scope.role = User.getUserRole();
     });
 
     $scope.logout = function(){
