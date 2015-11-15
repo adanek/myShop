@@ -8,12 +8,15 @@
     $scope.userCanCreateProduct = User.canCreateProduct();
     $scope.userCanCreateComment = User.canCreateComment();
 
-    if(User.isAuthenticated()){
-      if(User.isAdmin()){
+    if (User.isAuthenticated()) {
+      if (User.isAdmin()) {
         $scope.adminMode = true;
       }
     }
 
+    $scope.userCanEditProduct = function (product) {
+      return User.canEditProduct(product);
+    }
 
     var srv = this;
 
@@ -38,10 +41,10 @@
         "description": "Laptop",
         "creationDate": 1447584696796,
         "changeDate": 1447584696796,
-        "author": "Pati",
+        "author": "Andi",
         "authorID": 3
       }, {
-        "id": 1,
+        "id": 3,
         "title": "Demo Adidas Boost",
         "category": "Sport",
         "categoryID": 1,
@@ -52,14 +55,14 @@
         "authorID": 3
       },
       {
-        "id": 2,
+        "id": 4,
         "title": "Demo Lenovo Thinkpad",
         "category": "IT",
         "categoryID": 2,
         "description": "Laptop",
         "creationDate": 1447584696796,
         "changeDate": 1447584696796,
-        "author": "Pati",
+        "author": "Andi",
         "authorID": 3
       }
     ];
@@ -100,6 +103,22 @@
       }
     });
 
+    $scope.removeProduct = function(product){
+      var ndx = $scope.products.indexOf(product);
+
+      if(ndx > -1){
+        Products.delete(product).then(
+          function successCallback(){
+            $scope.products.splice(ndx, 1);
+          },
+          function errorCallback(){
+
+          }
+        );
+
+      }
+
+    };
 
   }]);
 

@@ -84,6 +84,31 @@ public class ItemService {
 	}
 
 	@GET
+	@Path("/{itemId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public core.Item getItemById(@PathParam("itemId") int itemId){
+
+		data.model.Category cat = new data.model.Category();
+		cat.setId(1);
+		cat.setName("Sport");
+
+		SavedUser author = new SavedUser();
+		author.setId(3);
+		author.setAlias("Pati");
+
+		data.model.Item item = new data.model.Item();
+		item.setId(itemId);
+		item.setCategory(cat);
+		item.setCreationDate(new Date());
+		item.setChangeDate(new Date());
+		item.setAuthor(author);
+		item.setDescription("Sportschuh");
+		item.setTitle("Adidas Boost");
+
+		return mapSingleItem(item);
+	}
+
+	@GET
 	@Path("/category/{category}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Item> getItemsFromCategory(@PathParam("category") int category) {

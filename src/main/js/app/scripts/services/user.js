@@ -7,8 +7,8 @@
     var srv = this;
     var authenticated = false;
     var user = {
-      alias: "Tom Riddle",
-      //alias: "Andi",
+      //alias: "Tom Riddle",
+      alias: "Andi",
       id: 999,
       role: 'guest',
       rights: {
@@ -27,6 +27,10 @@
 
     srv.canCreateProduct = function () {
       return user.rights.canCreateItem;
+    }
+
+    srv.canEditProduct = function (product) {
+      return product.author === user.alias || user.role === 'admin';
     }
 
     srv.canCreateComment = function () {
