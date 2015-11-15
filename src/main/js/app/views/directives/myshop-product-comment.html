@@ -1,0 +1,13 @@
+<blockquote>
+
+  <span>{{ comment.content }}</span>
+
+  <footer>
+    <span>{{ comment.author }} am {{ comment.creationDate | date : 'dd. MMMM yyyy'}}</span>
+    <span ng-show="userCanEditComment(comment)" class="pull-right">
+      <a ng-click="commentCtrl.editComment(comment)"><span class="glyphicon glyphicon-edit"></span></a>
+      <a ng-click="commentCtrl.deleteComment(comment)"><span class="glyphicon glyphicon-trash"></span></a>
+    </span>
+  </footer>
+
+</blockquote>

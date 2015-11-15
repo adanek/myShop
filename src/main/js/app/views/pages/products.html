@@ -26,68 +26,16 @@
 
       <header>{{ product.title }}</header>
 
-      <section class="product-details" ng-controller="PanelCtrl as panel">
+      <myshop-product-details></myshop-product-details>
 
-        <ul class="nav nav-pills">
-          <li ng-class="{active:panel.isSelected(1)}"><a href ng-click="panel.selectTab(1)">Description</a></li>
-          <li ng-class="{active:panel.isSelected(2)}"><a href ng-click="panel.selectTab(2)">Reviews</a></li>
-        </ul>
-
-        <section class="product-description" ng-show="panel.isSelected(1)">
-          <p>{{ product.description }}</p>
-        </section>
-
-        <section class="product-comments" ng-show="panel.isSelected(2)"
-                 ng-controller="CommentCtrl as commentCtrl">
-
-          <section class="comment-list">
-            <blockquote ng-repeat="comment in comments">
-              {{ comment.content }}
-              <footer>
-                <span>{{ comment.author }} am {{ comment.creationDate | date : 'dd. MMMM yyyy'}}</span>
-                <span ng-show="userCanEditComment(comment)" class="pull-right">
-                  <a ng-click="commentCtrl.editComment(comment)"><span class="glyphicon glyphicon-edit"></span></a>
-                  <a ng-click="commentCtrl.deleteComment(comment)"><span class="glyphicon glyphicon-trash"></span></a>
-                </span>
-              </footer>
-            </blockquote>
-          </section>
-
-          <section class="comment-creation" ng-show="userCanCreateComment">
-            <button ng-class="{hidden:commentCtrl.formVisible}"
-                    class="btn btn-default"
-                    ng-click="commentCtrl.showForm()">
-              Kommentar hinterlassen
-            </button>
-
-            <form name="commentForm" novalidate ng-show="commentCtrl.formVisible" ng-submit="commentCtrl.saveComment()">
-
-              <div class="form-group" show-errors>
-                <label for="comment">Kommentar:</label>
-              <textarea class="form-control" id="comment" name="comment" ng-model="comment.content"
-                        placeholder="Schreib hier deinen Kommentar hin und drücke dannach auf Speichern"
-                        required></textarea>
-
-                <div class="help-block">Kommentar ist notwendig</div>
-              </div>
-
-              <div class="form-group">
-                <input type="submit" value="Speichern" class="form-control">
-              </div>
-            </form>
-          </section>
-
-        </section>
-
-        <footer>
-          <a class="btn btn-info"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-shopping-cart"></span></a>
+      <footer>
+        <a class="btn btn-info"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-shopping-cart"></span></a>
           <span class="pull-right" ng-show="userCanEditProduct(product)">
             <a ng-href="#/products/{{product.id}}/edit" class="btn btn-warning"><span class="glyphicon glyphicon-edit"></span></a>
             <a ng-click="removeProduct(product)" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
           </span>
-        </footer>
-        <hr>
-      </section>
+      </footer>
+      <hr>
 
     </section>
   </section>
