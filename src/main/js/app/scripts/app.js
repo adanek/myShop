@@ -14,6 +14,8 @@ angular
     'ngRoute',
     'ui.bootstrap.showErrors'
   ])
+
+
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
@@ -29,6 +31,11 @@ angular
       .when('/login', {
         templateUrl: 'views/pages/login.html',
         controller: 'LoginCtrl'
+      })
+      .when('/register', {
+        templateUrl: 'views/pages/register.html',
+        controller: 'RegisterCtrl',
+        controllerAs: 'register'
       })
       .otherwise({
         redirectTo: '/'

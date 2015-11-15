@@ -138,7 +138,7 @@ public class UserService {
 	}
 
 	@POST
-	@Path("/new")
+	@Path("/register")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void register(String credstring, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
@@ -173,7 +173,7 @@ public class UserService {
 		if (user == null) {
 			HTTPStatusService.sendError(500, response);
 		} else {
-			response.setHeader("Location", "api/users/login");
+			//response.setHeader("Location", "api/users/login");
 			response.setStatus(201);
 		}
 	}

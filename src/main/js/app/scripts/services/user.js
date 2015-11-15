@@ -2,7 +2,7 @@
 
 (function (app) {
 
-  app.factory('User', ['$http', '$rootScope', function UserFactory($http, $rootScope) {
+  app.factory('User', ['$http', '$rootScope', '$q', function UserFactory($http, $rootScope, $q) {
 
     var srv = this;
     var authenticated = false;
@@ -25,12 +25,13 @@
     }
 
     srv.getUsername = function(){
-      console.log('getUsername called: ' + user);
       return user.alias == undefined ? '': user.alias;
     }
 
     srv.login = function (username, password) {
-      return $http.post('api/users/login', {name: username, hash: password}).then(
+
+      var hash = CryptoJS.SHA1(password).toString(CryptoJS.enc.Base64);
+      return $http.post('api/users/login', {name: username, hash: hash}).then(
         function successCallback(response){
           user = response.data;
           srv.setAuthenticated(true);
@@ -52,8 +53,28 @@
           return response;
         },
         function errorCallback(response){
-          return response;
+          return $q.reject(response);
         });
+    };
+
+    /**
+     * Registers a new user on the server
+     * @param name the name of the user
+     * @param password the password of the user in cleartext
+       * @returns Promise<User>
+       */
+    srv.register = function(name, password){
+      var hash = CryptoJS.SHA1(password).toString(CryptoJS.enc.Base64);
+
+      return $http.post('api/users/register', {name: name, hash: hash}).then(
+        function successCallback(response){
+          return response;
+        },
+        function errorCallback(response){
+          console.log("Something went wrong");
+          return $q.reject(response);
+        }
+      );
     };
 
     return srv;
