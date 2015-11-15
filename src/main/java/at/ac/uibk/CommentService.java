@@ -61,26 +61,29 @@ public class CommentService {
 
         List<Comment> coms = new ArrayList<Comment>();
 
-        Comment com1 = new Comment();
-        com1.commentId = 1;
-        com1.itemId = itemID;
-        com1.content = "erster kommentar";
-        com1.author = "Pati";
-        com1.authorID = 3;
-        coms.add(com1);
-
-        Comment com2 = new Comment();
-        com2.commentId = 2;
-        com2.itemId = itemID;
-        com2.content = "zweiter kommentar";
-        com2.author = "Andi";
-        com2.authorID = 4;
-        coms.add(com2);
+        if(itemID == 1){
+            Comment com1 = new Comment();
+            com1.commentId = 1;
+            com1.itemId = itemID;
+            com1.content = "Sport Kommentar";
+            com1.author = "Pati";
+            com1.authorID = 3;
+            com1.creationDate = new Date().getTime();
+            coms.add(com1);
+        } else {
+            Comment com2 = new Comment();
+            com2.commentId = 2;
+            com2.itemId = itemID;
+            com2.content = "IT Kommentar";
+            com2.author = "Andi";
+            com2.authorID = 4;
+            com2.creationDate = new Date().getTime();
+            coms.add(com2);
+        }
 
         return coms;
 
         //return mapCommentData(handler.getCommentsFromItem(itemID));
-
     }
 
     @POST

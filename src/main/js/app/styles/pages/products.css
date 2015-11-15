@@ -10,3 +10,7 @@
 .product {
   margin-bottom: 3em;
 }
+
+aside {
+  float: right;
+}

@@ -44,9 +44,13 @@ public class ItemService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Item> getItems() {
 
-		data.model.Category cat = new data.model.Category();
-		cat.setId(1);
-		cat.setName("Sport");
+		data.model.Category cat1 = new data.model.Category();
+		cat1.setId(1);
+		cat1.setName("Sport");
+
+        data.model.Category cat2 = new data.model.Category();
+        cat2.setId(2);
+        cat2.setName("IT");
 
 		SavedUser author = new SavedUser();
 		author.setId(3);
@@ -56,7 +60,7 @@ public class ItemService {
 
 		data.model.Item item1 = new data.model.Item();
 		item1.setId(1);
-		item1.setCategory(cat);
+		item1.setCategory(cat1);
 		item1.setCreationDate(new Date());
 		item1.setChangeDate(new Date());
 		item1.setAuthor(author);
@@ -66,7 +70,7 @@ public class ItemService {
 
 		data.model.Item item2 = new data.model.Item();
 		item2.setId(2);
-		item2.setCategory(cat);
+		item2.setCategory(cat2);
 		item2.setCreationDate(new Date());
 		item2.setChangeDate(new Date());
 		item2.setAuthor(author);
@@ -86,7 +90,7 @@ public class ItemService {
 
 		data.model.Category cat = new data.model.Category();
 		cat.setId(category);
-		if (category == 3) {
+		if (category == 1) {
 			cat.setName("Sport");
 		} else {
 			cat.setName("IT");
@@ -98,26 +102,27 @@ public class ItemService {
 
 		List<data.model.Item> items = new ArrayList<data.model.Item>();
 
-		data.model.Item item1 = new data.model.Item();
-		item1.setId(1);
-		item1.setCategory(cat);
-		item1.setCreationDate(new Date());
-		item1.setChangeDate(new Date());
-		item1.setAuthor(author);
-		item1.setDescription("Sportschuh");
-		item1.setTitle("Adidas Boost");
-		items.add(item1);
-
-		data.model.Item item2 = new data.model.Item();
-		item2.setId(1);
-		item2.setCategory(cat);
-		item2.setCreationDate(new Date());
-		item2.setChangeDate(new Date());
-		item2.setAuthor(author);
-		item2.setDescription("Laptop");
-		item2.setTitle("Lenovo Thinkpad");
-		items.add(item2);
-
+		if(category == 1) {
+            data.model.Item item1 = new data.model.Item();
+            item1.setId(1);
+            item1.setCategory(cat);
+            item1.setCreationDate(new Date());
+            item1.setChangeDate(new Date());
+            item1.setAuthor(author);
+            item1.setDescription("Sportschuh");
+            item1.setTitle("Adidas Boost");
+            items.add(item1);
+        } else {
+            data.model.Item item2 = new data.model.Item();
+            item2.setId(2);
+            item2.setCategory(cat);
+            item2.setCreationDate(new Date());
+            item2.setChangeDate(new Date());
+            item2.setAuthor(author);
+            item2.setDescription("Laptop");
+            item2.setTitle("Lenovo Thinkpad");
+            items.add(item2);
+        }
 		return mapItemData(items);
 		// return mapCategoryData(handler.getItemsFromCategory(category));
 

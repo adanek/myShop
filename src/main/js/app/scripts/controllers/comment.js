@@ -8,23 +8,33 @@
     $scope.comment = {};
     $scope.enableCreation = User.isAuthenticated();
 
-    $scope.cs = Comments.formProduct($scope.product.id);
-    $scope.comments = [{
-      "id": 1,
-      "itemID": 12,
-      "itemTitle": "Test title",
-      "content": "erster kommentar",
-      "author": "Pati",
-      "creationDate": 1447584696796,
-      "authorID": 3
-    }, {
-      "id": 2,
-      "itemID": 12,
-      "itemTitle": "Test title",
-      "content": "zweiter kommentar",
-      "author": "Andi",
-      "authorID": 4
-    }];
+    $scope.comments = [];
+    Comments.formProduct($scope.product.id).then(
+      function successCallback(response){
+        $scope.comments = response.data;
+      },
+      function errorCallback(response){
+
+      }
+    );
+
+    // Demo Daten
+    //$scope.comments = [{
+    //  "id": 1,
+    //  "itemID": 12,
+    //  "itemTitle": "Test title",
+    //  "content": "erster kommentar",
+    //  "author": "Pati",
+    //  "creationDate": 1447584696796,
+    //  "authorID": 3
+    //}, {
+    //  "id": 2,
+    //  "itemID": 12,
+    //  "itemTitle": "Test title",
+    //  "content": "zweiter kommentar",
+    //  "author": "Andi",
+    //  "authorID": 4
+    //}];
 
     srv.formVisible = false;
 
