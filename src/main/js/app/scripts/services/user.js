@@ -6,7 +6,7 @@
 
     var srv = this;
     var authenticated = false;
-    var user= {};
+    var user= {alias: "Tom Riddle", id: 999};
 
     srv.isAuthenticated = function () {
       return authenticated;
@@ -26,6 +26,10 @@
 
     srv.getUsername = function(){
       return user.alias == undefined ? '': user.alias;
+    }
+
+    srv.getID = function(){
+      return user.id;
     }
 
     srv.login = function (username, password) {

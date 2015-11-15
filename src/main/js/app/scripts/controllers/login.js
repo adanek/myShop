@@ -8,7 +8,6 @@
       $scope.password = '';
 
       $scope.login = function() {
-        console.log("Läuft");
 
         $scope.$broadcast('show-errors-check-validity');
 

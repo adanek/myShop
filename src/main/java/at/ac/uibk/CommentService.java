@@ -1,10 +1,7 @@
 package at.ac.uibk;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,187 +28,189 @@ import data.model.ItemComment;
 @Path("/comments")
 public class CommentService {
 
-	private DataHandler handler;
+    private DataHandler handler;
 
-	public CommentService() {
-		// handler = new DataHandler();
-	}
-	
-	@GET
-	@Path("/{commentID}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Comment getComment(@PathParam("commentID") int commentID, @Context HttpServletRequest req, 
-			@Context HttpServletResponse response){
-		
-		Comment com = new Comment();
-		
-		com.id = 7;
-		com.author = "Pati";
-		com.authorID = 3;
-		com.content = "Hallo, das ist mein erster Kommentar";
-		
-		return com;
-		
-		//return mapSingleComment(handler.getItemCommentByID(commentID));
-		
-	}
-	
-	@GET
-	@Path("/item/{itemID}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Collection<Comment> getCommentsFromItem(@PathParam("itemID") int itemID) {
-		
-		List<Comment> coms = new ArrayList<Comment>();
-		
-		Comment com1 = new Comment();
-		com1.id = 1;
-		com1.itemID = itemID;
-		com1.itemTitle = "Test title";
-		com1.content = "erster kommentar";
-		com1.author = "Pati";
-		com1.authorID = 3;
-		coms.add(com1);
-		
-		Comment com2 = new Comment();
-		com2.id = 2;
-		com2.itemID = itemID;
-		com2.itemTitle = "Test title";
-		com2.content = "zweiter kommentar";
-		com2.author = "Andi";
-		com2.authorID = 4;
-		coms.add(com2);
-		
-		return coms;
-		
-		//return mapCommentData(handler.getCommentsFromItem(itemID));
-		
-	}
-	
-	@POST
-	@Path("/new")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public void createComment(String commentString, @Context HttpServletRequest req,
-			@Context HttpServletResponse response){
-		
-		ObjectMapper om = new ObjectMapper();
-		Comment com = null;
+    public CommentService() {
+        // handler = new DataHandler();
+    }
 
-		try {
-			com = om.readValue(commentString, Comment.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    @GET
+    @Path("/{commentID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Comment getComment(@PathParam("commentID") int commentID, @Context HttpServletRequest req,
+                              @Context HttpServletResponse response) {
 
-		// Daten richtig gemapped...
-		if (com == null) {
-			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
-		} else {
+        Comment com = new Comment();
 
-			//data.model.ItemComment comment = handler.createItemComment(com.content, com.itemID, com.authorID);
-			data.model.ItemComment comment = new data.model.ItemComment();
-			
-			if (comment == null) {
-				HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
-			}
+        com.commentId = 7;
+        com.author = "Pati";
+        com.authorID = 3;
+        com.content = "Hallo, das ist mein erster Kommentar";
+        com.creationDate = new Date().getTime();
 
-			response.setHeader("Location", "api/comments/" + comment.getId());
-			response.setStatus(201);
-		}
-		
-	}
-	
-	@PUT
-	@Path("/{commentID}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Comment changeComment(@PathParam("commentID") int commentID, String commentString,
-			@Context HttpServletRequest req, @Context HttpServletResponse response) {
+        return com;
 
-		ObjectMapper om = new ObjectMapper();
-		Comment com = null;
+        //return mapSingleComment(handler.getItemCommentByID(commentID));
 
-		try {
-			com = om.readValue(commentString, Comment.class);
+    }
 
-			// Parameter müssen übereinstimmen
-			if (com.id != commentID) {
-				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
-			}
+    @GET
+    @Path("/item/{itemID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<Comment> getCommentsFromItem(@PathParam("itemID") int itemID) {
 
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        List<Comment> coms = new ArrayList<Comment>();
 
-		// Daten richtig gemapped...
-		if (com == null) {
-			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
-		}
+        Comment com1 = new Comment();
+        com1.commentId = 1;
+        com1.itemId = itemID;
+        com1.content = "erster kommentar";
+        com1.author = "Pati";
+        com1.authorID = 3;
+        coms.add(com1);
 
-		// dummy
-		return com;
+        Comment com2 = new Comment();
+        com2.commentId = 2;
+        com2.itemId = itemID;
+        com2.content = "zweiter kommentar";
+        com2.author = "Andi";
+        com2.authorID = 4;
+        coms.add(com2);
 
-		//return mapSingleComment(handler.changeComment(com.id, com.content));
-		
-	}
+        return coms;
 
-	@DELETE
-	@Path("/{commentID}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public void deleteComment(@PathParam("commentID") int commentID, @Context HttpServletRequest req,
-			@Context HttpServletResponse response) {
+        //return mapCommentData(handler.getCommentsFromItem(itemID));
 
-		// delete comment
-		//handler.deleteComment(commentID);
+    }
 
-		response.setStatus(response.SC_NO_CONTENT);
+    @POST
+    @Path("/new")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void createComment(String commentString, @Context HttpServletRequest req,
+                              @Context HttpServletResponse response) {
 
-	}
-	
-	//map single comment to output data type
-	private Comment mapSingleComment(ItemComment comment) {
-		
-		Comment com = new Comment();
+        ObjectMapper om = new ObjectMapper();
+        Comment com = null;
 
-		// mapping
-		com.id = comment.getId();
-		com.content = comment.getComment();
-		com.author = comment.getAuthor().getAlias();
-		com.authorID = comment.getAuthor().getId();
+        try {
+            com = om.readValue(commentString, Comment.class);
+        } catch (JsonParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-		return com;
+        // Daten richtig gemapped...
+        if (com == null) {
+            HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
+        } else {
 
-	}
-	
-	// map data for output
-	private Collection<Comment> mapCommentData(Collection<data.model.ItemComment> comments) {
+            //data.model.ItemComment comment = handler.createItemComment(com.content, com.itemID, com.authorID);
+            data.model.ItemComment comment = new data.model.ItemComment();
 
-		List<Comment> coms = new ArrayList<Comment>();
+            if (comment == null) {
+                HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
+            }
 
-		Iterator<data.model.ItemComment> iterator = comments.iterator();
+            response.setHeader("Location", "api/comments/" + comment.getId());
+            response.setStatus(201);
+        }
 
-		while (iterator.hasNext()) {
-			coms.add(mapSingleComment(iterator.next()));
-		}
+    }
 
-		// comments zurückgeben
-		return coms;
+    @PUT
+    @Path("/{commentID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Comment changeComment(@PathParam("commentID") int commentID, String commentString,
+                                 @Context HttpServletRequest req, @Context HttpServletResponse response) {
 
-	}
-	
+        ObjectMapper om = new ObjectMapper();
+        Comment com = null;
+
+        try {
+            com = om.readValue(commentString, Comment.class);
+
+            // Parameter mï¿½ssen ï¿½bereinstimmen
+            if (com.commentId != commentID) {
+                HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+            }
+
+        } catch (JsonParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // Daten richtig gemapped...
+        if (com == null) {
+            HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
+        }
+
+        // dummy
+        return com;
+
+        //return mapSingleComment(handler.changeComment(com.id, com.content));
+
+    }
+
+    @DELETE
+    @Path("/{commentID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void deleteComment(@PathParam("commentID") int commentID, @Context HttpServletRequest req,
+                              @Context HttpServletResponse response) {
+
+        // delete comment
+        //handler.deleteComment(commentID);
+
+        response.setStatus(response.SC_NO_CONTENT);
+
+    }
+
+    //map single comment to output data type
+    private Comment mapSingleComment(ItemComment comment) {
+
+        Comment com = new Comment();
+
+        // mapping
+        com.commentId = comment.getId();
+        com.itemId = comment.getItem().getId();
+        com.authorID = comment.getAuthor().getId();
+
+        com.content = comment.getComment();
+        com.author = comment.getAuthor().getAlias();
+        com.creationDate= new Date().getTime();
+
+        return com;
+
+    }
+
+    // map data for output
+    private Collection<Comment> mapCommentData(Collection<data.model.ItemComment> comments) {
+
+        List<Comment> coms = new ArrayList<Comment>();
+
+        Iterator<data.model.ItemComment> iterator = comments.iterator();
+
+        while (iterator.hasNext()) {
+            coms.add(mapSingleComment(iterator.next()));
+        }
+
+        // comments zurï¿½ckgeben
+        return coms;
+
+    }
+
 }

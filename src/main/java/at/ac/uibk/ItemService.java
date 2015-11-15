@@ -65,7 +65,7 @@ public class ItemService {
 		items.add(item1);
 
 		data.model.Item item2 = new data.model.Item();
-		item2.setId(1);
+		item2.setId(2);
 		item2.setCategory(cat);
 		item2.setCreationDate(new Date());
 		item2.setChangeDate(new Date());
@@ -177,7 +177,7 @@ public class ItemService {
 		try {
 			it = om.readValue(itemString, Item.class);
 
-			// Parameter müssen übereinstimmen
+			// Parameter mï¿½ssen ï¿½bereinstimmen
 			if (it.id != itemID) {
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
 			}
@@ -250,7 +250,7 @@ public class ItemService {
 			its.add(mapSingleItem(iterator.next()));
 		}
 
-		// items zurückgeben
+		// items zurï¿½ckgeben
 		return its;
 
 	}
