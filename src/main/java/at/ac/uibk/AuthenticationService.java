@@ -34,10 +34,7 @@ public class AuthenticationService {
 
 			// get user
 			SavedUser user = handler.getUserByID(userid);
-
-			//close db connection
-			handler.closeDatabaseConnection();
-			
+	
 			if (user != null) {
 				// guest authority
 				if (right == Rights.CAN_CREATE_COMMENT) {
