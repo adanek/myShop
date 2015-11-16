@@ -31,26 +31,30 @@ public class CategoryService {
 	private DataHandler handler;
 
 	public CategoryService() {
-		// handler = new DataHandler();
+		handler = new DataHandler();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Category> getCategories() {
 
-		List<data.model.Category> categories = new ArrayList<data.model.Category>();
+//		List<data.model.Category> categories = new ArrayList<data.model.Category>();
+//
+//		data.model.Category cat1 = new data.model.Category();
+//		cat1.setId(1);
+//		cat1.setName("Sport");
+//		categories.add(cat1);
+//
+//		data.model.Category cat2 = new data.model.Category();
+//		cat2.setId(2);
+//		cat2.setName("IT");
+//		categories.add(cat2);
 
-		data.model.Category cat1 = new data.model.Category();
-		cat1.setId(1);
-		cat1.setName("Sport");
-		categories.add(cat1);
-
-		data.model.Category cat2 = new data.model.Category();
-		cat2.setId(2);
-		cat2.setName("IT");
-		categories.add(cat2);
-
-		// return mapCategoryData(handler.getAllCategories());
+		Collection<data.model.Category> categories = handler.getAllCategories();
+		
+		//close db connection
+		handler.closeDatabaseConnection();
+		
 		return mapCategoryData(categories);
 
 	}
@@ -59,9 +63,12 @@ public class CategoryService {
 	@Path("/new")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public core.Category createCategory(String catString, @Context HttpServletRequest req,
+	public core.Category createCategory(String catString, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
+        // check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_CATEGORY, handler);
+		
 		ObjectMapper om = new ObjectMapper();
 		Category cat = null;
 
@@ -83,10 +90,14 @@ public class CategoryService {
 			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
 		} else {
 
-			//data.model.Category category = handler.createCategory(cat.name);
-			data.model.Category category = new data.model.Category();
-			category.setId(cat.id);
-			category.setName(cat.name);
+			data.model.Category category = handler.createCategory(cat.name);
+			
+			//close db connection
+			handler.closeDatabaseConnection();
+			
+//			data.model.Category category = new data.model.Category();
+//			category.setId(cat.id);
+//			category.setName(cat.name);
 			
 			if (category == null) {
 				HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
@@ -95,10 +106,7 @@ public class CategoryService {
 			response.setHeader("Location", "api/categories/" + cat.id);
 			response.setStatus(response.SC_CREATED);
 
-			//TODO: Return  category object
-			cat.id = 42;
-
-			return cat;
+			return mapSingleCategory(category);
 		}
 
         return null;
@@ -110,8 +118,11 @@ public class CategoryService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Category changeCategory(@PathParam("category") int category, String catString,
-			@Context HttpServletRequest req, @Context HttpServletResponse response) {
+			@Context HttpServletRequest request, @Context HttpServletResponse response) {
 
+		 // check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_CATEGORY, handler);
+		
 		ObjectMapper om = new ObjectMapper();
 		Category cat = null;
 
@@ -140,9 +151,14 @@ public class CategoryService {
 		}
 
 		// dummy
-		return cat;
+		//return cat;
+		
+		data.model.Category categoryDB = handler.changeCategory(category, cat.name);
+		
+		//close db connection
+		handler.closeDatabaseConnection();
 
-		// return mapSingleCategory(handler.changeCategory(category, cat.name));
+		return mapSingleCategory(categoryDB);
 
 	}
 
@@ -150,12 +166,18 @@ public class CategoryService {
 	@Path("/{category}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void deleteCategory(@PathParam("category") int category, @Context HttpServletRequest req,
+	public void deleteCategory(@PathParam("category") int category, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
+		 // check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_CATEGORY, handler);
+		
 		// delete category
-		//handler.deleteCategory(category);
+		handler.deleteCategory(category);
 
+		//close db connection
+		handler.closeDatabaseConnection();
+		
 		response.setStatus(response.SC_NO_CONTENT);
 
 	}

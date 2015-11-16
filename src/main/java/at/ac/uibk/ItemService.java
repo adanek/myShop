@@ -37,49 +37,55 @@ public class ItemService {
 	private DataHandler handler;
 
 	public ItemService() {
-		// handler = new DataHandler();
+		handler = new DataHandler();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Item> getItems() {
 
-		data.model.Category cat1 = new data.model.Category();
-		cat1.setId(1);
-		cat1.setName("Sport");
-
-        data.model.Category cat2 = new data.model.Category();
-        cat2.setId(2);
-        cat2.setName("IT");
-
-		SavedUser author = new SavedUser();
-		author.setId(3);
-		author.setAlias("Pati");
-
-		List<data.model.Item> items = new ArrayList<data.model.Item>();
-
-		data.model.Item item1 = new data.model.Item();
-		item1.setId(1);
-		item1.setCategory(cat1);
-		item1.setCreationDate(new Date());
-		item1.setChangeDate(new Date());
-		item1.setAuthor(author);
-		item1.setDescription("Sportschuh");
-		item1.setTitle("Adidas Boost");
-		items.add(item1);
-
-		data.model.Item item2 = new data.model.Item();
-		item2.setId(2);
-		item2.setCategory(cat2);
-		item2.setCreationDate(new Date());
-		item2.setChangeDate(new Date());
-		item2.setAuthor(author);
-		item2.setDescription("Laptop");
-		item2.setTitle("Lenovo Thinkpad");
-		items.add(item2);
-
+//		data.model.Category cat1 = new data.model.Category();
+//		cat1.setId(1);
+//		cat1.setName("Sport");
+//
+//        data.model.Category cat2 = new data.model.Category();
+//        cat2.setId(2);
+//        cat2.setName("IT");
+//
+//		SavedUser author = new SavedUser();
+//		author.setId(3);
+//		author.setAlias("Pati");
+//
+//		List<data.model.Item> items = new ArrayList<data.model.Item>();
+//
+//		data.model.Item item1 = new data.model.Item();
+//		item1.setId(1);
+//		item1.setCategory(cat1);
+//		item1.setCreationDate(new Date());
+//		item1.setChangeDate(new Date());
+//		item1.setAuthor(author);
+//		item1.setDescription("Sportschuh");
+//		item1.setTitle("Adidas Boost");
+//		items.add(item1);
+//
+//		data.model.Item item2 = new data.model.Item();
+//		item2.setId(2);
+//		item2.setCategory(cat2);
+//		item2.setCreationDate(new Date());
+//		item2.setChangeDate(new Date());
+//		item2.setAuthor(author);
+//		item2.setDescription("Laptop");
+//		item2.setTitle("Lenovo Thinkpad");
+//		items.add(item2);
+//
+//		return mapItemData(items);
+		
+		Collection<data.model.Item> items = handler.getAllItems();
+		
+    	//close db connection
+    	handler.closeDatabaseConnection();
+		
 		return mapItemData(items);
-		// return mapCategoryData(handler.getAllItems());
 
 	}
 
@@ -88,23 +94,28 @@ public class ItemService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public core.Item getItemById(@PathParam("itemId") int itemId){
 
-		data.model.Category cat = new data.model.Category();
-		cat.setId(1);
-		cat.setName("Sport");
+//		data.model.Category cat = new data.model.Category();
+//		cat.setId(1);
+//		cat.setName("Sport");
+//
+//		SavedUser author = new SavedUser();
+//		author.setId(3);
+//		author.setAlias("Pati");
+//
+//		data.model.Item item = new data.model.Item();
+//		item.setId(itemId);
+//		item.setCategory(cat);
+//		item.setCreationDate(new Date());
+//		item.setChangeDate(new Date());
+//		item.setAuthor(author);
+//		item.setDescription("Sportschuh");
+//		item.setTitle("Adidas Boost");
 
-		SavedUser author = new SavedUser();
-		author.setId(3);
-		author.setAlias("Pati");
-
-		data.model.Item item = new data.model.Item();
-		item.setId(itemId);
-		item.setCategory(cat);
-		item.setCreationDate(new Date());
-		item.setChangeDate(new Date());
-		item.setAuthor(author);
-		item.setDescription("Sportschuh");
-		item.setTitle("Adidas Boost");
-
+		data.model.Item item = handler.getItemByID(itemId);
+		
+    	//close db connection
+    	handler.closeDatabaseConnection();
+		
 		return mapSingleItem(item);
 	}
 
@@ -113,43 +124,49 @@ public class ItemService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Item> getItemsFromCategory(@PathParam("category") int category) {
 
-		data.model.Category cat = new data.model.Category();
-		cat.setId(category);
-		if (category == 1) {
-			cat.setName("Sport");
-		} else {
-			cat.setName("IT");
-		}
-
-		SavedUser author = new SavedUser();
-		author.setId(3);
-		author.setAlias("Pati");
-
-		List<data.model.Item> items = new ArrayList<data.model.Item>();
-
-		if(category == 1) {
-            data.model.Item item1 = new data.model.Item();
-            item1.setId(1);
-            item1.setCategory(cat);
-            item1.setCreationDate(new Date());
-            item1.setChangeDate(new Date());
-            item1.setAuthor(author);
-            item1.setDescription("Sportschuh");
-            item1.setTitle("Adidas Boost");
-            items.add(item1);
-        } else {
-            data.model.Item item2 = new data.model.Item();
-            item2.setId(2);
-            item2.setCategory(cat);
-            item2.setCreationDate(new Date());
-            item2.setChangeDate(new Date());
-            item2.setAuthor(author);
-            item2.setDescription("Laptop");
-            item2.setTitle("Lenovo Thinkpad");
-            items.add(item2);
-        }
+//		data.model.Category cat = new data.model.Category();
+//		cat.setId(category);
+//		if (category == 1) {
+//			cat.setName("Sport");
+//		} else {
+//			cat.setName("IT");
+//		}
+//
+//		SavedUser author = new SavedUser();
+//		author.setId(3);
+//		author.setAlias("Pati");
+//
+//		List<data.model.Item> items = new ArrayList<data.model.Item>();
+//
+//		if(category == 1) {
+//            data.model.Item item1 = new data.model.Item();
+//            item1.setId(1);
+//            item1.setCategory(cat);
+//            item1.setCreationDate(new Date());
+//            item1.setChangeDate(new Date());
+//            item1.setAuthor(author);
+//            item1.setDescription("Sportschuh");
+//            item1.setTitle("Adidas Boost");
+//            items.add(item1);
+//        } else {
+//            data.model.Item item2 = new data.model.Item();
+//            item2.setId(2);
+//            item2.setCategory(cat);
+//            item2.setCreationDate(new Date());
+//            item2.setChangeDate(new Date());
+//            item2.setAuthor(author);
+//            item2.setDescription("Laptop");
+//            item2.setTitle("Lenovo Thinkpad");
+//            items.add(item2);
+//        }
+//		return mapItemData(items);
+		
+		Collection<data.model.Item> items = handler.getItemsFromCategory(category);
+		
+    	//close db connection
+    	handler.closeDatabaseConnection();
+		
 		return mapItemData(items);
-		// return mapCategoryData(handler.getItemsFromCategory(category));
 
 	}
 
@@ -157,8 +174,11 @@ public class ItemService {
 	@Path("/new")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void createItem(String itemString, @Context HttpServletRequest req,
+	public void createItem(String itemString, @Context HttpServletRequest request,
 			@Context HttpServletResponse response){
+		
+		 // check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_ITEM, handler);
 		
 		ObjectMapper om = new ObjectMapper();
 		Item item = null;
@@ -181,8 +201,11 @@ public class ItemService {
 			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
 		} else {
 
-			//data.model.Item it = handler.createItem(item.title, item.description, item.categoryID, item.authorID);
-			data.model.Item it = new data.model.Item();
+			data.model.Item it = handler.createItem(item.title, item.description, item.categoryID, item.authorID);
+			//data.model.Item it = new data.model.Item();
+			
+	    	//close db connection
+	    	handler.closeDatabaseConnection();
 			
 			if (it == null) {
 				HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
@@ -199,8 +222,11 @@ public class ItemService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Item changeItem(@PathParam("item") int itemID, String itemString,
-			@Context HttpServletRequest req, @Context HttpServletResponse response) {
+			@Context HttpServletRequest request, @Context HttpServletResponse response) {
 
+		 // check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_ITEM, handler);
+		
 		ObjectMapper om = new ObjectMapper();
 		Item it = null;
 
@@ -229,9 +255,14 @@ public class ItemService {
 		}
 
 		// dummy
-		return it;
+		//return it;
 
-		//return mapSingleItem(handler.changeItem(itemID, it.title, it.description, it.categoryID));
+		data.model.Item item = handler.changeItem(itemID, it.title, it.description, it.categoryID);
+		
+    	//close db connection
+    	handler.closeDatabaseConnection();
+		
+		return mapSingleItem(item);
 
 	}
 	
@@ -239,12 +270,18 @@ public class ItemService {
 	@Path("/{item}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void deleteCategory(@PathParam("item") int item, @Context HttpServletRequest req,
+	public void deleteItem(@PathParam("item") int item, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
+		 // check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_ITEM, handler);
+		
 		// delete item
-		//handler.deleteItem(item);
+		handler.deleteItem(item);
 
+    	//close db connection
+    	handler.closeDatabaseConnection();
+		
 		response.setStatus(204);
 
 	}

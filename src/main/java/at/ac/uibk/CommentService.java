@@ -31,7 +31,7 @@ public class CommentService {
     private DataHandler handler;
 
     public CommentService() {
-        // handler = new DataHandler();
+        handler = new DataHandler();
     }
 
     @GET
@@ -40,17 +40,22 @@ public class CommentService {
     public Comment getComment(@PathParam("commentID") int commentID, @Context HttpServletRequest req,
                               @Context HttpServletResponse response) {
 
-        Comment com = new Comment();
+//        Comment com = new Comment();
+//
+//        com.commentId = 7;
+//        com.author = "Pati";
+//        com.authorID = 3;
+//        com.content = "Hallo, das ist mein erster Kommentar";
+//        com.creationDate = new Date().getTime();
+//
+//        return com;
 
-        com.commentId = 7;
-        com.author = "Pati";
-        com.authorID = 3;
-        com.content = "Hallo, das ist mein erster Kommentar";
-        com.creationDate = new Date().getTime();
-
-        return com;
-
-        //return mapSingleComment(handler.getItemCommentByID(commentID));
+    	data.model.ItemComment comment = handler.getItemCommentByID(commentID);
+    	
+    	//close db connection
+    	handler.closeDatabaseConnection();
+    	
+        return mapSingleComment(comment);
 
     }
 
@@ -59,40 +64,48 @@ public class CommentService {
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Comment> getCommentsFromItem(@PathParam("itemID") int itemID) {
 
-        List<Comment> coms = new ArrayList<Comment>();
+//        List<Comment> coms = new ArrayList<Comment>();
+//
+//        if(itemID == 1){
+//            Comment com1 = new Comment();
+//            com1.commentId = 1;
+//            com1.itemId = itemID;
+//            com1.content = "Sport Kommentar";
+//            com1.author = "Pati";
+//            com1.authorID = 3;
+//            com1.creationDate = new Date().getTime();
+//            coms.add(com1);
+//        } else {
+//            Comment com2 = new Comment();
+//            com2.commentId = 2;
+//            com2.itemId = itemID;
+//            com2.content = "IT Kommentar";
+//            com2.author = "Andi";
+//            com2.authorID = 4;
+//            com2.creationDate = new Date().getTime();
+//            coms.add(com2);
+//        }
+//
+//        return coms;
 
-        if(itemID == 1){
-            Comment com1 = new Comment();
-            com1.commentId = 1;
-            com1.itemId = itemID;
-            com1.content = "Sport Kommentar";
-            com1.author = "Pati";
-            com1.authorID = 3;
-            com1.creationDate = new Date().getTime();
-            coms.add(com1);
-        } else {
-            Comment com2 = new Comment();
-            com2.commentId = 2;
-            com2.itemId = itemID;
-            com2.content = "IT Kommentar";
-            com2.author = "Andi";
-            com2.authorID = 4;
-            com2.creationDate = new Date().getTime();
-            coms.add(com2);
-        }
-
-        return coms;
-
-        //return mapCommentData(handler.getCommentsFromItem(itemID));
+    	Collection<data.model.ItemComment> comments = handler.getCommentsFromItem(itemID);
+    	
+    	//close db connection
+    	handler.closeDatabaseConnection();
+    	
+        return mapCommentData(comments);
     }
 
     @POST
     @Path("/new")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public void createComment(String commentString, @Context HttpServletRequest req,
+    public void createComment(String commentString, @Context HttpServletRequest request,
                               @Context HttpServletResponse response) {
 
+    	 // check user rights
+        //AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_COMMENT, handler);
+    	
         ObjectMapper om = new ObjectMapper();
         Comment com = null;
 
@@ -114,9 +127,12 @@ public class CommentService {
             HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
         } else {
 
-            //data.model.ItemComment comment = handler.createItemComment(com.content, com.itemID, com.authorID);
-            data.model.ItemComment comment = new data.model.ItemComment();
+            data.model.ItemComment comment = handler.createItemComment(com.content, com.itemId, com.authorID);
+            //data.model.ItemComment comment = new data.model.ItemComment();
 
+        	//close db connection
+        	handler.closeDatabaseConnection();
+            
             if (comment == null) {
                 HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
             }
@@ -132,8 +148,11 @@ public class CommentService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Comment changeComment(@PathParam("commentID") int commentID, String commentString,
-                                 @Context HttpServletRequest req, @Context HttpServletResponse response) {
+                                 @Context HttpServletRequest request, @Context HttpServletResponse response) {
 
+    	// check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_COMMENT, handler);
+    	
         ObjectMapper om = new ObjectMapper();
         Comment com = null;
 
@@ -162,9 +181,14 @@ public class CommentService {
         }
 
         // dummy
-        return com;
+        //return com;
 
-        //return mapSingleComment(handler.changeComment(com.id, com.content));
+        data.model.ItemComment comment = handler.changeComment(com.commentId, com.content);
+        
+    	//close db connection
+    	handler.closeDatabaseConnection();
+        
+        return mapSingleComment(comment);
 
     }
 
@@ -172,12 +196,18 @@ public class CommentService {
     @Path("/{commentID}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public void deleteComment(@PathParam("commentID") int commentID, @Context HttpServletRequest req,
+    public void deleteComment(@PathParam("commentID") int commentID, @Context HttpServletRequest request,
                               @Context HttpServletResponse response) {
 
+    	// check user rights
+        AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_COMMENT, handler);
+    	
         // delete comment
-        //handler.deleteComment(commentID);
+        handler.deleteComment(commentID);
 
+    	//close db connection
+    	handler.closeDatabaseConnection();
+        
         response.setStatus(response.SC_NO_CONTENT);
 
     }
