@@ -100,10 +100,13 @@ public class CommentService {
 			comments = handler.getCommentsFromItem(itemID);
 		} catch (Exception e) {
 			response.setStatus(response.SC_NO_CONTENT);
-			return null;
+			
+			//leere liste zurückgeben
+			return new ArrayList<Comment>();
+		} finally{
+			// close db connection
+			handler.closeDatabaseConnection();
 		}
-		// close db connection
-		handler.closeDatabaseConnection();
 
 		return mapCommentData(comments);
 	}
