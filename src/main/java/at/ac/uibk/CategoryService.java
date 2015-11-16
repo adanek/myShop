@@ -203,6 +203,10 @@ public class CategoryService {
 	// map single category to output data type
 	private Category mapSingleCategory(data.model.Category category) {
 
+		if(category == null){
+			return null;
+		}
+		
 		Category cat = new Category();
 
 		cat.id = category.getId();
@@ -215,6 +219,10 @@ public class CategoryService {
 	// map data for output
 	private Collection<Category> mapCategoryData(Collection<data.model.Category> categories) {
 
+		if(categories == null){
+			return null;
+		}
+		
 		List<Category> cats = new ArrayList<Category>();
 
 		Iterator<data.model.Category> it = categories.iterator();

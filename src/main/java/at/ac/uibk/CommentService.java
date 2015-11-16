@@ -235,6 +235,10 @@ public class CommentService {
     //map single comment to output data type
     private Comment mapSingleComment(ItemComment comment) {
 
+    	if(comment == null){
+    		return null;
+    	}
+    	
         Comment com = new Comment();
 
         // mapping
@@ -253,6 +257,11 @@ public class CommentService {
     // map data for output
     private Collection<Comment> mapCommentData(Collection<data.model.ItemComment> comments) {
 
+    	//no comments
+    	if(comments == null){
+    		return null;
+    	}
+    	
         List<Comment> coms = new ArrayList<Comment>();
 
         Iterator<data.model.ItemComment> iterator = comments.iterator();

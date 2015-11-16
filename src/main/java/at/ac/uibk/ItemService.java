@@ -311,6 +311,10 @@ public class ItemService {
 	// map single item to output data type
 	private Item mapSingleItem(data.model.Item item) {
 
+		if(item == null){
+			return null;
+		}
+		
 		Item it = new Item();
 
 		// mapping
@@ -331,6 +335,10 @@ public class ItemService {
 	// map data for output
 	private Collection<Item> mapItemData(Collection<data.model.Item> items) {
 
+		if(items == null){
+			return null;
+		}
+		
 		List<Item> its = new ArrayList<Item>();
 
 		Iterator<data.model.Item> iterator = items.iterator();
