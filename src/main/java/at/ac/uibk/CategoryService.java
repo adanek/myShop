@@ -78,6 +78,11 @@ public class CategoryService {
 
 		try {
 			cat = om.readValue(catString, Category.class);
+			
+			//mapping error
+			if(cat == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -135,6 +140,11 @@ public class CategoryService {
 		try {
 			cat = om.readValue(catString, Category.class);
 
+			//mapping error
+			if(cat == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
+			
 			// Parameter m�ssen �bereinstimmen
 			if (cat.id != category) {
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);

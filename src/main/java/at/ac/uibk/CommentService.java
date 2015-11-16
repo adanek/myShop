@@ -117,6 +117,11 @@ public class CommentService {
 
         try {
             com = om.readValue(commentString, Comment.class);
+            
+			//mapping error
+			if(com == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
         } catch (JsonParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -167,6 +172,11 @@ public class CommentService {
         try {
             com = om.readValue(commentString, Comment.class);
 
+			//mapping error
+			if(com == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
+            
             // Parameter m�ssen �bereinstimmen
             if (com.commentId != commentID) {
                 HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);

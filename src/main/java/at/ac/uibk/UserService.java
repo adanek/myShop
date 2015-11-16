@@ -101,6 +101,11 @@ public class UserService {
 		try {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
+			//mapping error
+			if(uc == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
+			
         	handler = new DataHandler();
 			
 			user = handler.getUserLogin(uc.name, uc.hash);
@@ -172,6 +177,7 @@ public class UserService {
 		try {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
+			//mapping error
 			if(uc == null){
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
 			}

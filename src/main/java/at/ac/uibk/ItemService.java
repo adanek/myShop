@@ -193,6 +193,11 @@ public class ItemService {
 
 		try {
 			item = om.readValue(itemString, Item.class);
+			
+			//mapping error
+			if(item == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -243,6 +248,11 @@ public class ItemService {
 		try {
 			it = om.readValue(itemString, Item.class);
 
+			//mapping error
+			if(it == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
+			
 			// Parameter m�ssen �bereinstimmen
 			if (it.id != itemID) {
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
