@@ -10,5 +10,6 @@ public class Comment {
 	public String author;
 	public int authorID;
 	public long creationDate;
+	public long changeDate;
 	
 }

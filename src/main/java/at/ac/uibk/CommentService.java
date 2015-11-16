@@ -260,7 +260,8 @@ public class CommentService {
 
 		com.content = comment.getComment();
 		com.author = comment.getAuthor().getAlias();
-		com.creationDate = new Date().getTime();
+		com.creationDate = comment.getCreationDate().getTime();
+		com.changeDate = comment.getChangeDate().getTime();
 
 		return com;
 

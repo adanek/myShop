@@ -1,11 +1,15 @@
 package data.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "ItemComment")
@@ -16,6 +20,10 @@ public class ItemComment {
 	private int id;
 	@Lob
 	private String comment;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDate = new Date();
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date changeDate = new Date();
 	@ManyToOne
 	private Item item;
 	@ManyToOne
@@ -44,6 +52,18 @@ public class ItemComment {
 	}
 	public void setAuthor(SavedUser author) {
 		this.author = author;
+	}
+	public Date getCreationDate() {
+		return creationDate;
+	}
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+	public Date getChangeDate() {
+		return changeDate;
+	}
+	public void setChangeDate(Date changeDate) {
+		this.changeDate = changeDate;
 	}
 	
 }

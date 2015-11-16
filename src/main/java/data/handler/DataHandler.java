@@ -203,6 +203,7 @@ public class DataHandler {
 
 			// change comment text
 			comment.setComment(comment_text);
+			comment.setChangeDate(new Date());
 
 			// update comment
 			session.update(comment);
@@ -506,6 +507,8 @@ public class DataHandler {
 		itemComment.setComment(comment);
 		itemComment.setItem(item);
 		itemComment.setAuthor(user);
+		itemComment.setCreationDate(new Date());
+		itemComment.setChangeDate(new Date());
 
 		saveObjectToDb(itemComment);
 		return itemComment;
