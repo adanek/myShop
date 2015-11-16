@@ -71,7 +71,7 @@
           $scope.comment.authorID = User.getID();
           $scope.comment.itemID = $scope.product.id;
           $scope.comment.creationDate = Date.now();
-          $scope.comment.changeDateDate = $scope.comment.creationDate;
+          $scope.comment.changeDate = $scope.comment.creationDate;
           $scope.comment.content = "";
 
           srv.formVisible = true;
