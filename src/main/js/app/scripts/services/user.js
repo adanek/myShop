@@ -12,6 +12,7 @@
       id: 999,
       role: 'guest',
       rights: {
+        canCreateCategory: false,
         canCreateItem: false,
         canCreateComment: false
       }
@@ -24,6 +25,10 @@
 
     srv.isAdmin = function () {
       return user.role === 'admin';
+    };
+
+    srv.canCreateCategory = function(){
+      return user.rights.canCreateCategory;
     };
 
     srv.canCreateProduct = function () {

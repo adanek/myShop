@@ -5,6 +5,7 @@
   app.controller('ProductsCtrl', ['$scope', 'Products', 'User', function ($scope, Products, User) {
 
     $scope.caption = 'Das könnte Ihnen gefallen:';
+    $scope.userCanCreateCategory = User.canCreateCategory();
     $scope.userCanCreateProduct = User.canCreateProduct();
     $scope.userCanCreateComment = User.canCreateComment();
 
