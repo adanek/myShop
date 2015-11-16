@@ -31,7 +31,7 @@ public class CategoryService {
 	private DataHandler handler;
 
 	public CategoryService() {
-		handler = new DataHandler();
+		//handler = new DataHandler();
 	}
 
 	@GET
@@ -50,6 +50,8 @@ public class CategoryService {
 //		cat2.setName("IT");
 //		categories.add(cat2);
 
+    	handler = new DataHandler();
+		
 		Collection<data.model.Category> categories = handler.getAllCategories();
 		
 		//close db connection
@@ -66,6 +68,8 @@ public class CategoryService {
 	public core.Category createCategory(String catString, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+		
         // check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_CATEGORY, handler);
 		
@@ -120,6 +124,8 @@ public class CategoryService {
 	public Category changeCategory(@PathParam("category") int category, String catString,
 			@Context HttpServletRequest request, @Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+		
 		 // check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_CATEGORY, handler);
 		
@@ -169,6 +175,8 @@ public class CategoryService {
 	public void deleteCategory(@PathParam("category") int category, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+		
 		 // check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_CATEGORY, handler);
 		

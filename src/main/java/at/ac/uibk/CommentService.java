@@ -31,7 +31,7 @@ public class CommentService {
     private DataHandler handler;
 
     public CommentService() {
-        handler = new DataHandler();
+        //handler = new DataHandler();
     }
 
     @GET
@@ -50,6 +50,8 @@ public class CommentService {
 //
 //        return com;
 
+    	handler = new DataHandler();
+    	
     	data.model.ItemComment comment = handler.getItemCommentByID(commentID);
     	
     	//close db connection
@@ -88,6 +90,8 @@ public class CommentService {
 //
 //        return coms;
 
+    	handler = new DataHandler();
+    	
     	Collection<data.model.ItemComment> comments = handler.getCommentsFromItem(itemID);
     	
     	//close db connection
@@ -103,6 +107,8 @@ public class CommentService {
     public void createComment(String commentString, @Context HttpServletRequest request,
                               @Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+    	
     	 // check user rights
         //AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_COMMENT, handler);
     	
@@ -126,7 +132,7 @@ public class CommentService {
         if (com == null) {
             HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
         } else {
-
+        	
             data.model.ItemComment comment = handler.createItemComment(com.content, com.itemId, com.authorID);
             //data.model.ItemComment comment = new data.model.ItemComment();
 
@@ -150,6 +156,8 @@ public class CommentService {
     public Comment changeComment(@PathParam("commentID") int commentID, String commentString,
                                  @Context HttpServletRequest request, @Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+    	
     	// check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_COMMENT, handler);
     	
@@ -199,6 +207,8 @@ public class CommentService {
     public void deleteComment(@PathParam("commentID") int commentID, @Context HttpServletRequest request,
                               @Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+    	
     	// check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_COMMENT, handler);
     	

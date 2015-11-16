@@ -37,7 +37,7 @@ public class ItemService {
 	private DataHandler handler;
 
 	public ItemService() {
-		handler = new DataHandler();
+		//handler = new DataHandler();
 	}
 
 	@GET
@@ -80,6 +80,8 @@ public class ItemService {
 //
 //		return mapItemData(items);
 		
+    	handler = new DataHandler();
+		
 		Collection<data.model.Item> items = handler.getAllItems();
 		
     	//close db connection
@@ -111,6 +113,8 @@ public class ItemService {
 //		item.setDescription("Sportschuh");
 //		item.setTitle("Adidas Boost");
 
+    	handler = new DataHandler();
+		
 		data.model.Item item = handler.getItemByID(itemId);
 		
     	//close db connection
@@ -161,6 +165,8 @@ public class ItemService {
 //        }
 //		return mapItemData(items);
 		
+    	handler = new DataHandler();
+		
 		Collection<data.model.Item> items = handler.getItemsFromCategory(category);
 		
     	//close db connection
@@ -176,6 +182,8 @@ public class ItemService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void createItem(String itemString, @Context HttpServletRequest request,
 			@Context HttpServletResponse response){
+		
+    	handler = new DataHandler();
 		
 		 // check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_ITEM, handler);
@@ -224,6 +232,8 @@ public class ItemService {
 	public Item changeItem(@PathParam("item") int itemID, String itemString,
 			@Context HttpServletRequest request, @Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+		
 		 // check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_ITEM, handler);
 		
@@ -273,6 +283,8 @@ public class ItemService {
 	public void deleteItem(@PathParam("item") int item, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+		
 		 // check user rights
         AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_ITEM, handler);
 		

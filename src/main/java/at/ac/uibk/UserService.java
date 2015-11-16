@@ -32,7 +32,7 @@ public class UserService {
 	private DataHandler handler;
 
 	public UserService() {
-		handler = new DataHandler();
+		//handler = new DataHandler();
 	}
 
 	@GET
@@ -47,6 +47,8 @@ public class UserService {
 
 		session.setAttribute("User", "Pati");
 
+    	handler = new DataHandler();
+		
 		Collection<SavedUser> users = handler.getAllUsers();
 		
 		//close db connection
@@ -60,6 +62,8 @@ public class UserService {
 	public UserInfo getUser(@PathParam("userid") int userid, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
+    	handler = new DataHandler();
+		
 		// check user rights
 		AuthenticationService.checkGetUserInfo(request, response, userid);
 
@@ -97,6 +101,8 @@ public class UserService {
 		try {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
+        	handler = new DataHandler();
+			
 			user = handler.getUserLogin(uc.name, uc.hash);
 			// user = new SavedUser();
 			//
@@ -166,6 +172,8 @@ public class UserService {
 		try {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
+        	handler = new DataHandler();
+			
 			// create user
 			user = handler.createUser(uc.name, uc.hash, 2); // to-do
 
