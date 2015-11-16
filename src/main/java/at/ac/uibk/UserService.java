@@ -172,6 +172,10 @@ public class UserService {
 		try {
 			UserCredentials uc = om.readValue(credstring, UserCredentials.class);
 
+			if(uc == null){
+				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
+			}
+			
         	handler = new DataHandler();
 			
 			// create user
