@@ -225,7 +225,7 @@ public class ItemService {
 			}
 
 			response.setHeader("Location", "api/items");
-			response.setStatus(201);
+			response.setStatus(response.SC_CREATED);
 		}
 
 	}

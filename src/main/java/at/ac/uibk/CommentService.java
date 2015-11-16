@@ -130,10 +130,6 @@ public class CommentService {
 		try {
 			com = om.readValue(commentString, Comment.class);
 
-			// mapping error
-			if (com == null) {
-				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
-			}
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -147,9 +143,13 @@ public class CommentService {
 
 		// Daten richtig gemapped...
 		if (com == null) {
-			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
+			HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
 		} else {
 
+			if(com.authorID < 1){
+				com.authorID = 11; //dummy
+			}
+			
 			data.model.ItemComment comment = handler.createItemComment(com.content, com.itemId, com.authorID);
 			// data.model.ItemComment comment = new data.model.ItemComment();
 
