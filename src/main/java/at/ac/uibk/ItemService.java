@@ -206,7 +206,7 @@ public class ItemService {
 
 		// Daten richtig gemapped...
 		if (item == null) {
-			HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
+			HTTPStatusService.sendError(response.SC_BAD_GATEWAY, response);
 		} else {
 
 			data.model.Item it = handler.createItem(item.title, item.description, item.categoryID, item.authorID);
