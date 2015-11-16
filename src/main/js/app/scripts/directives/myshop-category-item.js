@@ -8,9 +8,9 @@
       restrict: 'E',
       templateUrl: 'views/directives/myshop-category-item.html',
       scope: {
-        category: "="
+        category: '='
       },
-      require: "^myshopCategorySelect",
+      require: '^myshopCategorySelect',
       link: function (scope, element, attrs, myshopCategorySelectCtrl) {
         scope.makeActive = function () {
             myshopCategorySelectCtrl.setActiveCategory(scope.category);
@@ -20,6 +20,6 @@
           return myshopCategorySelectCtrl.getActiveCategory() === scope.category.id;
         };
       }
-    }
+    };
   }]);
 })(angular.module('myshopApp'));

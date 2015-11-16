@@ -16,35 +16,17 @@
 
         $scope.userCanEditComment = function (comment) {
           return User.canEditComment(comment);
-        }
+        };
 
         $scope.comments = [];
         Comments.formProduct($scope.product.id).then(
           function successCallback(response) {
             $scope.comments = response.data;
           },
-          function errorCallback(response) {
+          function errorCallback() {
 
           }
         );
-
-        //Demo Daten
-        $scope.comments = [{
-          "id": 1,
-          "itemID": 12,
-          "itemTitle": "Test title",
-          "content": "erster kommentar",
-          "author": "Pati",
-          "creationDate": 1447584696796,
-          "authorID": 3
-        }, {
-          "id": 2,
-          "itemID": 12,
-          "itemTitle": "Test title",
-          "content": "zweiter kommentar",
-          "author": "Andi",
-          "authorID": 4
-        }];
 
         srv.deleteComment = function (comment) {
           var ndx = $scope.comments.indexOf(comment);
@@ -72,7 +54,7 @@
           $scope.comment.itemID = $scope.product.id;
           $scope.comment.creationDate = Date.now();
           $scope.comment.changeDate = $scope.comment.creationDate;
-          $scope.comment.content = "";
+          $scope.comment.content = '';
 
           srv.formVisible = true;
         };
@@ -87,23 +69,23 @@
 
               // Update existing comment
               Comments.update($scope.comment).then(
-                function successCallback(response) {
+                function successCallback() {
                   srv.formVisible = false;
                 },
                 function error(response) {
-                  console.log("Fail to save comment: " + response.status);
+                  console.log('Fail to save comment: ' + response.status);
                 }
               );
             } else {
 
               // Create new comment
               Comments.save($scope.comment).then(
-                function successCallback(response) {
+                function successCallback() {
                   $scope.comments.push($scope.comment);
                   srv.formVisible = false;
                 },
                 function error(response) {
-                  console.log("Fail to save comment: " + response.status);
+                  console.log('Fail to save comment: ' + response.status);
                 }
               );
             }

@@ -2,21 +2,14 @@
 
 (function (app){
   app.controller('ProductNewCtrl', ['$scope', '$location', 'Categories', 'Products', 'User',function ($scope, $location, Categories, Products, User){
-    $scope.caption = "Neues Produkt anlegen";
+    $scope.caption = 'Neues Produkt anlegen';
     $scope.product= {};
-
-    // Demo Daten
-    $scope.categories =  [
-      {"id": 1, "name": "Sport"},
-      {"id": 2, "name": "IT"},
-      {"id": 3, "name": "Bücher"}
-    ];
 
     Categories.query().then(
       function successCallback(response){
         $scope.categories = response.data;
       },
-      function errorCallback(response){
+      function errorCallback(){
 
       }
     );
@@ -34,12 +27,12 @@
         $scope.product.authorID = User.getID();
 
         Products.new($scope.product).then(
-          function success(response){
+          function success(){
             $scope.product= {};
             $scope.category = {};
-           $location.path("/products").replace();
+           $location.path('/products').replace();
           },
-          function error(response){
+          function error(){
 
           }
         );
