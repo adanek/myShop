@@ -69,7 +69,9 @@
         srv.showForm = function () {
           $scope.comment.author = User.getUsername();
           $scope.comment.authorID = User.getID();
+          $scope.comment.itemID = $scope.product.id;
           $scope.comment.creationDate = Date.now();
+          $scope.comment.changeDateDate = $scope.comment.creationDate;
           $scope.comment.content = "";
 
           srv.formVisible = true;
