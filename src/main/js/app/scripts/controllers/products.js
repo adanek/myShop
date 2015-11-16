@@ -8,12 +8,6 @@
     $scope.userCanCreateProduct = User.canCreateProduct();
     $scope.userCanCreateComment = User.canCreateComment();
 
-    if (User.isAuthenticated()) {
-      if (User.isAdmin()) {
-        $scope.adminMode = true;
-      }
-    }
-
     $scope.userCanEditProduct = function (product) {
       return User.canEditProduct(product);
     };
@@ -22,9 +16,7 @@
       function successCallback(response) {
         $scope.products = response.data;
       },
-      function errorCallback() {
-
-      }
+      function errorCallback() { }
     );
 
     $scope.$on('myshop-active-category-changed', function (event, category) {
