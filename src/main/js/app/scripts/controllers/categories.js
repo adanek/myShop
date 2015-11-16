@@ -3,19 +3,13 @@
 (function (app) {
   app.controller('CategoriesCtrl', ['$scope', 'Categories', function ($scope, Categories) {
 
-    $scope.categories = [
-      {"id": 1, "name": "Sport"},
-      {"id": 2, "name": "IT"},
-      {"id": 3, "name": "Bücher"}
-    ];
-
     $scope.category = {};
 
     Categories.query().then(
       function successCallback(response) {
         $scope.categories = response.data;
       },
-      function errorCallback(response) {
+      function errorCallback() {
 
       }
     );
@@ -30,13 +24,12 @@
 
           // Update existing category
           Categories.update($scope.category).then(
-            function successCallback(response) {
+            function successCallback() {
               $scope.category = {};
             },
-            function errorCallback(response) {
-              $scope.category = {};
+            function errorCallback() {
             }
-          )
+          );
         } else {
 
           // Add new category
@@ -46,13 +39,13 @@
               $scope.categories.push(response.data);
               $scope.category = {};
             },
-            function errorCallback(response) {
+            function errorCallback() {
               $scope.category = {};
             }
-          )
+          );
         }
       }
-    }
+    };
 
     $scope.edit = function (category) {
       $scope.category = category;
@@ -65,15 +58,14 @@
       if (ndx > -1) {
 
         Categories.remove(category).then(
-          function successCallback(response) {
-              $scope.categories.splice(ndx, 1);
+
+          function successCallback() {
+            $scope.categories.splice(ndx, 1);
           },
-          function errorCallback(response) {
-            function successCallback(response) {
-              $scope.categories.splice(ndx, 1);
-            }
+
+          function errorCallback() {
           }
-        )
+        );
       }
     };
 

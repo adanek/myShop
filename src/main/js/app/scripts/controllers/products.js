@@ -4,7 +4,7 @@
 
   app.controller('ProductsCtrl', ['$scope', 'Products', 'User', function ($scope, Products, User) {
 
-    $scope.caption = "Das könnte Ihnen gefallen:";
+    $scope.caption = 'Das könnte Ihnen gefallen:';
     $scope.userCanCreateProduct = User.canCreateProduct();
     $scope.userCanCreateComment = User.canCreateComment();
 
@@ -16,62 +16,13 @@
 
     $scope.userCanEditProduct = function (product) {
       return User.canEditProduct(product);
-    }
-
-    var srv = this;
-
-    // Demo Daten
-    $scope.products = [
-      {
-        "id": 1,
-        "title": "Demo Adidas Boost",
-        "category": "Sport",
-        "categoryID": 1,
-        "description": "Sportschuh",
-        "creationDate": 1447584696796,
-        "changeDate": 1447584696796,
-        "author": "Pati",
-        "authorID": 3
-      },
-      {
-        "id": 2,
-        "title": "Demo Lenovo Thinkpad",
-        "category": "IT",
-        "categoryID": 2,
-        "description": "Laptop",
-        "creationDate": 1447584696796,
-        "changeDate": 1447584696796,
-        "author": "Andi",
-        "authorID": 3
-      }, {
-        "id": 3,
-        "title": "Demo Adidas Boost",
-        "category": "Sport",
-        "categoryID": 1,
-        "description": "Sportschuh",
-        "creationDate": 1447584696796,
-        "changeDate": 1447584696796,
-        "author": "Pati",
-        "authorID": 3
-      },
-      {
-        "id": 4,
-        "title": "Demo Lenovo Thinkpad",
-        "category": "IT",
-        "categoryID": 2,
-        "description": "Laptop",
-        "creationDate": 1447584696796,
-        "changeDate": 1447584696796,
-        "author": "Andi",
-        "authorID": 3
-      }
-    ];
+    };
 
     Products.query().then(
       function successCallback(response) {
         $scope.products = response.data;
       },
-      function errorCallback(response) {
+      function errorCallback() {
 
       }
     );
@@ -84,7 +35,7 @@
           function successCallback(response) {
             $scope.products = response.data;
           },
-          function errorCallback(response) {
+          function errorCallback() {
 
           }
         );
@@ -96,7 +47,7 @@
           function successCallback(response) {
             $scope.products = response.data;
           },
-          function errorCallback(response) {
+          function errorCallback() {
 
           }
         );

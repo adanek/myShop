@@ -9,46 +9,31 @@
       templateUrl: 'views/directives/myshop-category-select.html',
 
       scope: {
-        activeCategory: "="
+        activeCategory: '='
       },
 
-      link: function (scope, element, attrs) {
-
-        // Demo Daten
-        scope.categories =  [
-          {"id": 1, "name": "Sport"},
-          {"id": 2, "name": "IT"},
-          {"id": 3, "name": "Bücher"}
-        ];
+      link: function (scope) {
 
         Categories.query().then(
-          function successCallback(response){
+          function successCallback(response) {
             scope.categories = response.data;
           },
-          function errorCallback(response){
-
+          function errorCallback() {
           }
         );
       },
 
-      controller: function ($scope) {
-
+      controller: ['$scope', function ($scope) {
 
         this.getActiveCategory = function () {
           return $scope.activeCategory;
         };
 
         this.setActiveCategory = function (category) {
-
-          if ($scope.activeCategory === category.id) {
-            $scope.activeCategory = undefined;
-          } else {
-            $scope.activeCategory = category.id;
-          }
-
+          $scope.activeCategory = $scope.activeCategory === category.id ? undefined : category.id;
           $scope.$emit('myshop-active-category-changed', $scope.activeCategory);
         };
-      }
-    }
+      }]
+    };
   }]);
 })(angular.module('myshopApp'));
