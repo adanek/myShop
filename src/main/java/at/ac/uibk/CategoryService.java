@@ -31,32 +31,33 @@ public class CategoryService {
 	private DataHandler handler;
 
 	public CategoryService() {
-		//handler = new DataHandler();
+		// handler = new DataHandler();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Category> getCategories() {
 
-//		List<data.model.Category> categories = new ArrayList<data.model.Category>();
-//
-//		data.model.Category cat1 = new data.model.Category();
-//		cat1.setId(1);
-//		cat1.setName("Sport");
-//		categories.add(cat1);
-//
-//		data.model.Category cat2 = new data.model.Category();
-//		cat2.setId(2);
-//		cat2.setName("IT");
-//		categories.add(cat2);
+		// List<data.model.Category> categories = new
+		// ArrayList<data.model.Category>();
+		//
+		// data.model.Category cat1 = new data.model.Category();
+		// cat1.setId(1);
+		// cat1.setName("Sport");
+		// categories.add(cat1);
+		//
+		// data.model.Category cat2 = new data.model.Category();
+		// cat2.setId(2);
+		// cat2.setName("IT");
+		// categories.add(cat2);
 
-    	handler = new DataHandler();
-		
+		handler = new DataHandler();
+
 		Collection<data.model.Category> categories = handler.getAllCategories();
-		
-		//close db connection
+
+		// close db connection
 		handler.closeDatabaseConnection();
-		
+
 		return mapCategoryData(categories);
 
 	}
@@ -68,19 +69,19 @@ public class CategoryService {
 	public core.Category createCategory(String catString, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
-    	handler = new DataHandler();
-		
-        // check user rights
-        AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_CATEGORY, handler);
-		
+		handler = new DataHandler();
+
+		// check user rights
+		AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_CATEGORY, handler);
+
 		ObjectMapper om = new ObjectMapper();
 		Category cat = null;
 
 		try {
 			cat = om.readValue(catString, Category.class);
-			
-			//mapping error
-			if(cat == null){
+
+			// mapping error
+			if (cat == null) {
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
 			}
 		} catch (JsonParseException e) {
@@ -100,14 +101,14 @@ public class CategoryService {
 		} else {
 
 			data.model.Category category = handler.createCategory(cat.name);
-			
-			//close db connection
+
+			// close db connection
 			handler.closeDatabaseConnection();
-			
-//			data.model.Category category = new data.model.Category();
-//			category.setId(cat.id);
-//			category.setName(cat.name);
-			
+
+			// data.model.Category category = new data.model.Category();
+			// category.setId(cat.id);
+			// category.setName(cat.name);
+
 			if (category == null) {
 				HTTPStatusService.sendError(response.SC_INTERNAL_SERVER_ERROR, response);
 			}
@@ -118,7 +119,7 @@ public class CategoryService {
 			return mapSingleCategory(category);
 		}
 
-        return null;
+		return null;
 
 	}
 
@@ -129,22 +130,22 @@ public class CategoryService {
 	public Category changeCategory(@PathParam("category") int category, String catString,
 			@Context HttpServletRequest request, @Context HttpServletResponse response) {
 
-    	handler = new DataHandler();
-		
-		 // check user rights
-        AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_CATEGORY, handler);
-		
+		handler = new DataHandler();
+
+		// check user rights
+		AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_CATEGORY, handler);
+
 		ObjectMapper om = new ObjectMapper();
 		Category cat = null;
 
 		try {
 			cat = om.readValue(catString, Category.class);
 
-			//mapping error
-			if(cat == null){
+			// mapping error
+			if (cat == null) {
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
 			}
-			
+
 			// Parameter m�ssen �bereinstimmen
 			if (cat.id != category) {
 				HTTPStatusService.sendError(response.SC_BAD_REQUEST, response);
@@ -167,11 +168,11 @@ public class CategoryService {
 		}
 
 		// dummy
-		//return cat;
-		
+		// return cat;
+
 		data.model.Category categoryDB = handler.changeCategory(category, cat.name);
-		
-		//close db connection
+
+		// close db connection
 		handler.closeDatabaseConnection();
 
 		return mapSingleCategory(categoryDB);
@@ -185,17 +186,17 @@ public class CategoryService {
 	public void deleteCategory(@PathParam("category") int category, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
-    	handler = new DataHandler();
-		
-		 // check user rights
-        AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_CATEGORY, handler);
-		
+		handler = new DataHandler();
+
+		// check user rights
+		AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_CATEGORY, handler);
+
 		// delete category
 		handler.deleteCategory(category);
 
-		//close db connection
+		// close db connection
 		handler.closeDatabaseConnection();
-		
+
 		response.setStatus(response.SC_NO_CONTENT);
 
 	}
@@ -203,10 +204,10 @@ public class CategoryService {
 	// map single category to output data type
 	private Category mapSingleCategory(data.model.Category category) {
 
-		if(category == null){
+		if (category == null) {
 			return null;
 		}
-		
+
 		Category cat = new Category();
 
 		cat.id = category.getId();
@@ -219,16 +220,14 @@ public class CategoryService {
 	// map data for output
 	private Collection<Category> mapCategoryData(Collection<data.model.Category> categories) {
 
-		if(categories == null){
-			return null;
-		}
-		
 		List<Category> cats = new ArrayList<Category>();
 
-		Iterator<data.model.Category> it = categories.iterator();
+		if (categories != null) {
+			Iterator<data.model.Category> it = categories.iterator();
 
-		while (it.hasNext()) {
-			cats.add(mapSingleCategory(it.next()));
+			while (it.hasNext()) {
+				cats.add(mapSingleCategory(it.next()));
+			}
 		}
 
 		// Katzen zur�ckgeben
