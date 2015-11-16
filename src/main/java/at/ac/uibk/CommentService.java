@@ -150,7 +150,7 @@ public class CommentService {
 				com.authorID = 11; //dummy
 			}
 			
-			data.model.ItemComment comment = handler.createItemComment(com.content, com.itemId, com.authorID);
+			data.model.ItemComment comment = handler.createItemComment(com.content, com.itemID, com.authorID);
 			// data.model.ItemComment comment = new data.model.ItemComment();
 
 			// close db connection
@@ -255,7 +255,7 @@ public class CommentService {
 
 		// mapping
 		com.commentId = comment.getId();
-		com.itemId = comment.getItem().getId();
+		com.itemID = comment.getItem().getId();
 		com.authorID = comment.getAuthor().getId();
 
 		com.content = comment.getComment();

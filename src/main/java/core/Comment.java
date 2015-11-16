@@ -5,7 +5,7 @@ import java.util.Date;
 public class Comment {
 
 	public int commentId;
-	public int itemId;
+	public int itemID;
 	public String content;
 	public String author;
 	public int authorID;
