@@ -15,6 +15,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -64,7 +65,8 @@ public class CommentService {
 	@GET
 	@Path("/item/{itemID}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Collection<Comment> getCommentsFromItem(@PathParam("itemID") int itemID) {
+	public Collection<Comment> getCommentsFromItem(@PathParam("itemID") int itemID, @Context HttpServletRequest req,
+			@Context HttpServletResponse response) {
 
 		// List<Comment> coms = new ArrayList<Comment>();
 		//
@@ -92,8 +94,14 @@ public class CommentService {
 
 		handler = new DataHandler();
 
-		Collection<data.model.ItemComment> comments = handler.getCommentsFromItem(itemID);
+		Collection<data.model.ItemComment> comments;
 
+		try {
+			comments = handler.getCommentsFromItem(itemID);
+		} catch (Exception e) {
+			response.setStatus(response.SC_NO_CONTENT);
+			return null;
+		}
 		// close db connection
 		handler.closeDatabaseConnection();
 
