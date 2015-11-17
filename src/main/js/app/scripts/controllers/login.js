@@ -16,17 +16,15 @@
           User.login($scope.username, $scope.password).then(
             function success(){
               //User.setAuthenticated(true);
-              $location.path("/").replace();
+              $location.path('/').replace();
             },
-            function error(){
-
-            }
+            function error(){}
           );
         }
-      }
+      };
 
       $scope.register = function(){
         $location.path('/register').replace();
-      }
+      };
     }]);
 })(angular.module('myshopApp'));

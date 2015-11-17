@@ -1,26 +1,11 @@
 'use strict';
 
 (function (app) {
-  app.controller('ProductEditCtrl', ['$scope', '$location', '$routeParams', 'Categories', 'Products', 'User', function ($scope, $location, $routeParams, Categories, Products, User) {
-    $scope.caption = "Produkt bearbeiten";
+  app.controller('ProductEditCtrl', ['$scope', '$location', '$routeParams', 'Categories', 'Products', function ($scope, $location, $routeParams, Categories, Products) {
 
-    $scope.product = {
-      id: 1,
-      author: "Andi",
-      authorID: 12
-    };
-
-    $scope.category = {
-      id: 2,
-      name: "IT"
-    }
-
-    // Demo Daten
-    $scope.categories = [
-      {"id": 1, "name": "Sport"},
-      {"id": 2, "name": "IT"},
-      {"id": 3, "name": "Bücher"}
-    ];
+    $scope.caption = 'Produkt bearbeiten';
+    $scope.product = {};
+    $scope.category = {};
 
     // Load Product data
     Products.get($routeParams.id).then(
@@ -38,7 +23,7 @@
       function successCallback(response) {
         $scope.categories = response.data;
       },
-      function errorCallback(response) {
+      function errorCallback() {
 
       }
     );
@@ -54,12 +39,10 @@
         $scope.product.categoryID = $scope.category.id;
 
         Products.update($scope.product).then(
-          function success(response) {
-            $location.path("/products").replace();
+          function success() {
+            $location.path('/products').replace();
           },
-          function error(response) {
-
-          }
+          function error() {}
         );
       }
     };

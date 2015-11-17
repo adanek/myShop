@@ -1,17 +1,7 @@
 'use strict';
 
-/**
- * @ngdoc function
- * @name myshopApp.controller:AboutCtrl
- * @description
- * # AboutCtrl
- * Controller of the myshopApp
- */
-angular.module('myshopApp')
-  .controller('AboutCtrl', function () {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+(function (app) {
+  app.controller('AboutCtrl', [function () {
+
+  }]);
+})(angular.module('myshopApp'));

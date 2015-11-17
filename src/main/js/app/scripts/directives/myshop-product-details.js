@@ -6,11 +6,6 @@
     return {
       templateUrl: 'views/directives/myshop-product-details.html',
       restrict: 'E',
-
-      link: function postLink(scope, element, attrs) {
-
-      },
-
       controller: function(){
         this.tab = 1;
 

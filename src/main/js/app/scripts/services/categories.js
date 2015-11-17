@@ -1,6 +1,7 @@
 'use strict';
 
 (function (app) {
+  //noinspection JSUnusedGlobalSymbols
   app.factory('Categories', ['$http', function CategoriesFactory($http) {
 
     return {
@@ -19,6 +20,6 @@
       remove: function(category){
         return $http.delete('api/categories/'+ category.id, category);
       }
-    }
+    };
   }]);
 })(angular.module('myshopApp'));
