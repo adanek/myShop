@@ -23,12 +23,13 @@ import data.model.Item;
 import data.model.ItemComment;
 import data.model.SavedUser;
 
-public class DataHandler {
+public class DataHandler implements IDataHandler {
 
 	private SessionFactory sessionFactory;
 	private ServiceRegistry serviceRegistry;
 	private Connection connection;
 
+	//private constructor
 	public DataHandler() throws IllegalStateException {
 
 		try {
@@ -87,6 +88,10 @@ public class DataHandler {
 		return conn;
 	}
 
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#closeDatabaseConnection()
+	 */
+	@Override
 	public void closeDatabaseConnection() throws IllegalStateException {
 		sessionFactory.close();
 		try {
@@ -182,6 +187,10 @@ public class DataHandler {
 	}
 
 	// change comment
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#changeComment(int, java.lang.String)
+	 */
+	@Override
 	public ItemComment changeComment(int commentID, String comment_text) throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
@@ -230,6 +239,10 @@ public class DataHandler {
 	}
 	
 	// change item
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#changeItem(int, java.lang.String, java.lang.String, int)
+	 */
+	@Override
 	public Item changeItem(int itemID, String title, String description, int categoryID) throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
@@ -287,6 +300,10 @@ public class DataHandler {
 	}
 	
 	// change category
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#changeCategory(int, java.lang.String)
+	 */
+	@Override
 	public Category changeCategory(int categoryID, String name) throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
@@ -334,6 +351,10 @@ public class DataHandler {
 	}
 	
 	// change user
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#changeUser(int, java.lang.String, int)
+	 */
+	@Override
 	public SavedUser changeUser(int userID, String alias, int role) throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
@@ -385,6 +406,10 @@ public class DataHandler {
 
 	}
 	
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#createUser(java.lang.String, java.lang.String, int)
+	 */
+	@Override
 	public SavedUser createUser(String alias, String password, int role) throws IllegalStateException {
 
 		// create user instance
@@ -409,6 +434,10 @@ public class DataHandler {
 		return user;
 	}
 
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#createCategory(java.lang.String)
+	 */
+	@Override
 	public Category createCategory(String name) throws IllegalStateException {
 
 		// create category instance
@@ -420,6 +449,10 @@ public class DataHandler {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#createItem(java.lang.String, java.lang.String, int, int)
+	 */
+	@Override
 	public Item createItem(String title, String description, int category, int author)
 			throws IllegalStateException, IllegalArgumentException {
 
@@ -468,6 +501,10 @@ public class DataHandler {
 	}
 
 	// create item comment
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#createItemComment(java.lang.String, int, int)
+	 */
+	@Override
 	public ItemComment createItemComment(String comment, int itemID, int author)
 			throws IllegalStateException, IllegalArgumentException {
 
@@ -515,6 +552,10 @@ public class DataHandler {
 	}
 
 	// delete item comment
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#deleteComment(int)
+	 */
+	@Override
 	public void deleteComment(int commentID) throws IllegalArgumentException {
 		try {
 			// get comment
@@ -528,6 +569,10 @@ public class DataHandler {
 	}
 
 	// delete item
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#deleteItem(int)
+	 */
+	@Override
 	public void deleteItem(int itemID) throws IllegalArgumentException {
 		try {
 			// get comment
@@ -541,6 +586,10 @@ public class DataHandler {
 	}
 
 	// delete category
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#deleteCategory(int)
+	 */
+	@Override
 	public void deleteCategory(int categoryID) throws IllegalArgumentException {
 		try {
 			// get category
@@ -554,6 +603,10 @@ public class DataHandler {
 	}
 
 	// get all categories
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getAllCategories()
+	 */
+	@Override
 	public Collection<Category> getAllCategories() throws IllegalStateException {
 
 		try {
@@ -567,6 +620,10 @@ public class DataHandler {
 	}
 
 	// get all items
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getAllItems()
+	 */
+	@Override
 	public Collection<Item> getAllItems() throws IllegalStateException {
 
 		try {
@@ -580,6 +637,10 @@ public class DataHandler {
 	}
 
 	// get all item comments
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getAllItemComments()
+	 */
+	@Override
 	public Collection<ItemComment> getAllItemComments() throws IllegalStateException {
 
 		try {
@@ -593,6 +654,10 @@ public class DataHandler {
 	}
 
 	// get all users
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getAllUsers()
+	 */
+	@Override
 	public Collection<SavedUser> getAllUsers() throws IllegalStateException {
 
 		try {
@@ -606,26 +671,46 @@ public class DataHandler {
 	}
 
 	// search for user by ID
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getUserByID(int)
+	 */
+	@Override
 	public SavedUser getUserByID(int id) throws IllegalArgumentException {
 		return this.<SavedUser> searchForID(id, SavedUser.class);
 	}
 
 	// search for category by ID
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getCategoryByID(int)
+	 */
+	@Override
 	public Category getCategoryByID(int id) throws IllegalArgumentException {
 		return this.<Category> searchForID(id, Category.class);
 	}
 
 	// search for item by ID
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getItemByID(int)
+	 */
+	@Override
 	public Item getItemByID(int id) throws IllegalArgumentException {
 		return this.<Item> searchForID(id, Item.class);
 	}
 
 	// search for comment by ID
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getItemCommentByID(int)
+	 */
+	@Override
 	public ItemComment getItemCommentByID(int id) throws IllegalArgumentException {
 		return this.<ItemComment> searchForID(id, ItemComment.class);
 	}
 
 	// get all comments from item
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getCommentsFromItem(int)
+	 */
+	@Override
 	public Collection<ItemComment> getCommentsFromItem(int itemID)
 			throws IllegalArgumentException, IllegalStateException {
 
@@ -667,6 +752,10 @@ public class DataHandler {
 	}
 
 	// get all items from category
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getItemsFromCategory(int)
+	 */
+	@Override
 	public Collection<Item> getItemsFromCategory(int categoryID)
 			throws IllegalArgumentException, IllegalStateException {
 
@@ -768,6 +857,10 @@ public class DataHandler {
 	}
 	
 	//login user
+	/* (non-Javadoc)
+	 * @see data.handler.IDataHandler#getUserLogin(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public SavedUser getUserLogin(String alias, String password)
 			throws IllegalStateException {
 		Session session = openSession();

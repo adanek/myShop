@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 
-import data.handler.DataHandler;
+import data.handler.IDataHandler;
 import data.model.SavedUser;
 
 public class AuthenticationService {
@@ -23,7 +23,7 @@ public class AuthenticationService {
 	}
 
 	public static void checkAuthority(HttpServletRequest request, HttpServletResponse response, Rights right,
-			DataHandler handler) {
+			IDataHandler handler) {
 
 		boolean auth = false;
 

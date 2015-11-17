@@ -29,12 +29,13 @@ import com.sun.media.sound.ModelAbstractChannelMixer;
 import core.Category;
 import core.Item;
 import data.handler.DataHandler;
+import data.handler.IDataHandler;
 import data.model.SavedUser;
 
 @Path("/items")
 public class ItemService {
 
-	private DataHandler handler;
+	private IDataHandler handler;
 
 	public ItemService() {
 		// handler = new DataHandler();

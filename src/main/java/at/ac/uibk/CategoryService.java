@@ -23,12 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.Category;
 import core.UserCredentials;
 import data.handler.DataHandler;
+import data.handler.IDataHandler;
 import data.model.SavedUser;
 
 @Path("/categories")
 public class CategoryService {
 
-	private DataHandler handler;
+	private IDataHandler handler;
 
 	public CategoryService() {
 		// handler = new DataHandler();

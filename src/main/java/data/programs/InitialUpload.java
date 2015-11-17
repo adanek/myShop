@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import data.handler.DataHandler;
+import data.handler.IDataHandler;
 import data.model.Category;
 import data.model.Item;
 import data.model.ItemComment;
@@ -13,7 +14,7 @@ public class InitialUpload {
 
 	public static void main(String[] args) {
 		
-		DataHandler handler = new DataHandler();
+		IDataHandler handler = new DataHandler();
 
 		//categories
 		int categoryID1 = handler.createCategory("Sport").getId();

@@ -24,12 +24,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.Comment;
 import core.Item;
 import data.handler.DataHandler;
+import data.handler.IDataHandler;
 import data.model.ItemComment;
 
 @Path("/comments")
 public class CommentService {
 
-	private DataHandler handler;
+	private IDataHandler handler;
 
 	public CommentService() {
 		// handler = new DataHandler();

@@ -24,12 +24,13 @@ import core.UserCredentials;
 import core.UserInfo;
 import core.UserRights;
 import data.handler.DataHandler;
+import data.handler.IDataHandler;
 import data.model.SavedUser;
 
 @Path("/users")
 public class UserService {
 
-	private DataHandler handler;
+	private IDataHandler handler;
 
 	public UserService() {
 		//handler = new DataHandler();
