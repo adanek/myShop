@@ -32,6 +32,13 @@ public class CategoryService {
 	private IDataHandler handler;
 
 	public CategoryService() {
+		if(handler == null){
+			synchronized(CategoryService.class){
+				if(handler == null){
+					handler = new DataHandler();
+				}
+			}
+		}
 		// handler = new DataHandler();
 	}
 
@@ -52,12 +59,12 @@ public class CategoryService {
 		// cat2.setName("IT");
 		// categories.add(cat2);
 
-		handler = new DataHandler();
+		//handler = new DataHandler();
 
 		Collection<data.model.Category> categories = handler.getAllCategories();
 
 		// close db connection
-		handler.closeDatabaseConnection();
+		//handler.closeDatabaseConnection();
 
 		return mapCategoryData(categories);
 
@@ -70,7 +77,7 @@ public class CategoryService {
 	public core.Category createCategory(String catString, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
-		handler = new DataHandler();
+		//handler = new DataHandler();
 
 		// check user rights
 		AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_CATEGORY, handler);
@@ -104,7 +111,7 @@ public class CategoryService {
 			data.model.Category category = handler.createCategory(cat.name);
 
 			// close db connection
-			handler.closeDatabaseConnection();
+			//handler.closeDatabaseConnection();
 
 			// data.model.Category category = new data.model.Category();
 			// category.setId(cat.id);
@@ -131,7 +138,7 @@ public class CategoryService {
 	public Category changeCategory(@PathParam("category") int category, String catString,
 			@Context HttpServletRequest request, @Context HttpServletResponse response) {
 
-		handler = new DataHandler();
+		//handler = new DataHandler();
 
 		// check user rights
 		AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_CATEGORY, handler);
@@ -174,7 +181,7 @@ public class CategoryService {
 		data.model.Category categoryDB = handler.changeCategory(category, cat.name);
 
 		// close db connection
-		handler.closeDatabaseConnection();
+		//handler.closeDatabaseConnection();
 
 		return mapSingleCategory(categoryDB);
 
@@ -187,7 +194,7 @@ public class CategoryService {
 	public void deleteCategory(@PathParam("category") int category, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
-		handler = new DataHandler();
+		//handler = new DataHandler();
 
 		// check user rights
 		AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_CATEGORY, handler);
@@ -196,7 +203,7 @@ public class CategoryService {
 		handler.deleteCategory(category);
 
 		// close db connection
-		handler.closeDatabaseConnection();
+		//handler.closeDatabaseConnection();
 
 		response.setStatus(response.SC_NO_CONTENT);
 
