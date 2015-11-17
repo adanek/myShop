@@ -304,7 +304,7 @@ public class ItemService {
 		// close db connection
 		handler.closeDatabaseConnection();
 
-		response.setStatus(204);
+		response.setStatus(response.SC_NO_CONTENT);
 
 	}
 
