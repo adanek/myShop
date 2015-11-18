@@ -25,12 +25,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import core.Item;
-import data.model.Category;
+import core.Category;
 
 public class RestApi {
 
 	private String returnValue = null;
 	private List<Category> categories;
+	private List<Item> items;
 
 	@Test
 	public void getCategories() {
@@ -52,8 +53,15 @@ public class RestApi {
 	@Test
 	public void getItems() {
 
+		Gson gson = new Gson();
+		
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/items", null, "GET");
 
+		if (this.returnValue != null) {
+			this.items = gson.fromJson(this.returnValue, new TypeToken<ArrayList<Item>>() {
+			}.getType());
+		}
+		
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
 
@@ -106,7 +114,7 @@ public class RestApi {
 			catID = 1;
 		} else {
 			//get first category
-			catID = this.categories.get(0).getId();
+			catID = this.categories.get(0).id;
 		}
 		
 		JSONObject json = new JSONObject();
@@ -138,14 +146,31 @@ public class RestApi {
 		// first we have to login
 		login();
 
+		int itemID = 0;
+		
+		if(this.items == null || this.items.size() == 0){
+			getItems();
+		}
+		
+		if(this.items == null || this.items.size() == 0){
+			
+			System.out.println("Dummy item used");
+			
+			//dummy data
+			itemID = 1;
+		} else {
+			//get first category
+			itemID = this.items.get(0).id;
+		}
+		
 		JSONObject json = new JSONObject();
 		try {
 			json.put("author", "Pati2");
 			json.put("authorID", 9);
-			json.put("content", "IT");
+			json.put("content", "Content");
 			json.put("changeDate", new Date().getTime());
 			json.put("creationDate", new Date().getTime());
-			json.put("itemID", 39);
+			json.put("itemID", itemID);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
