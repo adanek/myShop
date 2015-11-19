@@ -43,6 +43,7 @@ dependencies {
 	testCompile 'org.testng:testng:6+'
 	testCompile 'org.seleniumhq.selenium:selenium-firefox-driver:2+'
 	testCompile 'org.seleniumhq.selenium:selenium-support:2+'
+    testCompile 'org.mockito:mockito-core:2.0.31-beta'
 }
 
 // Tasks for heroku deployment
