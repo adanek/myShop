@@ -34,7 +34,7 @@ public class DataHandler implements IDataHandler {
 
 		try {
 			// connect to db
-			connection = connectToDatabase();
+			//connection = connectToDatabase();
 
 			// create session factory
 			Configuration configuration = new Configuration();
@@ -47,9 +47,6 @@ public class DataHandler implements IDataHandler {
 		} catch (HibernateException e) {
 			System.out.println("Hibernate problems");
 			throw new IllegalStateException("Hibernate problems");
-		} catch (URISyntaxException e) {
-			System.out.println("wrong URI to database");
-			throw new IllegalStateException("wrong URI to database");
 		} catch (IllegalStateException e) {
 			System.out.println("no connection to database");
 			throw new IllegalStateException("no connection to database");
@@ -93,13 +90,13 @@ public class DataHandler implements IDataHandler {
 	 */
 	@Override
 	public void closeDatabaseConnection() throws IllegalStateException {
-		sessionFactory.close();
-		try {
-			connection.close();
-		} catch (Exception e) {
-			System.out.println("closing connection not possible");
-			throw new IllegalStateException("closing connection not possible");
-		}
+//		sessionFactory.close();
+//		try {
+//			connection.close();
+//		} catch (Exception e) {
+//			System.out.println("closing connection not possible");
+//			throw new IllegalStateException("closing connection not possible");
+//		}
 	}
 
 	/**
