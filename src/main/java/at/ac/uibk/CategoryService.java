@@ -21,10 +21,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import core.Category;
-import core.UserCredentials;
 import data.handler.DataHandler;
 import data.handler.IDataHandler;
-import data.model.SavedUser;
 
 @Path("/categories")
 public class CategoryService {
@@ -73,7 +71,7 @@ public class CategoryService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_CATEGORY, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_CREATE_CATEGORY, handler);
 
 		ObjectMapper om = new ObjectMapper();
 		Category cat = null;
@@ -134,7 +132,7 @@ public class CategoryService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_CATEGORY, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_EDIT_CATEGORY, handler);
 
 		ObjectMapper om = new ObjectMapper();
 		Category cat = null;
@@ -190,7 +188,7 @@ public class CategoryService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_CATEGORY, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_DELETE_CATEGORY, handler);
 
 		// delete category
 		handler.deleteCategory(category);

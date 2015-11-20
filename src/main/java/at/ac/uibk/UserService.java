@@ -140,15 +140,17 @@ public class UserService {
 			HTTPStatusService.sendError(response.SC_UNAUTHORIZED, response);
 		}
 
-		// create session
+		// create new session
 		HttpSession session = request.getSession(true);
 
 		// write userid to session
 		session.setAttribute("userid", user.getId());
 
-		// map data for output
-		return mapUserDate(user);
+		// save userinfo in sessino
+		UserInfo userInfo = mapUserDate(user);
+		session.setAttribute("userInfo", userInfo);
 
+		return userInfo;
 	}
 
 	@POST

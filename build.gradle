@@ -16,9 +16,7 @@ dependencies {
 
     // Heroku Settings
     runtimeOnly "org.eclipse.jetty:jetty-runner:9.3.3.v20150827"
-    //runtimeOnly "org.mortbay.jetty:jetty-runner:8.1.1.v20120215"
-    //runtimeOnly "com.newrelic.agent.java:newrelic-agent:2.18.0"
-	
+
 	//PostgreSQL
 	compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
 	

@@ -3,13 +3,11 @@ package at.ac.uibk;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,13 +22,10 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.media.sound.ModelAbstractChannelMixer;
 
-import core.Category;
 import core.Item;
 import data.handler.DataHandler;
 import data.handler.IDataHandler;
-import data.model.SavedUser;
 
 @Path("/items")
 public class ItemService {
@@ -187,7 +182,7 @@ public class ItemService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_CREATE_ITEM, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_CREATE_ITEM, handler);
 
 		ObjectMapper om = new ObjectMapper();
 		Item item = null;
@@ -241,7 +236,7 @@ public class ItemService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_ITEM, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_EDIT_ITEM, handler);
 
 		ObjectMapper om = new ObjectMapper();
 		Item it = null;
@@ -297,7 +292,7 @@ public class ItemService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_ITEM, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_DELETE_ITEM, handler);
 
 		// delete item
 		handler.deleteItem(item);

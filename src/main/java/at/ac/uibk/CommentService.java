@@ -15,14 +15,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import core.Comment;
-import core.Item;
 import data.handler.DataHandler;
 import data.handler.IDataHandler;
 import data.model.ItemComment;
@@ -102,7 +100,7 @@ public class CommentService {
 		} catch (Exception e) {
 			response.setStatus(response.SC_NO_CONTENT);
 			
-			//leere liste zurückgeben
+			//leere liste zurï¿½ckgeben
 			return new ArrayList<Comment>();
 		} finally{
 			// close db connection
@@ -122,7 +120,7 @@ public class CommentService {
 		handler = new DataHandler();
 
 		// check user rights
-		// AuthenticationService.checkAuthority(request, response,
+		// AuthenticationService.ensureUserRight(request, response,
 		// Rights.CAN_CREATE_COMMENT, handler);
 
 		ObjectMapper om = new ObjectMapper();
@@ -177,7 +175,7 @@ public class CommentService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_EDIT_COMMENT, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_EDIT_COMMENT, handler);
 
 		ObjectMapper om = new ObjectMapper();
 		Comment com = null;
@@ -233,7 +231,7 @@ public class CommentService {
 		handler = new DataHandler();
 
 		// check user rights
-		AuthenticationService.checkAuthority(request, response, Rights.CAN_DELETE_COMMENT, handler);
+		AuthenticationService.ensureUserRight(request, response, Rights.CAN_DELETE_COMMENT, handler);
 
 		// delete comment
 		handler.deleteComment(commentID);
