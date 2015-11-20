@@ -1,15 +1,12 @@
 package team1.myshop.core;
 
 import data.handler.DataHandler;
-import data.handler.IDataHandler;
+import team1.myshop.contracts.IDataHandler;
 
-/**
- * Created by adanek on 20.11.2015.
- */
 public class ServiceLocator {
 
     private static IDataHandler _dataHandler;
-    private static String lock = "This is my lock object for syncronized blocks";
+    private static final String lock = "This is my lock object for syncronized blocks";
 
     public static IDataHandler getDataHandler(){
         if(_dataHandler == null){

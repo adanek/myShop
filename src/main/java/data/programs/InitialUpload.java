@@ -1,14 +1,7 @@
 package data.programs;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import data.handler.DataHandler;
-import data.handler.IDataHandler;
-import data.model.Category;
-import data.model.Item;
-import data.model.ItemComment;
-import data.model.SavedUser;
+import team1.myshop.contracts.IDataHandler;
 
 public class InitialUpload {
 

@@ -22,6 +22,7 @@ import data.model.Category;
 import data.model.Item;
 import data.model.ItemComment;
 import data.model.SavedUser;
+import team1.myshop.contracts.IDataHandler;
 
 public class DataHandler implements IDataHandler {
 
@@ -86,7 +87,7 @@ public class DataHandler implements IDataHandler {
 	}
 
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#closeDatabaseConnection()
+	 * @see team1.myshop.contracts.IDataHandler#closeDatabaseConnection()
 	 */
 	@Override
 	public void closeDatabaseConnection() throws IllegalStateException {
@@ -102,8 +103,7 @@ public class DataHandler implements IDataHandler {
 	/**
 	 * save an object to the database, when it is an entity
 	 * 
-	 * @param the
-	 *            object of an entity
+	 * @param obj the object of an entity
 	 * @return the ID of the entity
 	 * @throws IllegalStateException
 	 *             commit failed by saving from object
@@ -185,7 +185,7 @@ public class DataHandler implements IDataHandler {
 
 	// change comment
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#changeComment(int, java.lang.String)
+	 * @see team1.myshop.contracts.IDataHandler#changeComment(int, java.lang.String)
 	 */
 	@Override
 	public ItemComment changeComment(int commentID, String comment_text) throws IllegalArgumentException, IllegalStateException {
@@ -237,7 +237,7 @@ public class DataHandler implements IDataHandler {
 	
 	// change item
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#changeItem(int, java.lang.String, java.lang.String, int)
+	 * @see team1.myshop.contracts.IDataHandler#changeItem(int, java.lang.String, java.lang.String, int)
 	 */
 	@Override
 	public Item changeItem(int itemID, String title, String description, int categoryID) throws IllegalArgumentException, IllegalStateException {
@@ -298,7 +298,7 @@ public class DataHandler implements IDataHandler {
 	
 	// change category
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#changeCategory(int, java.lang.String)
+	 * @see team1.myshop.contracts.IDataHandler#changeCategory(int, java.lang.String)
 	 */
 	@Override
 	public Category changeCategory(int categoryID, String name) throws IllegalArgumentException, IllegalStateException {
@@ -349,7 +349,7 @@ public class DataHandler implements IDataHandler {
 	
 	// change user
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#changeUser(int, java.lang.String, int)
+	 * @see team1.myshop.contracts.IDataHandler#changeUser(int, java.lang.String, int)
 	 */
 	@Override
 	public SavedUser changeUser(int userID, String alias, int role) throws IllegalArgumentException, IllegalStateException {
@@ -404,7 +404,7 @@ public class DataHandler implements IDataHandler {
 	}
 	
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#createUser(java.lang.String, java.lang.String, int)
+	 * @see team1.myshop.contracts.IDataHandler#createUser(java.lang.String, java.lang.String, int)
 	 */
 	@Override
 	public SavedUser createUser(String alias, String password, int role) throws IllegalStateException {
@@ -432,7 +432,7 @@ public class DataHandler implements IDataHandler {
 	}
 
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#createCategory(java.lang.String)
+	 * @see team1.myshop.contracts.IDataHandler#createCategory(java.lang.String)
 	 */
 	@Override
 	public Category createCategory(String name) throws IllegalStateException {
@@ -447,7 +447,7 @@ public class DataHandler implements IDataHandler {
 	}
 
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#createItem(java.lang.String, java.lang.String, int, int)
+	 * @see team1.myshop.contracts.IDataHandler#createItem(java.lang.String, java.lang.String, int, int)
 	 */
 	@Override
 	public Item createItem(String title, String description, int category, int author)
@@ -499,7 +499,7 @@ public class DataHandler implements IDataHandler {
 
 	// create item comment
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#createItemComment(java.lang.String, int, int)
+	 * @see team1.myshop.contracts.IDataHandler#createItemComment(java.lang.String, int, int)
 	 */
 	@Override
 	public ItemComment createItemComment(String comment, int itemID, int author)
@@ -550,7 +550,7 @@ public class DataHandler implements IDataHandler {
 
 	// delete item comment
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#deleteComment(int)
+	 * @see team1.myshop.contracts.IDataHandler#deleteComment(int)
 	 */
 	@Override
 	public void deleteComment(int commentID) throws IllegalArgumentException {
@@ -567,7 +567,7 @@ public class DataHandler implements IDataHandler {
 
 	// delete item
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#deleteItem(int)
+	 * @see team1.myshop.contracts.IDataHandler#deleteItem(int)
 	 */
 	@Override
 	public void deleteItem(int itemID) throws IllegalArgumentException {
@@ -584,7 +584,7 @@ public class DataHandler implements IDataHandler {
 
 	// delete category
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#deleteCategory(int)
+	 * @see team1.myshop.contracts.IDataHandler#deleteCategory(int)
 	 */
 	@Override
 	public void deleteCategory(int categoryID) throws IllegalArgumentException {
@@ -601,7 +601,7 @@ public class DataHandler implements IDataHandler {
 
 	// get all categories
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getAllCategories()
+	 * @see team1.myshop.contracts.IDataHandler#getAllCategories()
 	 */
 	@Override
 	public Collection<Category> getAllCategories() throws IllegalStateException {
@@ -618,7 +618,7 @@ public class DataHandler implements IDataHandler {
 
 	// get all items
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getAllItems()
+	 * @see team1.myshop.contracts.IDataHandler#getAllItems()
 	 */
 	@Override
 	public Collection<Item> getAllItems() throws IllegalStateException {
@@ -635,7 +635,7 @@ public class DataHandler implements IDataHandler {
 
 	// get all item comments
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getAllItemComments()
+	 * @see team1.myshop.contracts.IDataHandler#getAllItemComments()
 	 */
 	@Override
 	public Collection<ItemComment> getAllItemComments() throws IllegalStateException {
@@ -652,7 +652,7 @@ public class DataHandler implements IDataHandler {
 
 	// get all users
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getAllUsers()
+	 * @see team1.myshop.contracts.IDataHandler#getAllUsers()
 	 */
 	@Override
 	public Collection<SavedUser> getAllUsers() throws IllegalStateException {
@@ -669,7 +669,7 @@ public class DataHandler implements IDataHandler {
 
 	// search for user by ID
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getUserByID(int)
+	 * @see team1.myshop.contracts.IDataHandler#getUserByID(int)
 	 */
 	@Override
 	public SavedUser getUserByID(int id) throws IllegalArgumentException {
@@ -678,7 +678,7 @@ public class DataHandler implements IDataHandler {
 
 	// search for category by ID
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getCategoryByID(int)
+	 * @see team1.myshop.contracts.IDataHandler#getCategoryByID(int)
 	 */
 	@Override
 	public Category getCategoryByID(int id) throws IllegalArgumentException {
@@ -687,7 +687,7 @@ public class DataHandler implements IDataHandler {
 
 	// search for item by ID
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getItemByID(int)
+	 * @see team1.myshop.contracts.IDataHandler#getItemByID(int)
 	 */
 	@Override
 	public Item getItemByID(int id) throws IllegalArgumentException {
@@ -696,7 +696,7 @@ public class DataHandler implements IDataHandler {
 
 	// search for comment by ID
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getItemCommentByID(int)
+	 * @see team1.myshop.contracts.IDataHandler#getItemCommentByID(int)
 	 */
 	@Override
 	public ItemComment getItemCommentByID(int id) throws IllegalArgumentException {
@@ -705,7 +705,7 @@ public class DataHandler implements IDataHandler {
 
 	// get all comments from item
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getCommentsFromItem(int)
+	 * @see team1.myshop.contracts.IDataHandler#getCommentsFromItem(int)
 	 */
 	@Override
 	public Collection<ItemComment> getCommentsFromItem(int itemID)
@@ -750,7 +750,7 @@ public class DataHandler implements IDataHandler {
 
 	// get all items from category
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getItemsFromCategory(int)
+	 * @see team1.myshop.contracts.IDataHandler#getItemsFromCategory(int)
 	 */
 	@Override
 	public Collection<Item> getItemsFromCategory(int categoryID)
@@ -855,7 +855,7 @@ public class DataHandler implements IDataHandler {
 	
 	//login user
 	/* (non-Javadoc)
-	 * @see data.handler.IDataHandler#getUserLogin(java.lang.String, java.lang.String)
+	 * @see team1.myshop.contracts.IDataHandler#getUserLogin(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public SavedUser getUserLogin(String alias, String password)

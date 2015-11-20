@@ -1,16 +1,19 @@
-package at.ac.uibk;
+package team1.myshop.web.helper;
 
-import static org.mockito.Mockito.*;
-
+import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 import org.testng.annotations.Test;
+import team1.myshop.contracts.IAuthenticationService;
+import team1.myshop.contracts.IHttpService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
-import static org.testng.Assert.*;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.*;
 
 public class AuthenticationServiceTest {
 
@@ -18,14 +21,17 @@ public class AuthenticationServiceTest {
     @Test
     public void getUserInfo_userLogedIn_doNotSendUnauthorized() throws IOException {
 
+        IAuthenticationService sut = new AuthenticationService();
+        HttpServletResponse response = mock(HttpServletResponse.class);
         int userid = 2;
+
         HttpSession session = mock(HttpSession.class);
         when(session.getAttribute("userid")).thenReturn(userid);
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getSession(false)).thenReturn(session);
-        HttpServletResponse response = mock(HttpServletResponse.class);
 
-        AuthenticationService.checkGetUserInfo(request, response, userid);
+        sut.checkGetUserInfo(request, response, userid);
 
         verify(response, times(0)).sendError(anyInt());
     }
@@ -33,19 +39,24 @@ public class AuthenticationServiceTest {
     @Test
     public void getUserInfo_userNotLogedIn_SendUnauthorized() throws IOException {
 
+        AuthenticationService sut = new AuthenticationService();
         int userid = 2;
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getSession(false)).thenReturn(null);
 
-        AuthenticationService.checkGetUserInfo(request, response, userid);
+        IHttpService http = mock(IHttpService.class);
+        sut.setHttpService(http);
 
-        verify(response).sendError(401);
+        sut.checkGetUserInfo(request, response, userid);
+
+        verify(http, times(1)).cancelRequest(response, SC_UNAUTHORIZED);
     }
 
     @Test
     public void getUserInfo_otherUser_SendUnauthorized() throws IOException {
 
+        AuthenticationService sut = new AuthenticationService();
         HttpSession session = mock(HttpSession.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -56,8 +67,11 @@ public class AuthenticationServiceTest {
         when(session.getAttribute("userid")).thenReturn(otherUserId);
         when(request.getSession(false)).thenReturn(session);
 
-        AuthenticationService.checkGetUserInfo(request, response, userid);
+        IHttpService http = mock(IHttpService.class);
+        sut.setHttpService(http);
 
-        verify(response).sendError(401);
+        sut.checkGetUserInfo(request, response, userid);
+
+        verify(http, times(1)).cancelRequest(response, SC_UNAUTHORIZED);
     }
 }

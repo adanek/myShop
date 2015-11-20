@@ -17,15 +17,12 @@ import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import core.Item;
-import core.Category;
+import team1.myshop.web.model.Item;
+import team1.myshop.web.model.Category;
 
 public class RestApi {
 
@@ -100,7 +97,7 @@ public class RestApi {
 		// first we have to login
 		login();
 
-		int catID = 0;
+		int catID;
 		
 		if(this.categories == null || this.categories.size() == 0){
 			getCategories();
@@ -146,7 +143,7 @@ public class RestApi {
 		// first we have to login
 		login();
 
-		int itemID = 0;
+		int itemID;
 		
 		if(this.items == null || this.items.size() == 0){
 			getItems();
@@ -234,7 +231,7 @@ public class RestApi {
 				// Object test = connection.getContent();
 				InputStreamReader in = new InputStreamReader((InputStream) connection.getContent());
 				BufferedReader buff = new BufferedReader(in);
-				String line = null;
+				String line;
 				StringBuffer buffer = new StringBuffer();
 				do {
 					line = buff.readLine();
