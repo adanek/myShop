@@ -19,14 +19,13 @@
         <Arg>jdbc/myshopDB</Arg>
         <Arg>
             <New class="org.postgresql.ds.PGPoolingDataSource">
-                <Set name="User">zddgxyvxvpjoqc</Set>
-                <Set name="Password">y7SaGLztPTlKYI_l6E11-fEpFj</Set>
-                <Set name="DatabaseName">d7cmp6g8g2psho</Set>
-                <Set name="ServerName">ec2-54-83-202-64.compute-1.amazonaws.com</Set>
+                <Set name="User">cokvwecanelrtv</Set>
+                <Set name="Password">VvwJFAhDt67qXlTACqNZAW9g0r</Set>
+                <Set name="DatabaseName">dc9eqmlj8jqkap</Set>
+                <Set name="ServerName">ec2-54-83-36-203.compute-1.amazonaws.com</Set>
                 <Set name="PortNumber">5432</Set>
                 <Set name="Ssl">true</Set>
                 <Set name="Sslfactory">org.postgresql.ssl.NonValidatingFactory</Set>
-                <Set name="MaxConnections">10</Set>
             </New>
         </Arg>
     </New>
