@@ -1,5 +1,6 @@
 package team1.myshop.web;
 
+import org.apache.logging.log4j.LogManager;
 import team1.myshop.contracts.UserRights;
 import team1.myshop.web.model.Comment;
 import data.model.ItemComment;
@@ -129,5 +130,10 @@ public class CommentService extends ServiceBase {
         dh.deleteComment(commentID);
 
         response.setStatus(SC_NO_CONTENT);
+    }
+
+    @Override
+    public void initializeLogger() {
+        this.setLogger(LogManager.getLogger(CommentService.class));
     }
 }

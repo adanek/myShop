@@ -1,5 +1,6 @@
 package team1.myshop.web;
 
+import org.apache.logging.log4j.LogManager;
 import team1.myshop.web.model.UserCredentials;
 import team1.myshop.web.model.UserInfo;
 import data.model.SavedUser;
@@ -114,5 +115,10 @@ public class UserService extends ServiceBase {
         response.setStatus(201);
 
         return UserInfo.parse(user);
+    }
+
+    @Override
+    public void initializeLogger() {
+        this.setLogger(LogManager.getLogger(UserService.class));
     }
 }

@@ -10,6 +10,7 @@ public class HttpService implements team1.myshop.contracts.IHttpService {
     public void cancelRequest(HttpServletResponse response, int status){
         try {
             response.sendError(status);
+            response.flushBuffer();
         } catch (IOException e) {
             e.printStackTrace();
         }

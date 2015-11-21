@@ -7,4 +7,6 @@ public interface IAuthenticationService {
 	void checkGetUserInfo(HttpServletRequest request, HttpServletResponse response, int userid);
 
 	void ensureUserRight(HttpServletRequest request, HttpServletResponse response, UserRights right);
+
+	boolean userHasRight(HttpServletRequest request, UserRights right);
 }

@@ -9,12 +9,12 @@
         return $http.get('api/categories');
       },
 
-      update: function(category) {
-        return $http.put('api/categories/'+ category.id, category);
+      new: function(category){
+        return $http.post('api/categories', category);
       },
 
-      new: function(category){
-        return $http.post('api/categories/new', category);
+      update: function(category) {
+        return $http.put('api/categories/'+ category.id, category);
       },
 
       remove: function(category){

@@ -1,5 +1,6 @@
 package team1.myshop.web;
 
+import org.apache.logging.log4j.LogManager;
 import team1.myshop.contracts.UserRights;
 import team1.myshop.web.model.Item;
 import team1.myshop.web.helper.JsonParser;
@@ -125,5 +126,10 @@ public class ItemService extends ServiceBase {
         dh.deleteItem(item);
 
         response.setStatus(SC_NO_CONTENT);
+    }
+
+    @Override
+    public void initializeLogger() {
+        this.setLogger(LogManager.getLogger(UserService.class));
     }
 }
