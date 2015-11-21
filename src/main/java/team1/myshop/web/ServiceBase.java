@@ -1,9 +1,8 @@
 package team1.myshop.web;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import team1.myshop.contracts.IDataHandler;
 import team1.myshop.contracts.IAuthenticationService;
+import team1.myshop.contracts.IDataHandler;
 import team1.myshop.contracts.IHttpService;
 import team1.myshop.core.ServiceLocator;
 import team1.myshop.web.helper.AuthenticationService;

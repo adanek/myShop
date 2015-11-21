@@ -36,6 +36,7 @@ public class CategoryService extends ServiceBase {
 
         if (categories == null) {
             http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+            return null;
         }
 
         return Category.parse(categories);
@@ -48,14 +49,20 @@ public class CategoryService extends ServiceBase {
                                    @Context HttpServletResponse response) {
 
         this.initialize();
+
         // check user rights
-        auth.ensureUserRight(request, response, UserRights.CAN_CREATE_CATEGORY);
+        if(!auth.userHasRight(request, UserRights.CAN_CREATE_CATEGORY)){
+            logger.info("User wants to create a category, but did not have the right to");
+            http.cancelRequest(response, SC_UNAUTHORIZED);
+            return null;
+        }
 
         Category cat = JsonParser.parse(catString, Category.class);
 
         // parse body data
         if (cat == null) {
             http.cancelRequest(response, SC_BAD_REQUEST);
+            return null;
         }
 
         // Save the new category
@@ -63,6 +70,7 @@ public class CategoryService extends ServiceBase {
 
         if (category == null) {
             http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+            return null;
         }
 
         // Set response headers
@@ -93,6 +101,7 @@ public class CategoryService extends ServiceBase {
         // Validate data
         if (cat == null || cat.id != category) {
             http.cancelRequest(response, SC_BAD_REQUEST);
+            return null;
         }
 
         // Save category

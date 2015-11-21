@@ -27,12 +27,17 @@ public class UserService extends ServiceBase {
         this.initialize();
 
         // check user rights
-        auth.checkGetUserInfo(request, response, userid);
+        if(!auth.checkGetUserInfo(request, response, userid)){
+            logger.info("User tried to access the userinfo of another user");
+            http.cancelRequest(response, SC_UNAUTHORIZED);
+            return null;
+        }
 
         SavedUser user = dh.getUserByID(userid);
 
         if (user == null) {
             http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+            return null;
         }
 
         return UserInfo.parse(user);
@@ -49,13 +54,16 @@ public class UserService extends ServiceBase {
 
         UserCredentials credentials = JsonParser.parse(credstring, UserCredentials.class);
         if (credentials == null) {
+            logger.info("Could not parse user credentials: " + credstring);
             http.cancelRequest(response, SC_BAD_REQUEST);
+            return null;
         }
 
         assert credentials != null;
         SavedUser user = dh.getUserLogin(credentials.name, credentials.hash);
         if (user == null) {
             http.cancelRequest(response, SC_UNAUTHORIZED);
+            return null;
         }
 
         // create new session
@@ -99,7 +107,9 @@ public class UserService extends ServiceBase {
 
         UserCredentials credentials = JsonParser.parse(credstring, UserCredentials.class);
         if (credentials == null) {
+            logger.info("Could not parse user credentials: " + credstring);
             http.cancelRequest(response, SC_BAD_REQUEST);
+            return null;
         }
 
         assert credentials != null;
@@ -108,6 +118,7 @@ public class UserService extends ServiceBase {
         // user create failed
         if (user == null) {
             http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+            return null;
         }
 
         assert user != null;

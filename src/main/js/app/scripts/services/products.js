@@ -4,16 +4,16 @@
   //noinspection JSUnusedGlobalSymbols
   app.factory('Products', ['$http', function ProductsFactory($http) {
     return {
+      new: function (product) {
+        return $http.post('api/items', product);
+      },
+
       query: function () {
         return $http.get('api/items');
       },
 
       fromCategory: function (categotryId) {
         return $http.get('api/items/category/' + categotryId);
-      },
-
-      new: function (product) {
-        return $http.post('api/items/new', product);
       },
 
       delete: function(product){

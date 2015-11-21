@@ -1,6 +1,7 @@
 package team1.myshop.web.helper;
 
 import data.model.SavedUser;
+import org.apache.logging.log4j.LogManager;
 import team1.myshop.contracts.UserRights;
 import team1.myshop.web.ServiceBase;
 import team1.myshop.web.model.UserInfo;
@@ -15,13 +16,10 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 public class AuthenticationService extends ServiceBase implements team1.myshop.contracts.IAuthenticationService {
 
     @Override
-    public void checkGetUserInfo(HttpServletRequest request, HttpServletResponse response, int userid) {
+    public boolean checkGetUserInfo(HttpServletRequest request, HttpServletResponse response, int userid) {
 
         HttpSession session = request.getSession(false);
-
-        if (session == null || (int) session.getAttribute("userid") != userid) {
-            http.cancelRequest(response, SC_UNAUTHORIZED);
-        }
+        return (session == null || (int) session.getAttribute("userid") != userid);
     }
 
     @Override
@@ -91,9 +89,25 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
                 return user.rights.canCreateCategory;
             case CAN_EDIT_CATEGORY:
                 return user.rights.canEditCategory;
+            case CAN_CREATE_ITEM:
+                return user.rights.canCreateItem;
+            case CAN_EDIT_ITEM:
+                return user.rights.canEditItem;
+            case CAN_DELETE_ITEM:
+                return user.rights.canDeleteItem;
+            case CAN_CREATE_COMMENT:
+                return user.rights.canCreateComment;
+            case CAN_EDIT_COMMENT:
+                return user.rights.canEditComment;
+            case CAN_DELETE_COMMENT:
+                return user.rights.canDeleteComment;
             default:
                 return false;
         }
     }
 
+    @Override
+    public void initializeLogger() {
+        this.setLogger(LogManager.getLogger(AuthenticationService.class));
+    }
 }
