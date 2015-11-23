@@ -19,7 +19,12 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
     public boolean checkGetUserInfo(HttpServletRequest request, HttpServletResponse response, int userid) {
 
         HttpSession session = request.getSession(false);
-        return (session == null || (int) session.getAttribute("userid") != userid);
+
+        if(session == null){
+            return false;
+        }
+
+        return (int) session.getAttribute("userid") == userid;
     }
 
     @Override
