@@ -57,6 +57,7 @@ public class CategoryService extends ServiceBase {
             return null;
         }
 
+
         Category cat = JsonParser.parse(catString, Category.class);
 
         // parse body data
@@ -66,7 +67,8 @@ public class CategoryService extends ServiceBase {
         }
 
         // Save the new category
-        data.model.Category category = dh.createCategory(cat != null ? cat.name : null);
+        assert cat != null;
+        data.model.Category category = dh.createCategory(cat.name);
 
         if (category == null) {
             http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
@@ -74,7 +76,6 @@ public class CategoryService extends ServiceBase {
         }
 
         // Set response headers
-        assert cat != null;
         response.setHeader("Location", "api/categories/" + cat.id);
         response.setStatus(HttpServletResponse.SC_CREATED);
 
