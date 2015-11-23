@@ -60,7 +60,7 @@ public class RestApi {
 		}
 		
 		// check HTTP status code --> OK
-		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 
 	}
 
@@ -84,7 +84,7 @@ public class RestApi {
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/categories", json, "POST");
 
 		// check HTTP status code --> OK
-		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 
 	}
 
@@ -130,7 +130,7 @@ public class RestApi {
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/items", json, "POST");
 		
 		// check HTTP status code --> OK
-		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 
 	}
 
@@ -176,7 +176,7 @@ public class RestApi {
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/comments/new", json, "POST");
 
 		// check HTTP status code --> OK
-		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 	}
 
 	@Test
@@ -194,8 +194,7 @@ public class RestApi {
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/login", cred, "POST");
 
 		// check HTTP status code --> OK
-		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
-
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 	}
 
 	private int callURL(String urlString, JSONObject json, String method) {

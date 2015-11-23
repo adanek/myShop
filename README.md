@@ -3,41 +3,41 @@
 Um das Projekt lokal zu starten verwende
 gradle jettyRunWar
 
-# Task 5:
+Um die Tests auszuf�hren:
+gradle test
 
-Abgabedatum - 09.11.2015 bis 12:00 Uhr
+# Task 6:
+
+Abgabedatum - 23.11.2015 bis 20:00 Uhr
 
 ## Doing
 
-Bitte beachten, dass ab jetzt der Einsatz von Libraries/Frameworks erlaubt (und sogar erwünscht) ist.
+Bitte beachten, dass ab jetzt der Einsatz von Libraries/Frameworks erlaubt (und sogar erw�nscht) ist.
 
-### Erstellung des Grundgerüstes
+### Testing der Web-Applikation
 
-Es ist folgendes Grundgerüst mit Hilfe eines Java-Servers (Jetty, Apache Tomcat) zu erstellen.
-- Kategorien (beinhalten 0 bis n Items)
-- Items (besteht min. aus Titel, Beschreibung, Erstellungs- und Änderungsdatum, Author)
-- Item-Kommentare (gehören zu genau einem Item, ein Item hat beliebig viele Kommentare)
-- [Startseite]
-- Anbindung an eine Datenbank (per JDBC, JPA, Hibernate, ...)
-- An geeigneten Stellen sollen Page-Reloads vermieden werden (AJAX)
+Die entwickelte Web-Applikation soll automatisiert getestet werden.   
 
-### Benutzersystem
+#### Server-Testing (inkl. Code-Coverage)
+Am Server soll (zumindest) zwischen Unit- und Integrationstests unterschieden werden.   
+Dabei sollen min. folgende Komponenten gepr�ft werden:   
+1) REST-API (sowie deren Businesslogic)
+2) Authentifizierung
 
-Ein Benutzersystem mit folgenden Eckdaten soll erstellt werden:
-- Am System sollen sich Benutzer anmelden und registrieren können
-- Nur angemeldete Benutzer können Kommentare für Items erstellen (eigenen Kommentare können bearbeitet werden, andere nicht)
-- Es gibt min die drei Rollen: Guest (read-only), Benutzer (erstellen bzw. bearbeiten von Kommentaren) und Administrator (erstellen bzw. bearbeiten von Kategorien, Items und allen Kommentaren).
+Ebenso ist eine Code-Coverage zu erstellen, die min. 60% erreichen soll.   
+Beschreibe kurz, wie die Trennung der einzelnen Komponenten sauber gelingt und mit Hilfe welcher Techniken/Tools dies umgesetzt wurde.
 
-### REST-API
+#### Browser-Simulation
+Der Seitenaufbau in einem (simulierten) Browser soll getestet werden.   
+Falls m�glich/sinnvoll, soll dabei ebenfalls eine Codeabdeckung generiert werden (vorerst gibt es hier aber keinen Wert, der erreicht werden muss).
 
-Alle Funktionen sollen über eine REST-API aufrufbar sein. Es ist darauf zu achten, dass das Benutzersystem auch auf dieser API funktionsfähig bleibt.
+#### Abgrenzung
+Beschreibe, was im Rahmen der obigen Teilaufgaben nicht getestet wurde bzw. werden konnte.   
+Was sollte noch getestet werden?   
+Wie k�nnte dabei vorgegangen werden?
 
 ## Reading:
 
-### Java
-[Jetty Konfiguration (per Annotations)](http://www.eclipse.org/jetty/documentation/current/using-annotations.html)
-[REST-API (mit Jersey)](http://www.vogella.com/tutorials/REST/article.html)
-
-### Gradle
-[Gradle Documentation](https://docs.gradle.org/current/userguide/userguide.html)
+### Testen
+[Vorlesungsfolien](http://dbis-informatik.uibk.ac.at/298-0-VOPS-Programmieren-von-Web-Information-Systems.html)
 

@@ -60,3 +60,8 @@ task copyToLib << {
 
 task stage(dependsOn: ["clean", "war", "copyToLib"])
 
+test {
+  // enable TestNG support (default is JUnit)
+  useTestNG()
+}
+
