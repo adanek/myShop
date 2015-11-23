@@ -81,7 +81,7 @@ public class RestApi {
 			e.printStackTrace();
 		}
 
-		int code = callURL("http://webinfo-myshop.herokuapp.com/api/categories/new", json, "POST");
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/categories", json, "POST");
 
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
@@ -127,10 +127,10 @@ public class RestApi {
 			e.printStackTrace();
 		}
 
-		int code = callURL("http://webinfo-myshop.herokuapp.com/api/items/new", json, "POST");
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/items", json, "POST");
 		
 		// check HTTP status code --> OK
-		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_NO_CONTENT);
+		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
 
 	}
 
@@ -176,8 +176,7 @@ public class RestApi {
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/comments/new", json, "POST");
 
 		// check HTTP status code --> OK
-		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_NO_CONTENT);
-
+		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
 	}
 
 	@Test
