@@ -14,6 +14,7 @@ import java.io.IOException;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertEquals;
 
 public class AuthenticationServiceTest {
 
@@ -31,13 +32,14 @@ public class AuthenticationServiceTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getSession(false)).thenReturn(session);
 
-        sut.checkGetUserInfo(request, response, userid);
+        boolean expected = true;
+        boolean actual = sut.checkGetUserInfo(request, response, userid);
 
-        verify(response, times(0)).sendError(anyInt());
+        assertEquals(actual, expected);
     }
 
     @Test
-    public void getUserInfo_userNotLogedIn_SendUnauthorized() throws IOException {
+    public void getUserInfo_userNotLogedIn_ReturnsFalse() throws IOException {
 
         AuthenticationService sut = new AuthenticationService();
         int userid = 2;
@@ -48,13 +50,14 @@ public class AuthenticationServiceTest {
         IHttpService http = mock(IHttpService.class);
         sut.setHttpService(http);
 
-        sut.checkGetUserInfo(request, response, userid);
+        boolean expected = false;
+        boolean actual = sut.checkGetUserInfo(request, response, userid);
 
-        verify(http, times(1)).cancelRequest(response, SC_UNAUTHORIZED);
+        assertEquals(actual, expected);
     }
 
     @Test
-    public void getUserInfo_otherUser_SendUnauthorized() throws IOException {
+    public void getUserInfo_otherUser_ReturnsFalse() throws IOException {
 
         AuthenticationService sut = new AuthenticationService();
         HttpSession session = mock(HttpSession.class);
@@ -70,8 +73,9 @@ public class AuthenticationServiceTest {
         IHttpService http = mock(IHttpService.class);
         sut.setHttpService(http);
 
-        sut.checkGetUserInfo(request, response, userid);
+        boolean expected = false;
+        boolean actual = sut.checkGetUserInfo(request, response, userid);
 
-        verify(http, times(1)).cancelRequest(response, SC_UNAUTHORIZED);
+        assertEquals(actual, expected);
     }
 }

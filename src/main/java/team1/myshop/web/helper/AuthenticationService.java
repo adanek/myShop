@@ -19,7 +19,12 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
     public boolean checkGetUserInfo(HttpServletRequest request, HttpServletResponse response, int userid) {
 
         HttpSession session = request.getSession(false);
-        return (session == null || (int) session.getAttribute("userid") != userid);
+
+        if(session == null){
+            return false;
+        }
+
+        return (int) session.getAttribute("userid") == userid;
     }
 
     @Override
@@ -101,6 +106,10 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
                 return user.rights.canEditComment;
             case CAN_DELETE_COMMENT:
                 return user.rights.canDeleteComment;
+            case CAN_DELETE_USER:
+                return user.rights.canDeleteUser;
+            case CAN_EDIT_USER:
+                return user.rights.canEditUser;
             default:
                 return false;
         }

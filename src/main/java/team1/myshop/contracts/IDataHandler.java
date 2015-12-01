@@ -23,7 +23,7 @@ public interface IDataHandler {
 	Category changeCategory(int categoryID, String name) throws IllegalArgumentException, IllegalStateException;
 
 	// change user
-	SavedUser changeUser(int userID, String alias, int role) throws IllegalArgumentException, IllegalStateException;
+	SavedUser changeUser(int userID, int role) throws IllegalArgumentException, IllegalStateException;
 
 	SavedUser createUser(String alias, String password, int role) throws IllegalStateException;
 
@@ -77,5 +77,8 @@ public interface IDataHandler {
 
 	//login user
 	SavedUser getUserLogin(String alias, String password) throws IllegalStateException;
+
+	//delete user
+	void deleteUser(int userID) throws IllegalArgumentException;
 
 }

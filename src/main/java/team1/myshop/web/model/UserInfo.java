@@ -32,6 +32,7 @@ public class UserInfo {
 				ur.canEditCategory = true;
 				ur.canEditItem = true;
 				ur.canEditComment = true;
+				ur.canDeleteUser = true;
 				break;
 			case 2:
 				ui.role = "author";
