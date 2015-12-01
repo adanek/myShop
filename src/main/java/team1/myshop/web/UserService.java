@@ -1,5 +1,6 @@
 package team1.myshop.web;
 
+import com.auth0.jwt.JWTSigner;
 import org.apache.logging.log4j.LogManager;
 
 import team1.myshop.web.model.Item;
@@ -20,6 +21,7 @@ import static javax.servlet.http.HttpServletResponse.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 @Path("/users")
 public class UserService extends ServiceBase {
@@ -127,7 +129,10 @@ public class UserService extends ServiceBase {
 		UserInfo userInfo = UserInfo.parse(user);
 		session.setAttribute("userInfo", userInfo);
 
-		return userInfo;
+        JWTSigner signer = new JWTSigner("MY_SECRET");
+        userInfo.token = signer.sign(new HashMap<>(10));
+
+        return userInfo;
 	}
 
 	@POST
@@ -237,7 +242,7 @@ public class UserService extends ServiceBase {
 			return null;
 		}
 
-		//der eigene User darf nicht geändert werden
+		//der eigene User darf nicht geï¿½ndert werden
 		if(userID == auth.getUserInfo(request).id){
 			http.cancelRequest(response, SC_FORBIDDEN);
 			return null;

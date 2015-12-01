@@ -1,5 +1,7 @@
 package team1.myshop.web.helper;
 
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.JWTVerifyException;
 import data.model.SavedUser;
 import org.apache.logging.log4j.LogManager;
 import team1.myshop.contracts.UserRights;
@@ -9,7 +11,12 @@ import team1.myshop.web.model.UserInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.Enumeration;
+import java.util.Map;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
@@ -20,7 +27,7 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
 
         HttpSession session = request.getSession(false);
 
-        if(session == null){
+        if (session == null) {
             return false;
         }
 
@@ -28,16 +35,16 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
     }
 
     @Override
-    public UserInfo getUserInfo(HttpServletRequest request){
-    	
-    	HttpSession session = request.getSession(false);
-    	
+    public UserInfo getUserInfo(HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
         if (session == null) {
             return null;
         }
-    	
+
         UserInfo user = null;
-        
+
         Enumeration<String> attributeNames = session.getAttributeNames();
         while (attributeNames.hasMoreElements()) {
             if (attributeNames.nextElement().equals("userInfo")) {
@@ -45,11 +52,11 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
                 break;
             }
         }
-        
+
         return user;
-    	
+
     }
-    
+
     @Override
     public void ensureUserRight(HttpServletRequest request, HttpServletResponse response, UserRights right) {
 
@@ -92,6 +99,31 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
     }
 
     public boolean userHasRight(HttpServletRequest request, UserRights right) {
+
+        this.initialize();
+
+        JWTVerifier verifier = new JWTVerifier("MY_SECRET");
+        String token = null;
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null) {
+            token = authorization.split(" ")[1];
+        }
+        if (token != null) {
+            try {
+                Map<String, Object> data = verifier.verify(token);
+                this.logger.info("Authtoken successful verified");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SignatureException e) {
+                e.printStackTrace();
+            } catch (JWTVerifyException e) {
+                e.printStackTrace();
+            }
+        }
 
         HttpSession session = request.getSession(false);
 

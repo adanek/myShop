@@ -13,6 +13,7 @@ public class UserInfo {
 	public int userid; //?
 	public String role;
 	public UserRights rights;
+	public String token;
 
 	public static UserInfo parse(SavedUser user){
 		UserInfo ui = new UserInfo();
