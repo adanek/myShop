@@ -11,5 +11,7 @@ public class UserRights {
 	public boolean canEditCategory;
 	public boolean canEditItem;
 	public boolean canEditComment;
+	public boolean canDeleteUser;
+	public boolean canEditUser;
 	
 }

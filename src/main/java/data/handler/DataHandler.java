@@ -30,18 +30,21 @@ public class DataHandler implements IDataHandler {
 	private ServiceRegistry serviceRegistry;
 	private Connection connection;
 
-	//private constructor
-	public DataHandler() throws IllegalStateException {
+	// private constructor
+	public DataHandler(boolean test) throws IllegalStateException {
 
 		try {
 			// connect to db
-			//connection = connectToDatabase();
+			// connection = connectToDatabase();
 
 			// create session factory
 			Configuration configuration = new Configuration();
 			// productive DB
-			configuration.configure();
-
+			if (test) {
+				configuration.configure("hibernate.cfg.test.xml");
+			} else {
+				configuration.configure();
+			}
 			serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 			sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
@@ -54,6 +57,12 @@ public class DataHandler implements IDataHandler {
 		} catch (Exception e) {
 			System.out.println("some connection error");
 		}
+	}
+
+	// private constructor
+	public DataHandler() throws IllegalStateException {
+
+		this(false);
 	}
 
 	/**
@@ -86,24 +95,27 @@ public class DataHandler implements IDataHandler {
 		return conn;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#closeDatabaseConnection()
 	 */
 	@Override
 	public void closeDatabaseConnection() throws IllegalStateException {
-//		sessionFactory.close();
-//		try {
-//			connection.close();
-//		} catch (Exception e) {
-//			System.out.println("closing connection not possible");
-//			throw new IllegalStateException("closing connection not possible");
-//		}
+		// sessionFactory.close();
+		// try {
+		// connection.close();
+		// } catch (Exception e) {
+		// System.out.println("closing connection not possible");
+		// throw new IllegalStateException("closing connection not possible");
+		// }
 	}
 
 	/**
 	 * save an object to the database, when it is an entity
 	 * 
-	 * @param obj the object of an entity
+	 * @param obj
+	 *            the object of an entity
 	 * @return the ID of the entity
 	 * @throws IllegalStateException
 	 *             commit failed by saving from object
@@ -184,11 +196,15 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// change comment
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#changeComment(int, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#changeComment(int,
+	 * java.lang.String)
 	 */
 	@Override
-	public ItemComment changeComment(int commentID, String comment_text) throws IllegalArgumentException, IllegalStateException {
+	public ItemComment changeComment(int commentID, String comment_text)
+			throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
 
@@ -234,13 +250,17 @@ public class DataHandler implements IDataHandler {
 		}
 
 	}
-	
+
 	// change item
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#changeItem(int, java.lang.String, java.lang.String, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#changeItem(int,
+	 * java.lang.String, java.lang.String, int)
 	 */
 	@Override
-	public Item changeItem(int itemID, String title, String description, int categoryID) throws IllegalArgumentException, IllegalStateException {
+	public Item changeItem(int itemID, String title, String description, int categoryID)
+			throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
 
@@ -260,12 +280,12 @@ public class DataHandler implements IDataHandler {
 			// get category
 			Category cat = getCategoryByID(categoryID);
 
-			if(cat == null){
+			if (cat == null) {
 				throw new IllegalArgumentException("categoryID");
 			}
-			
+
 			Item item = results.get(0);
-			
+
 			// change item
 			item.setTitle(title);
 			item.setDescription(description);
@@ -295,10 +315,13 @@ public class DataHandler implements IDataHandler {
 		}
 
 	}
-	
+
 	// change category
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#changeCategory(int, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#changeCategory(int,
+	 * java.lang.String)
 	 */
 	@Override
 	public Category changeCategory(int categoryID, String name) throws IllegalArgumentException, IllegalStateException {
@@ -346,20 +369,24 @@ public class DataHandler implements IDataHandler {
 		}
 
 	}
-	
+
 	// change user
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#changeUser(int, java.lang.String, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#changeUser(int,
+	 * java.lang.String, int)
 	 */
 	@Override
-	public SavedUser changeUser(int userID, String alias, int role) throws IllegalArgumentException, IllegalStateException {
+	public SavedUser changeUser(int userID, int role)
+			throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
 
-		if(role < 1 || role > 3){
+		if (role < 1 || role > 3) {
 			throw new IllegalArgumentException("invalid role");
 		}
-		
+
 		try {
 
 			// begin transaction
@@ -376,7 +403,6 @@ public class DataHandler implements IDataHandler {
 			SavedUser user = results.get(0);
 
 			// change user data
-			user.setAlias(alias);
 			user.setRole(role);
 
 			// update user
@@ -402,9 +428,12 @@ public class DataHandler implements IDataHandler {
 		}
 
 	}
-	
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#createUser(java.lang.String, java.lang.String, int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#createUser(java.lang.String,
+	 * java.lang.String, int)
 	 */
 	@Override
 	public SavedUser createUser(String alias, String password, int role) throws IllegalStateException {
@@ -412,13 +441,13 @@ public class DataHandler implements IDataHandler {
 		// create user instance
 		SavedUser user = new SavedUser();
 		user.setAlias(alias);
-		
-		if(role < 1 || role > 3){
+
+		if (role < 1 || role > 3) {
 			throw new IllegalStateException("invalid user role");
 		}
-		
+
 		user.setRole(role);
-		
+
 		try {
 			user.setPassword(PasswordHash.getSaltedHash(password));
 		} catch (Exception e) {
@@ -431,7 +460,9 @@ public class DataHandler implements IDataHandler {
 		return user;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#createCategory(java.lang.String)
 	 */
 	@Override
@@ -446,8 +477,11 @@ public class DataHandler implements IDataHandler {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#createItem(java.lang.String, java.lang.String, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#createItem(java.lang.String,
+	 * java.lang.String, int, int)
 	 */
 	@Override
 	public Item createItem(String title, String description, int category, int author)
@@ -498,8 +532,12 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// create item comment
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#createItemComment(java.lang.String, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * team1.myshop.contracts.IDataHandler#createItemComment(java.lang.String,
+	 * int, int)
 	 */
 	@Override
 	public ItemComment createItemComment(String comment, int itemID, int author)
@@ -549,7 +587,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// delete item comment
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#deleteComment(int)
 	 */
 	@Override
@@ -565,8 +605,23 @@ public class DataHandler implements IDataHandler {
 		}
 	}
 
+	@Override
+	public void deleteUser(int userID) throws IllegalArgumentException {
+		try {
+			// SavedUser
+			SavedUser user = getUserByID(userID);
+			// delete comment from database
+			deleteObjectFromDb(user);
+		} catch (IllegalArgumentException e) {
+			System.out.println("deletion or getting user from ID failed");
+			throw new IllegalArgumentException("deletion or getting user from ID failed", e);
+		}
+	}
+
 	// delete item
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#deleteItem(int)
 	 */
 	@Override
@@ -583,7 +638,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// delete category
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#deleteCategory(int)
 	 */
 	@Override
@@ -600,7 +657,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// get all categories
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getAllCategories()
 	 */
 	@Override
@@ -617,7 +676,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// get all items
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getAllItems()
 	 */
 	@Override
@@ -634,7 +695,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// get all item comments
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getAllItemComments()
 	 */
 	@Override
@@ -651,7 +714,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// get all users
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getAllUsers()
 	 */
 	@Override
@@ -668,7 +733,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// search for user by ID
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getUserByID(int)
 	 */
 	@Override
@@ -677,7 +744,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// search for category by ID
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getCategoryByID(int)
 	 */
 	@Override
@@ -686,7 +755,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// search for item by ID
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getItemByID(int)
 	 */
 	@Override
@@ -695,7 +766,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// search for comment by ID
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getItemCommentByID(int)
 	 */
 	@Override
@@ -704,7 +777,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// get all comments from item
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getCommentsFromItem(int)
 	 */
 	@Override
@@ -749,7 +824,9 @@ public class DataHandler implements IDataHandler {
 	}
 
 	// get all items from category
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see team1.myshop.contracts.IDataHandler#getItemsFromCategory(int)
 	 */
 	@Override
@@ -852,49 +929,50 @@ public class DataHandler implements IDataHandler {
 			session.close();
 		}
 	}
-	
-	//login user
-	/* (non-Javadoc)
-	 * @see team1.myshop.contracts.IDataHandler#getUserLogin(java.lang.String, java.lang.String)
+
+	// login user
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#getUserLogin(java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
-	public SavedUser getUserLogin(String alias, String password)
-			throws IllegalStateException {
+	public SavedUser getUserLogin(String alias, String password) throws IllegalStateException {
 		Session session = openSession();
-	
+
 		try {
 
 			// begin transaction
 			session.beginTransaction();
 
-			//System.out.println("Transaction started");
-			
+			// System.out.println("Transaction started");
+
 			Criteria cr = session.createCriteria(SavedUser.class);
 			cr.add(Restrictions.eq("alias", alias));
 			List<SavedUser> results = cr.list();
 
 			// commit
 			session.getTransaction().commit();
-			
+
 			// only one element in the list because the id is unique
 			for (SavedUser user : results) {
 				try {
-					//System.out.println("PW check started");
+					// System.out.println("PW check started");
 					if (PasswordHash.check(password, user.getPassword()))
-						//System.out.println("Return user");
+						// System.out.println("Return user");
 						return user;
 				} catch (Exception e) {
-					//System.out.println("PW check failed");
+					// System.out.println("PW check failed");
 					throw new IllegalStateException("Fail by checking the user password");
 				}
 			}
-			//System.out.println("no users found");
+			// System.out.println("no users found");
 		} catch (HibernateException e) {
 			// Exception -> rollback
-			//System.out.println("Error!!");
+			// System.out.println("Error!!");
 			session.getTransaction().rollback();
-			throw new IllegalStateException(
-					"something went wrong by getting the user");
+			throw new IllegalStateException("something went wrong by getting the user");
 		} finally {
 			// close session
 			session.close();

@@ -8,13 +8,13 @@ public class DatabaseTest {
 
 	public static void main(String[] args) {
 
-		IDataHandler handler = new DataHandler();
+		IDataHandler handler = new DataHandler(true);
 
-		handler.changeUser(4, "Pat", 2);
+		handler.deleteUser(4);
 
-		SavedUser user = handler.getUserByID(4);
+		//SavedUser user = handler.getUserByID(4);
 		
-		System.out.println("User: " + user.getId() + " " + user.getAlias() + " " + user.getRole());
+		//System.out.println("User: " + user.getId() + " " + user.getAlias() + " " + user.getRole());
 
 		handler.closeDatabaseConnection();
 

@@ -178,6 +178,34 @@ public class RestApi {
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 	}
+	
+	@Test
+	public void deleteUser() {
+
+		CookieManager cookieManager = new CookieManager();
+		CookieHandler.setDefault(cookieManager);
+
+		// first we have to login
+		login();
+
+		int userID = 3;
+		
+		JSONObject json = new JSONObject();
+		try {
+			json.put("id", userID);
+			json.put("alias", "Andi");
+			json.put("role", "1");
+			json.put("rights", "");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/" + userID, json, "POST");
+
+		// check HTTP status code --> OK
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_NO_CONTENT, code);
+	}
 
 	@Test
 	public void login() {
