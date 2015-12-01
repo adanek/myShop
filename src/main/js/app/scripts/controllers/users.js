@@ -28,23 +28,23 @@
     //  "user"
     //];
 
-    function init (){
+    function init() {
       // Load users
       User.all().then(
-        function success(response){
+        function success(response) {
           $scope.users = response.data;
         },
-        function error(response){
+        function error(response) {
           console.log(response);
         }
       );
 
       // load user roles
       User.roles().then(
-        function success(response){
+        function success(response) {
           $scope.roles = response.data;
         },
-        function error(response){
+        function error(response) {
           console.log(response);
         });
     }
@@ -70,19 +70,19 @@
       $scope.user = undefined;
     };
 
-    $scope.remove= function(user){
-      User.deleteUser(user).then(
-        function success(){
-          $scope.oldRole = undefined;
-          $scope.user = undefined;
-          var pos = $scope.users.indexOf(user);
-          $scope.users.slice(pos, 1);
-        },
-        function error(response){
-          console.log(response);
-        }
-      );
-    };
+    $scope.remove = function (user) {
 
+      var ndx = $scope.users.indexOf(user);
+      if (ndx > -1) {
+
+        User.remove(user).then(
+          function success() {
+            $scope.users.splice(ndx, 1);
+          },
+          function error(response) {
+            $scope.error = "Failed to delete user " + user.alias;
+          });
+      }
+    };
   }]);
 })(angular.module('myshopApp'));
