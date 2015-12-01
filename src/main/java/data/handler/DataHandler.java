@@ -766,6 +766,11 @@ public class DataHandler implements IDataHandler {
 			// commit
 			session.getTransaction().commit();
 
+			//user not available
+			if(results.size() < 1){
+				return null;
+			}
+			
 			// only one element in the list because the id is unique
 			return results.get(0);
 

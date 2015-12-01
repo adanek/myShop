@@ -163,6 +163,13 @@ public class UserService extends ServiceBase {
 		}
 
 		assert credentials != null;
+		
+		//user already exists?
+		if(dh.getUserByName(credentials.name) != null){
+			http.cancelRequest(response, SC_CONFLICT);
+			return null;
+		}
+		
 		SavedUser user = dh.createUser(credentials.name, credentials.hash, 2); // to-do
 
 		// user create failed
