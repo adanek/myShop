@@ -32,7 +32,7 @@
       // Load users
       User.all().then(
         function success(response){
-          $scope.users = response.body;
+          $scope.users = response.data;
         },
         function error(response){
           console.log(response);
@@ -42,7 +42,7 @@
       // load user roles
       User.roles().then(
         function success(response){
-          $scope.roles = response.body;
+          $scope.roles = response.data;
         },
         function error(response){
           console.log(response);
