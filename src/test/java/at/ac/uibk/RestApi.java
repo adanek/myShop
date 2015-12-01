@@ -17,11 +17,15 @@ import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.BeforeClass;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import data.handler.DataHandler;
+import data.model.SavedUser;
 import team1.myshop.web.model.Item;
+import team1.myshop.contracts.IDataHandler;
 import team1.myshop.web.model.Category;
 
 public class RestApi {
@@ -29,6 +33,7 @@ public class RestApi {
 	private String returnValue = null;
 	private List<Category> categories;
 	private List<Item> items;
+	private IDataHandler dh;
 
 	@Test
 	public void getCategories() {
@@ -46,7 +51,7 @@ public class RestApi {
 		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
 
 	}
-	
+
 	@Test
 	public void getRoles() {
 
@@ -78,19 +83,19 @@ public class RestApi {
 		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 
 	}
-	
+
 	@Test
 	public void getItems() {
 
 		Gson gson = new Gson();
-		
+
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/items", null, "GET");
 
 		if (this.returnValue != null) {
 			this.items = gson.fromJson(this.returnValue, new TypeToken<ArrayList<Item>>() {
 			}.getType());
 		}
-		
+
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 
@@ -121,6 +126,28 @@ public class RestApi {
 	}
 
 	@Test
+	public void createUser() {
+
+		CookieManager cookieManager = new CookieManager();
+		CookieHandler.setDefault(cookieManager);
+
+		JSONObject json = new JSONObject();
+		try {
+			json.put("name", "TestUser");
+			json.put("hash", "d033e22ae348aeb5660fc2140aec35850c4da997");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/register", json, "POST");
+
+		// check HTTP status code --> OK
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
+
+	}
+
+	@Test
 	public void createItem() {
 
 		CookieManager cookieManager = new CookieManager();
@@ -130,22 +157,22 @@ public class RestApi {
 		login();
 
 		int catID;
-		
-		if(this.categories == null || this.categories.size() == 0){
+
+		if (this.categories == null || this.categories.size() == 0) {
 			getCategories();
 		}
-		
-		if(this.categories == null || this.categories.size() == 0){
-			
+
+		if (this.categories == null || this.categories.size() == 0) {
+
 			System.out.println("Dummy cat used");
-			
-			//dummy data
+
+			// dummy data
 			catID = 1;
 		} else {
-			//get first category
+			// get first category
 			catID = this.categories.get(0).id;
 		}
-		
+
 		JSONObject json = new JSONObject();
 		try {
 			json.put("author", "Pati2");
@@ -160,7 +187,7 @@ public class RestApi {
 		}
 
 		int code = callURL("http://webinfo-myshop.herokuapp.com/api/items", json, "POST");
-		
+
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 
@@ -176,22 +203,22 @@ public class RestApi {
 		login();
 
 		int itemID;
-		
-		if(this.items == null || this.items.size() == 0){
+
+		if (this.items == null || this.items.size() == 0) {
 			getItems();
 		}
-		
-		if(this.items == null || this.items.size() == 0){
-			
+
+		if (this.items == null || this.items.size() == 0) {
+
 			System.out.println("Dummy item used");
-			
-			//dummy data
+
+			// dummy data
 			itemID = 1;
 		} else {
-			//get first category
+			// get first category
 			itemID = this.items.get(0).id;
 		}
-		
+
 		JSONObject json = new JSONObject();
 		try {
 			json.put("author", "Pati2");
@@ -210,7 +237,7 @@ public class RestApi {
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 	}
-	
+
 	@Test
 	public void deleteUser() {
 
@@ -220,16 +247,18 @@ public class RestApi {
 		// first we have to login
 		login();
 
-		int userID = 3;
-		
-		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/" + userID, null, "DELETE");
+		IDataHandler dh = new DataHandler(true);
+
+		SavedUser user = dh.getUserByName("TestUser");
+
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/" + user.getId(), null, "DELETE");
 
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(HttpURLConnection.HTTP_NO_CONTENT, code);
 	}
 
 	@Test
-	public void changeUser() {
+	public void changeToAdmin() {
 
 		CookieManager cookieManager = new CookieManager();
 		CookieHandler.setDefault(cookieManager);
@@ -237,25 +266,30 @@ public class RestApi {
 		// first we have to login
 		login();
 
-		int userID = 3;
+		//create local datahandler
+		if (this.dh == null) {
+			this.dh = new DataHandler(true);
+		}
 		
+		SavedUser user = dh.getUserByName("TestUser");
+
 		JSONObject json = new JSONObject();
 		try {
-			json.put("id", userID);
-			json.put("alias", "Andi");
-			json.put("userid", userID);
-			json.put("role", "guest");
+			json.put("id", user.getId());
+			json.put("alias", "TestUser");
+			json.put("userid", user.getId());
+			json.put("role", "admin");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/" + userID, json, "PUT");
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/" + user.getId(), json, "PUT");
 
 		// check HTTP status code --> OK
 		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 	}
-	
+
 	@Test
 	public void login() {
 
@@ -328,6 +362,39 @@ public class RestApi {
 		}
 
 		return code;
+	}
+
+	@Test
+	public void changeToGuest() {
+
+		CookieManager cookieManager = new CookieManager();
+		CookieHandler.setDefault(cookieManager);
+
+		// first we have to login
+		login();
+
+		//create local datahandler
+		if (this.dh == null) {
+			this.dh = new DataHandler(true);
+		}
+
+		SavedUser user = dh.getUserByName("TestUser");
+
+		JSONObject json = new JSONObject();
+		try {
+			json.put("id", user.getId());
+			json.put("alias", "TestUser");
+			json.put("userid", user.getId());
+			json.put("role", "guest");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/" + user.getId(), json, "PUT");
+
+		// check HTTP status code --> OK
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
 	}
 
 }

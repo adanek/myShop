@@ -743,6 +743,44 @@ public class DataHandler implements IDataHandler {
 		return this.<SavedUser> searchForID(id, SavedUser.class);
 	}
 
+	// search for user by name
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see team1.myshop.contracts.IDataHandler#getUserByID(int)
+	 */
+	@Override
+	public SavedUser getUserByName(String alias) throws IllegalArgumentException {
+
+		Session session = openSession();
+
+		try {
+
+			// begin transaction
+			session.beginTransaction();
+
+			Criteria cr = session.createCriteria(SavedUser.class);
+			cr.add(Restrictions.eq("alias", alias));
+			List<SavedUser> results = cr.list();
+
+			// commit
+			session.getTransaction().commit();
+
+			// only one element in the list because the id is unique
+			return results.get(0);
+
+		} catch (IndexOutOfBoundsException e) {
+			// Exception -> rollback
+			session.getTransaction().rollback();
+			throw new IllegalArgumentException("object with this ID is not in the database", e);
+		} finally {
+			// close session
+			session.close();
+		}
+
+		
+	}
+	
 	// search for category by ID
 	/*
 	 * (non-Javadoc)

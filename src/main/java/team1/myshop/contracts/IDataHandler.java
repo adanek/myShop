@@ -81,4 +81,6 @@ public interface IDataHandler {
 	//delete user
 	void deleteUser(int userID) throws IllegalArgumentException;
 
+	SavedUser getUserByName(String alias) throws IllegalArgumentException;
+
 }
