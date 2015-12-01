@@ -121,9 +121,8 @@
       );
     };
 
-    srv.deleteUser = function(user){
-
-      return $http.delete('api/users/'+ user.id);
+    srv.remove = function(user){
+      return $http.delete('api/users/'+ user.id, user);
     };
 
     srv.changeRole = function(user){
