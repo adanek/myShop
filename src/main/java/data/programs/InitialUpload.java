@@ -15,11 +15,12 @@ public class InitialUpload {
 		
 		//user
 		int userID1 = handler.createUser("Andi", "d033e22ae348aeb5660fc2140aec35850c4da997", 1).getId();
-		int userID2 = handler.createUser("Pati", "d033e22ae348aeb5660fc2140aec35850c4da997", 1).getId();
+		int userID2 = handler.createUser("Pati2", "d033e22ae348aeb5660fc2140aec35850c4da997", 1).getId();
+		int userID3 = handler.createUser("TestUser", "d033e22ae348aeb5660fc2140aec35850c4da997", 3).getId();
 		
 		//items
-		int itemID1 = handler.createItem("Adidas Boost", "Laufschuh", categoryID1, userID2).getId();
-		int itemID2 = handler.createItem("Lenovo ThinkPad", "Laptop", categoryID2, userID1).getId();
+		int itemID1 = handler.createItem("Fake Item 1", "Laufschuh", categoryID1, userID2, 160.0).getId();
+		int itemID2 = handler.createItem("Fake Item 2", "Laptop", categoryID2, userID1, 1200.0).getId();
 		
 		//item comments
 		int commentID1 = handler.createItemComment("Super Laufschuh", itemID1, userID2).getId();

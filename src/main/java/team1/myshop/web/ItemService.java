@@ -74,7 +74,7 @@ public class ItemService extends ServiceBase {
         }
 
         assert item != null;
-        data.model.Item it = dh.createItem(item.title, item.description, item.categoryID, item.authorID);
+        data.model.Item it = dh.createItem(item.title, item.description, item.categoryID, item.authorID, item.price);
         if (it == null) {
             http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
             return null;
@@ -117,7 +117,7 @@ public class ItemService extends ServiceBase {
             return null;
         }
 
-        data.model.Item item = dh.changeItem(itemID, it.title, it.description, it.categoryID);
+        data.model.Item item = dh.changeItem(itemID, it.title, it.description, it.categoryID, it.price);
         return Item.parse(item);
     }
 

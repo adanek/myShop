@@ -25,6 +25,7 @@ public class Item {
 	private int id;
 	private String title;
 	private String description;
+	private double price;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date creationDate = new Date();
 	@Temporal(TemporalType.TIMESTAMP)
@@ -99,6 +100,14 @@ public class Item {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 
 }
