@@ -46,7 +46,39 @@ public class RestApi {
 		AssertJUnit.assertEquals(code, HttpURLConnection.HTTP_OK);
 
 	}
+	
+	@Test
+	public void getRoles() {
 
+		CookieManager cookieManager = new CookieManager();
+		CookieHandler.setDefault(cookieManager);
+
+		// first we have to login
+		login();
+
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/roles", null, "GET");
+
+		// check HTTP status code --> OK
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
+
+	}
+
+	@Test
+	public void getUsers() {
+
+		CookieManager cookieManager = new CookieManager();
+		CookieHandler.setDefault(cookieManager);
+
+		// first we have to login
+		login();
+
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users", null, "GET");
+
+		// check HTTP status code --> OK
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_OK, code);
+
+	}
+	
 	@Test
 	public void getItems() {
 

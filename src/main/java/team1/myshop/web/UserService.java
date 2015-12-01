@@ -18,9 +18,56 @@ import javax.ws.rs.core.MediaType;
 
 import static javax.servlet.http.HttpServletResponse.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 @Path("/users")
 public class UserService extends ServiceBase {
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Collection<UserInfo> getUsers(@Context HttpServletRequest request,
+			@Context HttpServletResponse response) {
+
+		this.initialize();
+
+		// check user rights
+		if (!auth.userHasRight(request, UserRights.CAN_QUERY_USERS)) {
+			logger.info("User tried to access all users");
+			http.cancelRequest(response, SC_UNAUTHORIZED);
+			return null;
+		}
+
+		Collection<SavedUser> users = dh.getAllUsers();
+
+		return UserInfo.parse(users);
+	}
+	
+	@GET
+	@Path("/roles")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Collection<String> getRoles(@Context HttpServletRequest request,
+			@Context HttpServletResponse response) {
+
+		this.initialize();
+
+		// check user rights
+		if (!auth.userHasRight(request, UserRights.CAN_QUERY_ROLES)) {
+			logger.info("User tried to access all roles");
+			http.cancelRequest(response, SC_UNAUTHORIZED);
+			return null;
+		}
+
+		Collection<String> roles = new ArrayList<>();
+		
+		//add roles
+		roles.add("admin");
+		roles.add("author");
+		roles.add("guest");
+
+		return roles;
+	}
+	
 	@GET
 	@Path("/{userid}")
 	@Produces(MediaType.APPLICATION_JSON)

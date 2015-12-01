@@ -110,6 +110,10 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
                 return user.rights.canDeleteUser;
             case CAN_EDIT_USER:
                 return user.rights.canEditUser;
+            case CAN_QUERY_USERS:
+                return user.rights.canQueryUsers;
+            case CAN_QUERY_ROLES:
+                return user.rights.canQueryRoles;
             default:
                 return false;
         }

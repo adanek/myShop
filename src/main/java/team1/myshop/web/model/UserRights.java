@@ -13,5 +13,7 @@ public class UserRights {
 	public boolean canEditComment;
 	public boolean canDeleteUser;
 	public boolean canEditUser;
+	public boolean canQueryUsers;
+	public boolean canQueryRoles;
 	
 }

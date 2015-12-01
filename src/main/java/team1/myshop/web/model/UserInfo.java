@@ -1,5 +1,9 @@
 package team1.myshop.web.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import data.model.SavedUser;
 
 public class UserInfo {
@@ -34,6 +38,8 @@ public class UserInfo {
 				ur.canEditComment = true;
 				ur.canDeleteUser = true;
 				ur.canEditUser = true;
+				ur.canQueryUsers = true;
+				ur.canQueryRoles = true;
 				break;
 			case 2:
 				ui.role = "author";
@@ -41,6 +47,7 @@ public class UserInfo {
 				ur.canCreateComment = true;
 				ur.canEditItem = true;
 				ur.canEditComment = true;
+				
 				break;
 			case 3:
 				ui.role = "guest";
@@ -52,4 +59,16 @@ public class UserInfo {
 
 		return ui;
 	}
+	
+	public static Collection<UserInfo> parse(Collection<SavedUser> users){
+
+		List<UserInfo> info = new ArrayList<>();
+		
+		for(SavedUser u : users){
+			info.add(UserInfo.parse(u));
+		}
+		return info;
+		
+	}
+	
 }
