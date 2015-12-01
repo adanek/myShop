@@ -6,38 +6,58 @@ gradle jettyRunWar
 Um die Tests auszuführen:
 gradle test
 
-# Task 6:
+# Task 7:
 
-Abgabedatum - 23.11.2015 bis 20:00 Uhr
+Abgabedatum - 14.12.2015 bis 20:00 Uhr
 
 ## Doing
 
-Bitte beachten, dass ab jetzt der Einsatz von Libraries/Frameworks erlaubt (und sogar erwünscht) ist.
+Bitte beachten, dass der Einsatz von Libraries/Frameworks erlaubt (und sogar erwünscht) ist.
 
-### Testing der Web-Applikation
+### Web-Applikation-Frontend
 
-Die entwickelte Web-Applikation soll automatisiert getestet werden.   
+Die entwickelte Web-Applikation wird um ein Front-End erweitert.   
+Folgende Funktionalitäten sollen damit umsetzbar sein:
+ * Benutzer-Resgistrierung
+ * Login/Logout
+ * Ansicht der div. Warengruppen
+ * Ansicht der Items in einer Warengruppe
+ * Detail-Ansicht eines Items inkl. Kommentaren
 
-#### Server-Testing (inkl. Code-Coverage)
-Am Server soll (zumindest) zwischen Unit- und Integrationstests unterschieden werden.   
-Dabei sollen min. folgende Komponenten geprüft werden:   
-1) REST-API (sowie deren Businesslogic)
-2) Authentifizierung
+Für bestimmte Benutzer (Admins) soll außerdem folgendes möglich sein:
+ * Benutzer löschen
+ * Benutzer sollen zu admins ernannt werden können (bzw. soll dieses Recht auch entzogen werden können).
+ * Gruppen/Items/Kommentare löschen
 
-Ebenso ist eine Code-Coverage zu erstellen, die min. 60% erreichen soll.   
-Beschreibe kurz, wie die Trennung der einzelnen Komponenten sauber gelingt und mit Hilfe welcher Techniken/Tools dies umgesetzt wurde.
+Die Funktionalitäten für einen Admin können entweder in einem eigenen UI erfolgen, können aber auch mit der "nicht-admin-UI" integriert werden.   
+Es dürfen auch unterschiedliche Technologien pro UI verwendet werden (etwa User-UI per JSP und Admin-UI per AngularJS2 oder User-UI pre AngularJS2 und Admin-UI per JSF oder beides per AngularJS2 jedoch einmal per ES6 und einmal per TS oder...).   
+Super wäre aber, wenn min. einmal AngularJS2 verwendet werden würde :-)
 
-#### Browser-Simulation
-Der Seitenaufbau in einem (simulierten) Browser soll getestet werden.   
-Falls möglich/sinnvoll, soll dabei ebenfalls eine Codeabdeckung generiert werden (vorerst gibt es hier aber keinen Wert, der erreicht werden muss).
+### Warenkob-Funktionalität
+Im Front-End soll es möglich sein, bestimmte Items in einen Warenkorb zu legen.   
+In diesem soll die Anzahl von Items verändert werden können.   
+Ebenso sollen Items wieder aus dem Warenkorb entfernt werden können (falls mal eines unabsichtlich angeklickt wurde).   
+Wird ein Warenkorb bestellt, so soll die Bezahlung über PayPal erfolgen.   
+Dazu muss die PayPal-API verwendet werden (ACHTUNG: Bitte nur im Testing-Mode arbeiten).
 
-#### Abgrenzung
-Beschreibe, was im Rahmen der obigen Teilaufgaben nicht getestet wurde bzw. werden konnte.   
-Was sollte noch getestet werden?   
-Wie könnte dabei vorgegangen werden?
+### Testing
+Überlege, wie die geforderte Funktionalität getestet werden kann.
+Implementiere min. folgende Tests:
+ * Erfolgreiche Benutzerregistrierung
+ * Fehlerhafte Benutzerregistrierung (etwa nicht übereinstimmende Passwörter)
+ * Benutzer löschen
+ * Benutzer zu Admin ernennen
+ * Admin-Recht entziehen (was passiert, wenn nur 1 Admin im System und dieses Recht diesem entzogen wird)?
+ * Erfolgreiche Bestellung eines Warenkorbs
+ * Fehlerhafte Bestellung eiens Warenkorbs (was kann hier schief laufen?)
 
 ## Reading:
 
 ### Testen
-[Vorlesungsfolien](http://dbis-informatik.uibk.ac.at/298-0-VOPS-Programmieren-von-Web-Information-Systems.html)
+[NodeJS](https://nodejs.org/)
+[AngularJS 2](https://angular.io/)
+[AngularJS 2 Resources] (https://angular.io/docs/js/latest/resources.html)
+[PayPal API](https://developer.paypal.com/docs/api/overview/)
+
+
 
