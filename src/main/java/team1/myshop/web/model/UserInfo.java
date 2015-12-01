@@ -43,9 +43,7 @@ public class UserInfo {
 				break;
 			case 2:
 				ui.role = "author";
-				ur.canCreateItem = true;
 				ur.canCreateComment = true;
-				ur.canEditItem = true;
 				ur.canEditComment = true;
 				
 				break;
