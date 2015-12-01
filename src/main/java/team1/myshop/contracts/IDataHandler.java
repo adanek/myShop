@@ -16,7 +16,7 @@ public interface IDataHandler {
 			throws IllegalArgumentException, IllegalStateException;
 
 	// change item
-	Item changeItem(int itemID, String title, String description, int categoryID)
+	Item changeItem(int itemID, String title, String description, int categoryID, double price)
 			throws IllegalArgumentException, IllegalStateException;
 
 	// change category
@@ -29,7 +29,7 @@ public interface IDataHandler {
 
 	Category createCategory(String name) throws IllegalStateException;
 
-	Item createItem(String title, String description, int category, int author)
+	Item createItem(String title, String description, int category, int author, double price)
 			throws IllegalStateException, IllegalArgumentException;
 
 	// create item comment

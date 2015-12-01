@@ -291,6 +291,39 @@ public class RestApi {
 	}
 
 	@Test
+	public void changeOwnUser() {
+
+		CookieManager cookieManager = new CookieManager();
+		CookieHandler.setDefault(cookieManager);
+
+		// first we have to login
+		login();
+
+		//create local datahandler
+		if (this.dh == null) {
+			this.dh = new DataHandler(true);
+		}
+		
+		SavedUser user = dh.getUserByName("Pati2");
+
+		JSONObject json = new JSONObject();
+		try {
+			json.put("id", user.getId());
+			json.put("alias", user.getAlias());
+			json.put("userid", user.getId());
+			json.put("role", "guest");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int code = callURL("http://webinfo-myshop.herokuapp.com/api/users/" + user.getId(), json, "PUT");
+
+		// check HTTP status code --> FORBIDDEN
+		AssertJUnit.assertEquals(HttpURLConnection.HTTP_FORBIDDEN, code);
+	}
+	
+	@Test
 	public void login() {
 
 		JSONObject cred = new JSONObject();

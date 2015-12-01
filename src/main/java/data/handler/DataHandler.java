@@ -259,7 +259,7 @@ public class DataHandler implements IDataHandler {
 	 * java.lang.String, java.lang.String, int)
 	 */
 	@Override
-	public Item changeItem(int itemID, String title, String description, int categoryID)
+	public Item changeItem(int itemID, String title, String description, int categoryID, double price)
 			throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
@@ -291,6 +291,7 @@ public class DataHandler implements IDataHandler {
 			item.setDescription(description);
 			item.setCategory(cat);
 			item.setChangeDate(new Date());
+			item.setPrice(price);
 
 			// update item
 			session.update(item);
@@ -484,7 +485,7 @@ public class DataHandler implements IDataHandler {
 	 * java.lang.String, int, int)
 	 */
 	@Override
-	public Item createItem(String title, String description, int category, int author)
+	public Item createItem(String title, String description, int category, int author, double price)
 			throws IllegalStateException, IllegalArgumentException {
 
 		SavedUser user;
@@ -525,6 +526,7 @@ public class DataHandler implements IDataHandler {
 		item.setAuthor(user);
 		item.setCategory(cat);
 		item.setCreationDate(new Date());
+		item.setPrice(price);
 
 		saveObjectToDb(item);
 		return item;

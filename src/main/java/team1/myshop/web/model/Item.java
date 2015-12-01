@@ -15,6 +15,8 @@ public class Item {
 	public long changeDate;
 	public String author;
 	public int authorID;
+	public double price;
+	public boolean available;
 
 	public static Item parse(data.model.Item item) {
 
@@ -34,6 +36,18 @@ public class Item {
 		it.authorID = item.getAuthor().getId();
 		it.category = item.getCategory().getName();
 		it.categoryID = item.getCategory().getId();
+		it.price = item.getPrice();
+
+		//get random number
+		int randomNumber = (int) (101 * Math.random());
+
+		//item available
+		if (randomNumber > 20) {
+			it.available = true;
+		//item not available
+		} else {
+			it.available = false;
+		}
 
 		return it;
 	}
@@ -43,9 +57,9 @@ public class Item {
 		List<Item> its = new ArrayList<>();
 
 		if (items != null) {
-            for (data.model.Item item : items) {
-                its.add(Item.parse(item));
-            }
+			for (data.model.Item item : items) {
+				its.add(Item.parse(item));
+			}
 		}
 
 		return its;
