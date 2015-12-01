@@ -106,6 +106,10 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
                 return user.rights.canEditComment;
             case CAN_DELETE_COMMENT:
                 return user.rights.canDeleteComment;
+            case CAN_DELETE_USER:
+                return user.rights.canDeleteUser;
+            case CAN_EDIT_USER:
+                return user.rights.canEditUser;
             default:
                 return false;
         }

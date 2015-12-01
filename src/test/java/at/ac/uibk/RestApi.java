@@ -211,7 +211,7 @@ public class RestApi {
 		try {
 			json.put("id", userID);
 			json.put("alias", "Andi");
-			json.put("role", "3");
+			json.put("role", "guest");
 			json.put("rights", "");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
