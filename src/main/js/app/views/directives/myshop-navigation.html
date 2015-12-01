@@ -1,0 +1,11 @@
+<section class="myshop-navigation">
+
+  <ul class="nav navbar-nav">
+    <li ng-repeat="link in nav.links"
+        ng-class="{active:nav.isSelected(link)}"
+        ng-show="nav.linkVisible(link)">
+      <a ng-href="#{{link.target}}">{{link.name}}</a>
+    </li>
+
+  </ul>
+</section>

@@ -40,13 +40,7 @@
 
       <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
-        <ul class="nav navbar-nav">
-          <li class="active">
-            <a href="#/">Home</a></li>
-          <li><a ng-href="#/products">Produkte</a></li>
-          <li><a ng-href="#/about">About</a></li>
-          <li ng-if="isAdmin()"><a ng-href="#/users">Benutzer</a></li>
-        </ul>
+        <myshop-navigation></myshop-navigation>
 
         <p class="navbar-text navbar-right">
           <span ng-if="authenticated">Logged in as {{ username }} ({{ role }}) <a ng-click="logout()">logout</a></span>
@@ -89,17 +83,18 @@
   <!-- build:js({.tmp,app}) scripts/scripts.js -->
   <script src="scripts/app.js"></script>
 
-  <script src="scripts/directives/myshop-category-select.js"></script>
-  <script src="scripts/directives/myshop-category-item.js"></script>
-  <script src="scripts/directives/myshop-product-details.js"></script>
-  <script src="scripts/directives/myshop-product-comments.js"></script>
-  <script src="scripts/directives/myshop-product-comment.js"></script>
-
   <script src="scripts/services/comments.js"></script>
   <script src="scripts/services/categories.js"></script>
   <script src="scripts/services/products.js"></script>
   <script src="scripts/services/user.js"></script>
   <script src="scripts/services/cart.js"></script>
+
+  <script src="scripts/directives/myshop-category-select.js"></script>
+  <script src="scripts/directives/myshop-category-item.js"></script>
+  <script src="scripts/directives/myshop-product-details.js"></script>
+  <script src="scripts/directives/myshop-product-comments.js"></script>
+  <script src="scripts/directives/myshop-product-comment.js"></script>
+  <script src="scripts/directives/myshop-navigation.js"></script>
 
   <script src="scripts/controllers/main.js"></script>
   <script src="scripts/controllers/about.js"></script>
