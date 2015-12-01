@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import team1.myshop.contracts.UserRights;
@@ -40,6 +40,7 @@ import team1.myshop.web.model.paypal.PaymentResponse;
 import team1.myshop.web.model.paypal.RedirectUrls;
 import team1.myshop.web.model.paypal.Transaction;
 
+@Path("/orders")
 public class BasketService extends ServiceBase {
 
 	private String token = "A101.QAeBLMAPAnnTaDCrk14qIBYHS_VPshCSLi5fDoP41rlxUNrOkGn3yjcovID7mAS4.ZRyhbMqGZmK4QZdW2PQZf0e6MGi";
@@ -54,9 +55,8 @@ public class BasketService extends ServiceBase {
 	}
 	
     @POST
-    @Path("/orders")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void postOrder(String itemString, @Context HttpServletRequest request,
+    //@Consumes(MediaType.APPLICATION_JSON)
+    public void postOrder(@Context HttpServletRequest request,
                                    @Context HttpServletResponse response) {
 
         this.initialize();
