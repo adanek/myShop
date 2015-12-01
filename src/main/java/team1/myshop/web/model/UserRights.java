@@ -15,5 +15,6 @@ public class UserRights {
 	public boolean canEditUser;
 	public boolean canQueryUsers;
 	public boolean canQueryRoles;
+	public boolean canCreateOrders;
 	
 }

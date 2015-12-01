@@ -138,6 +138,8 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
                 return user.rights.canQueryUsers;
             case CAN_QUERY_ROLES:
                 return user.rights.canQueryRoles;
+            case CAN_CREATE_ORDERS:
+                return user.rights.canCreateOrders;
             default:
                 return false;
         }

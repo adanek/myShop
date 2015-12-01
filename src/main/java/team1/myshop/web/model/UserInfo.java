@@ -40,11 +40,13 @@ public class UserInfo {
 				ur.canEditUser = true;
 				ur.canQueryUsers = true;
 				ur.canQueryRoles = true;
+				ur.canCreateOrders = true;
 				break;
 			case 2:
 				ui.role = "author";
 				ur.canCreateComment = true;
 				ur.canEditComment = true;
+				ur.canCreateOrders = true;
 				
 				break;
 			case 3:
