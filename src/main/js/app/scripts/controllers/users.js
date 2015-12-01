@@ -75,6 +75,8 @@
         function success(){
           $scope.oldRole = undefined;
           $scope.user = undefined;
+          var pos = $scope.users.indexOf(user);
+          $scope.users.slice(pos, 1);
         },
         function error(response){
           console.log(response);
