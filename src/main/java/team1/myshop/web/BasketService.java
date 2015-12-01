@@ -55,7 +55,7 @@ public class BasketService extends ServiceBase {
 	}
 	
     @POST
-    //@Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public void postOrder(@Context HttpServletRequest request,
                                    @Context HttpServletResponse response) {
 
@@ -86,7 +86,7 @@ public class BasketService extends ServiceBase {
         for(Link l : pr.links){
         	if(l.rel.equals("approval_url") == true){
         		response.setHeader("Location", l.href);
-        		response.setStatus(HttpServletResponse.SC_SEE_OTHER);
+        		response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
         		return;
         	}
         }
