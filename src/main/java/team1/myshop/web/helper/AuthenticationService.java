@@ -28,6 +28,29 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
     }
 
     @Override
+    public UserInfo getUserInfo(HttpServletRequest request){
+    	
+    	HttpSession session = request.getSession(false);
+    	
+        if (session == null) {
+            return null;
+        }
+    	
+        UserInfo user = null;
+        
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            if (attributeNames.nextElement().equals("userInfo")) {
+                user = (UserInfo) session.getAttribute("userInfo");
+                break;
+            }
+        }
+        
+        return user;
+    	
+    }
+    
+    @Override
     public void ensureUserRight(HttpServletRequest request, HttpServletResponse response, UserRights right) {
 
         this.initialize();
@@ -81,6 +104,7 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
         while (attributeNames.hasMoreElements()) {
             if (attributeNames.nextElement().equals("userInfo")) {
                 user = (UserInfo) session.getAttribute("userInfo");
+                break;
             }
         }
         if (user == null) {

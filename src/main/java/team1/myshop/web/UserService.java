@@ -211,7 +211,7 @@ public class UserService extends ServiceBase {
 	@Path("/{userid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public UserInfo changeUser(@PathParam("userid") int user, String userString, @Context HttpServletRequest request,
+	public UserInfo changeUser(@PathParam("userid") int userID, String userString, @Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
 		this.initialize();
@@ -229,14 +229,20 @@ public class UserService extends ServiceBase {
 			http.cancelRequest(response, SC_BAD_REQUEST);
 			return null;
 		}
-
+		
 		// Parameter müssen übereinstimmen
 		assert ui != null;
-		if (ui.id != user) {
+		if (ui.id != userID) {
 			http.cancelRequest(response, SC_BAD_REQUEST);
 			return null;
 		}
 
+		//der eigene User darf nicht ge�ndert werden
+		if(userID == auth.getUserInfo(request).id){
+			http.cancelRequest(response, SC_FORBIDDEN);
+			return null;
+		}
+		
 		int role = 0;
 
 		switch (ui.role) {
