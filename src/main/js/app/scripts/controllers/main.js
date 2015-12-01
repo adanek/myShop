@@ -1,7 +1,7 @@
 'use strict';
 
 (function(app){
-  app.controller('MainCtrl', ['$scope', '$rootScope', 'User', function ($scope, $rootScope, User) {
+  app.controller('MainCtrl', ['$scope', '$rootScope', 'User', 'Cart', function ($scope, $rootScope, User, Cart) {
 
     $scope.title = 'Home';
     $scope.authenticated = User.isAuthenticated();
@@ -26,6 +26,10 @@
     $scope.isAdmin = function(){
       return User.isAuthenticated() && User.isAdmin();
     };
+
+    $scope.$watch(Cart.getItemCount, function(newValue){
+      $scope.cartItemCount = newValue;
+    });
 
   }]);
 })(angular.module('myshopApp'));

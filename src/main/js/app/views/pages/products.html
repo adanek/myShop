@@ -25,12 +25,18 @@
     </header>
     <section class="product" ng-repeat="product in products">
 
-      <header>{{ product.title }}</header>
+      <header>
+        <span>{{ product.title }}</span>
+        <span class="pull-right">{{product.price | currency:'€ '}}</span>
+      </header>
 
       <myshop-product-details></myshop-product-details>
 
       <footer>
-        <a class="btn btn-info"><span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-shopping-cart"></span></a>
+        <a class="btn btn-info" ng-click="addToCart(product)">
+          <span class="glyphicon glyphicon-plus"></span>
+          <span class="glyphicon glyphicon-shopping-cart"></span>
+        </a>
           <span class="pull-right" ng-show="userCanEditProduct(product)">
             <a ng-href="#/products/{{product.id}}/edit" class="btn btn-warning"><span class="glyphicon glyphicon-edit"></span></a>
             <a ng-click="removeProduct(product)" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>

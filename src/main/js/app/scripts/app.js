@@ -57,6 +57,10 @@ angular
         templateUrl: 'views/pages/users.html',
         controller: 'UserCtrl'
       })
+      .when('/cart', {
+        templateUrl: 'views/pages/cart.html',
+        controller: 'CartCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

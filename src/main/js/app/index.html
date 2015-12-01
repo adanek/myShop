@@ -45,14 +45,16 @@
             <a href="#/">Home</a></li>
           <li><a ng-href="#/products">Produkte</a></li>
           <li><a ng-href="#/about">About</a></li>
-          <li><a ng-href="#/">Contact</a></li>
-
           <li ng-if="isAdmin()"><a ng-href="#/users">Benutzer</a></li>
         </ul>
 
         <p class="navbar-text navbar-right">
           <span ng-if="authenticated">Logged in as {{ username }} ({{ role }}) <a ng-click="logout()">logout</a></span>
           <span ng-if="!authenticated"><a ng-href="#/login">login</a></span>
+          <a ng-href="#/cart">
+            <span class="glyphicon glyphicon-shopping-cart"></span>
+            <span class="badge">{{cartItemCount}}</span>
+          </a>
         </p>
       </div>
     </div>
@@ -97,6 +99,7 @@
   <script src="scripts/services/categories.js"></script>
   <script src="scripts/services/products.js"></script>
   <script src="scripts/services/user.js"></script>
+  <script src="scripts/services/cart.js"></script>
 
   <script src="scripts/controllers/main.js"></script>
   <script src="scripts/controllers/about.js"></script>
@@ -108,6 +111,7 @@
   <script src="scripts/controllers/product-new.js"></script>
   <script src="scripts/controllers/product-edit.js"></script>
   <script src="scripts/controllers/users.js"></script>
+  <script src="scripts/controllers/cart.js"></script>
   <!-- endbuild -->
 
 </div>

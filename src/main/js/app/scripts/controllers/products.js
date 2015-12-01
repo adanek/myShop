@@ -2,7 +2,7 @@
 
 (function (app) {
 
-  app.controller('ProductsCtrl', ['$scope', 'Products', 'User', function ($scope, Products, User) {
+  app.controller('ProductsCtrl', ['$scope', 'Products', 'User','Cart', function ($scope, Products, User, Cart) {
 
     $scope.caption = 'Das könnte Ihnen gefallen:';
     $scope.userCanCreateCategory = User.canCreateCategory();
@@ -63,6 +63,10 @@
       }
 
     };
+
+    $scope.addToCart = function(product){
+      Cart.add(product, 1);
+    }
 
   }]);
 
