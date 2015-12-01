@@ -53,6 +53,10 @@ angular
         templateUrl: 'views/pages/product-edit.html',
         controller: 'ProductEditCtrl'
       })
+      .when('/users', {
+        templateUrl: 'views/pages/users.html',
+        controller: 'UserCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

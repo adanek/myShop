@@ -23,6 +23,10 @@
       User.logout();
     };
 
+    $scope.isAdmin = function(){
+      return User.isAuthenticated() && User.isAdmin();
+    };
+
   }]);
 })(angular.module('myshopApp'));
 

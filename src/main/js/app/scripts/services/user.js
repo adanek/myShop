@@ -10,7 +10,7 @@
     var defaultUser = {
       alias: 'Tom Riddle',
       id: 999,
-      role: 'guest',
+      role: 'evil lord',
       rights: {
         canCreateCategory: false,
         canCreateItem: false,
@@ -119,6 +119,23 @@
           return $q.reject(response);
         }
       );
+    };
+
+    srv.deleteUser = function(user){
+
+      return $http.delete('api/users/'+ user.id);
+    };
+
+    srv.changeRole = function(user){
+        return $http.put('api/users/'+user.id, user);
+    };
+
+    srv.all = function(){
+      return $http.get('api/users');
+    };
+
+    srv.roles = function(){
+      return $http.get('api/users/roles');
     };
 
     return srv;
