@@ -42,127 +42,134 @@ import team1.myshop.web.model.paypal.Transaction;
 @Path("/orders")
 public class BasketService extends ServiceBase {
 
-	//private String token = "A101.tN_GXxT-B4MxI4KOMQ6-6gOJ8QyAN178kjQWg3og5YZgaVLLTBZNQbdzFTmr8cfy.RKmoB0qInoxFOmxWPY-4jkZnD6q";
+	// private String token =
+	// "A101.tN_GXxT-B4MxI4KOMQ6-6gOJ8QyAN178kjQWg3og5YZgaVLLTBZNQbdzFTmr8cfy.RKmoB0qInoxFOmxWPY-4jkZnD6q";
 	private static String client_id = "ASew5p32yz4tAteBGZmjju_zwFEwx6sI0LSUnN_G5TkNRHPvWJJBfspcnzjUMMDASc5_I6S-1vx3M2pe";
 	private static String secret = "EFmX2ZHHNpUYkXVlwE4FXD2zl1xWwoCuNAty0yfhcr_AM3FybMZy5PKCGomN0FwIK0GhG6iaIf924IPO";
-	
-    public BasketService() {
-        super();
-    }
-	
+
+	public BasketService() {
+		super();
+	}
+
 	@Override
 	public void initializeLogger() {
 		this.setLogger(LogManager.getLogger(BasketService.class));
 	}
-	
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public String postOrder(String orderString, @Context HttpServletRequest request,
-                                   @Context HttpServletResponse response) {
 
-        this.initialize();
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String postOrder(String orderString, @Context HttpServletRequest request,
+			@Context HttpServletResponse response) {
 
-        // check user rights
-        if(!auth.userHasRight(request, UserRights.CAN_CREATE_ORDERS)){
-            logger.info("User wants to create an order, but did not have the right to");
-            http.cancelRequest(response, SC_UNAUTHORIZED);
-            return "Unauthorized";
-        }
+		this.initialize();
 
-        Gson gson = new Gson();
-        
-        //parse itemString to item Array
-        CartItem[] items = gson.fromJson(orderString, new TypeToken<CartItem[]>() {
+		// check user rights
+		if (!auth.userHasRight(request, UserRights.CAN_CREATE_ORDERS)) {
+			logger.info("User wants to create an order, but did not have the right to");
+			http.cancelRequest(response, SC_UNAUTHORIZED);
+			return "Unauthorized";
+		}
+
+		Gson gson = new Gson();
+
+		// parse itemString to item Array
+		CartItem[] items = gson.fromJson(orderString, new TypeToken<CartItem[]>() {
 		}.getType());
-        
-        if (items == null || items.length < 1) {
-            http.cancelRequest(response, SC_BAD_REQUEST);
-            return "Bad request";
-        }
 
-        //calculate amount
-        double amount = calculateBasketAmount(items);
-        
-        //get access token
-        String token = getAccessToken();
-        
-        //call payment
-        PaymentResponse pr = callPaypalPayment(amount, token);
-        
-        if(pr == null){
-        	logger.error("Payment Response not available");
-        	http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
-        	return null;
-        }
-        
-        for(Link l : pr.links){
-        	if(l.rel.equals("approval_url") == true){
-//        		try {
-//        			response.setHeader("Access-Control-Allow-Origin", "*");
-//        			//response.setHeader("Access-Control-Request-Method", "POST, GET, OPTIONS");
-//					response.sendRedirect(l.href);
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					try {
-//						response.sendError(SC_INTERNAL_SERVER_ERROR);
-//					} catch (IOException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
-//					return "Redirect failed";
-//				}
-        		response.setHeader("Location", l.href);
-        		response.setStatus(HttpServletResponse.SC_OK);
-        		return "Success";
-        	}
-        }
-        
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        return "Error";
-        
-    }
-    
-    //calculate basket amount
-    private double calculateBasketAmount(CartItem[] items) {
-		
-    	double amount = 0;
-    	
-    	for(CartItem it : items){
-    		data.model.Item item = dh.getItemByID(it.itemId);
-    		amount += (item.getPrice() * it.amount);
-    	}
-    	
+		if (items == null || items.length < 1) {
+			http.cancelRequest(response, SC_BAD_REQUEST);
+			return "Bad request";
+		}
+
+		// calculate amount
+		double amount = calculateBasketAmount(items);
+
+		// get access token
+		String token = getAccessToken();
+
+		// call payment
+		PaymentResponse pr = callPaypalPayment(amount, token);
+
+		if (pr == null) {
+			logger.error("Payment Response not available");
+			http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+			return null;
+		}
+
+		for (Link l : pr.links) {
+			if (l.rel.equals("approval_url") == true) {
+				// try {
+				// response.setHeader("Access-Control-Allow-Origin", "*");
+				// //response.setHeader("Access-Control-Request-Method", "POST,
+				// GET, OPTIONS");
+				// response.sendRedirect(l.href);
+				// } catch (IOException e) {
+				// e.printStackTrace();
+				// try {
+				// response.sendError(SC_INTERNAL_SERVER_ERROR);
+				// } catch (IOException e1) {
+				// // TODO Auto-generated catch block
+				// e1.printStackTrace();
+				// }
+				// return "Redirect failed";
+				// }
+				response.setHeader("Location", l.href);
+				response.setStatus(HttpServletResponse.SC_OK);
+				return "Success";
+			}
+		}
+
+		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		return "Error";
+
+	}
+
+	// calculate basket amount
+	private double calculateBasketAmount(CartItem[] items) {
+
+		double amount = 0;
+
+		for (CartItem it : items) {
+			data.model.Item item = dh.getItemByID(it.itemId);
+			amount += (item.getPrice() * it.amount);
+		}
+
 		return amount;
 	}
 
 	@GET
-    @Path("/execute")
-    public void executeOrder(@Context HttpServletRequest request,
-            @Context HttpServletResponse response) {
-    	
-        //get access token
-        String token = getAccessToken();
-        
-        //get request parameters
-        String payment = request.getParameter("paymentId");
-        String payer   = request.getParameter("PayerID");
-        
-        //execute payment
-        int code = callPaypalExecute(token, payer, payment);
-    	
-        //return status code
-        try {
-			response.sendRedirect("/#/orders/accepted");
+	@Path("/execute")
+	public void executeOrder(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+
+		// get access token
+		String token = getAccessToken();
+
+		// get request parameters
+		String payment = request.getParameter("paymentId");
+		String payer = request.getParameter("PayerID");
+
+		// execute payment
+		int code = callPaypalExecute(token, payer, payment);
+
+		// return status code
+		try {
+			//success
+			if (code < 400) {
+				response.sendRedirect("/#/orders/accepted");
+			//error
+			} else {
+				response.sendRedirect("/#/orders/failed");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
-    }
 
-    //call execution
-    private int callPaypalExecute(String token, String payer, String payment) {
-		
+	}
+
+	// call execution
+	private int callPaypalExecute(String token, String payer, String payment) {
+
 		try {
 			URL url = new URL("https://api.sandbox.paypal.com/v1/payments/payment/" + payment + "/execute/");
 
@@ -171,13 +178,13 @@ public class BasketService extends ServiceBase {
 
 			Execution exec = new Execution();
 			exec.payer_id = payer;
-			
+
 			Gson gson = new Gson();
 
 			// convert java object to JSON format,
 			// and returned as JSON formatted string
 			String json = gson.toJson(exec);
-			
+
 			if (json != null && json.length() > 0) {
 				connection.setDoOutput(true);
 				connection.setDoInput(true);
@@ -192,24 +199,24 @@ public class BasketService extends ServiceBase {
 
 			connection.connect();
 
-			//get response code
+			// get response code
 			return connection.getResponseCode();
-				
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		//internal server error
+
+		// internal server error
 		return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-		
+
 	}
 
-	//call payment
+	// call payment
 	private PaymentResponse callPaypalPayment(double a, String token) {
-		
+
 		Amount amount = new Amount();
 		amount.total = String.format("%.2f", a);
-		
+
 		amount.currency = "EUR";
 
 		Transaction trans = new Transaction();
@@ -229,7 +236,7 @@ public class BasketService extends ServiceBase {
 		URL url;
 
 		PaymentResponse pr = null;
-		
+
 		int code = 0;
 		try {
 			url = new URL("https://api.sandbox.paypal.com/v1/payments/payment");
@@ -252,12 +259,12 @@ public class BasketService extends ServiceBase {
 			connection.connect();
 
 			code = connection.getResponseCode();
-			
-			//Fehler
-			if(code >= 300){
+
+			// Fehler
+			if (code >= 300) {
 				return null;
 			}
-			
+
 			try {
 				// Object test = connection.getContent();
 				InputStreamReader in = new InputStreamReader((InputStream) connection.getContent());
@@ -276,7 +283,7 @@ public class BasketService extends ServiceBase {
 
 					pr = gson.fromJson(returnValue, new TypeToken<PaymentResponse>() {
 					}.getType());
-					
+
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -284,11 +291,11 @@ public class BasketService extends ServiceBase {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return pr;
 	}
 
-	//get access token
+	// get access token
 	private String getAccessToken() {
 		URL url;
 
@@ -305,18 +312,18 @@ public class BasketService extends ServiceBase {
 			connection.setDoInput(true);
 			connection.setInstanceFollowRedirects(false);
 			connection.setRequestProperty("Accept", "application/json");
-			
+
 			String userpass = client_id + ":" + secret;
-			
+
 			String basic = new String(Base64.getEncoder().encode(userpass.getBytes()));
-			
+
 			connection.setRequestProperty("Authorization", "Basic " + basic);
-			
+
 			OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
 			wr.write("grant_type=client_credentials");
 			wr.flush();
 			wr.close();
-			
+
 			connection.connect();
 
 			code = connection.getResponseCode();
@@ -344,7 +351,7 @@ public class BasketService extends ServiceBase {
 					String returnValue = buffer.toString();
 
 					Gson gson = new Gson();
-					
+
 					tr = gson.fromJson(returnValue, new TypeToken<TokenResponse>() {
 					}.getType());
 
@@ -355,12 +362,12 @@ public class BasketService extends ServiceBase {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		if(tr != null){
+
+		if (tr != null) {
 			return tr.access_token;
 		}
-		
+
 		return null;
 	}
-	
+
 }
