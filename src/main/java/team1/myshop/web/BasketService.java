@@ -43,7 +43,7 @@ import team1.myshop.web.model.paypal.Transaction;
 @Path("/orders")
 public class BasketService extends ServiceBase {
 
-	private String token = "A101.QAeBLMAPAnnTaDCrk14qIBYHS_VPshCSLi5fDoP41rlxUNrOkGn3yjcovID7mAS4.ZRyhbMqGZmK4QZdW2PQZf0e6MGi";
+	private String token = "A101.tN_GXxT-B4MxI4KOMQ6-6gOJ8QyAN178kjQWg3og5YZgaVLLTBZNQbdzFTmr8cfy.RKmoB0qInoxFOmxWPY-4jkZnD6q";
 	
     public BasketService() {
         super();
