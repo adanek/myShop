@@ -79,10 +79,10 @@ public class BasketService extends ServiceBase {
         Gson gson = new Gson();
         
         //parse itemString to item Array
-        Collection<CartItem> items = gson.fromJson(orderString, new TypeToken<ArrayList<CartItem>>() {
+        CartItem[] items = gson.fromJson(orderString, new TypeToken<CartItem[]>() {
 		}.getType());
         
-        if (items == null || items.size() < 1) {
+        if (items == null || items.length < 1) {
             http.cancelRequest(response, SC_BAD_REQUEST);
             return "Bad request";
         }
@@ -110,7 +110,7 @@ public class BasketService extends ServiceBase {
     }
     
     //calculate basket amount
-    private double calculateBasketAmount(Collection<CartItem> items) {
+    private double calculateBasketAmount(CartItem[] items) {
 		
     	double amount = 0;
     	
