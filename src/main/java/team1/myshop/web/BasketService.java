@@ -151,7 +151,12 @@ public class BasketService extends ServiceBase {
         int code = callPaypalExecute(token, payer, payment);
     	
         //return status code
-        response.setStatus(code);
+        try {
+			response.sendRedirect("/#/orders/accepted");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
     }
 
