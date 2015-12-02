@@ -3,7 +3,7 @@
 (function (app) {
 
   //noinspection JSUnusedGlobalSymbols
-  app.factory('User', ['$http', '$rootScope', '$q', '$location', function UserFactory($http, $rootScope, $q, $location) {
+  app.factory('User', ['$http', '$rootScope', '$q', '$location', '$localStorage', function UserFactory($http, $rootScope, $q, $location, $localStorage) {
 
     var srv = this;
     var authenticated = false;
@@ -78,6 +78,11 @@
       return $http.post('api/users/login', {name: username, hash: hash}).then(
         function successCallback(response) {
           user = response.data;
+
+          $localStorage.token = user.token;
+          $localStorage.uid= user.id;
+
+
           srv.setAuthenticated(true);
 
           $rootScope.$broadcast('user-login');
@@ -91,6 +96,8 @@
     srv.logout = function () {
       return $http.post('api/users/logout').then(
         function successCallback(response) {
+          delete $localStorage.token;
+          delete $localStorage.id;
           srv.setAuthenticated(false);
           user = defaultUser;
           $location.path('/#').replace();
