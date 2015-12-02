@@ -40,11 +40,15 @@
       Cart.checkout().then(
         function success(response){
           var url = response.headers('Location');
-          $window.location.href = url;
+          $window.open(url);
         },
         function error(response){
           console.log(response);
         });
+    };
+
+    $scope.redirect = function(){
+      $window.open("http://wikitravel.org");
     };
 
   }]);
