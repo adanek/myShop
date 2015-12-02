@@ -39,7 +39,9 @@
     $scope.checkout = function(){
       Cart.checkout().then(
         function success(response){
+          console.log(response);
           var url = response.headers('Location');
+          console.log(url);
           $window.open(url);
         },
         function error(response){
