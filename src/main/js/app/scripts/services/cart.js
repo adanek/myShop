@@ -63,7 +63,13 @@
     };
 
     srv.checkout = function(){
-      return $http.post('api/cashdesk', items);
+
+      var order = [];
+      items.forEach(function (entry){
+        order.push({amount: entry.amount, itemId: entry.item.id})
+      });
+
+      return $http.post('api/orders', order);
     };
 
     return srv;

@@ -36,5 +36,15 @@
       Cart.clear();
     };
 
+    $scope.checkout = function(){
+      Cart.checkout().then(
+        function success(response){
+          console.log(response);
+        },
+        function error(response){
+          console.log(response);
+        });
+    };
+
   }]);
 })(angular.module('myshopApp'));
