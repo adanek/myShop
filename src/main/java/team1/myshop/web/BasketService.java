@@ -26,6 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.http.protocol.HttpService;
 import org.apache.logging.log4j.LogManager;
 
 import com.google.gson.*;
@@ -96,9 +97,17 @@ public class BasketService extends ServiceBase {
         //call payment
         PaymentResponse pr = callPaypalPayment(amount, token);
         
+        if(pr == null){
+        	logger.error("Payment Response not available");
+        	http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+        	return null;
+        }
+        
         for(Link l : pr.links){
         	if(l.rel.equals("approval_url") == true){
         		try {
+        			response.setHeader("Access-Control-Allow-Origin", "*");
+        			//response.setHeader("Access-Control-Request-Method", "POST, GET, OPTIONS");
 					response.sendRedirect(l.href);
 				} catch (IOException e) {
 					e.printStackTrace();
