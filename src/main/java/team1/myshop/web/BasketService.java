@@ -98,8 +98,20 @@ public class BasketService extends ServiceBase {
         
         for(Link l : pr.links){
         	if(l.rel.equals("approval_url") == true){
-        		response.setHeader("Location", l.href);
-        		response.setStatus(HttpServletResponse.SC_SEE_OTHER);
+        		try {
+					response.sendRedirect(l.href);
+				} catch (IOException e) {
+					e.printStackTrace();
+					try {
+						response.sendError(SC_INTERNAL_SERVER_ERROR);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					return "Redirect failed";
+				}
+        		//response.setHeader("Location", l.href);
+        		//response.setStatus(HttpServletResponse.SC_SEE_OTHER);
         		return "Success";
         	}
         }
