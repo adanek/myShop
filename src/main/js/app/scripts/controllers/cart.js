@@ -1,55 +1,55 @@
 (function (app) {
-  app.controller('CartCtrl', ['$scope','Cart', '$window', function ($scope, Cart, $window) {
+  app.controller('CartCtrl', ['$scope', 'Cart', '$window', function ($scope, Cart, $window) {
 
     $scope.items = [];
     $scope.items = Cart.getItems();
 
-    $scope.removeEntry = function(entry){
+    $scope.removeEntry = function (entry) {
       var ndx = $scope.items.indexOf(entry);
 
-      if(ndx > -1){
+      if (ndx > -1) {
         Cart.remove(entry);
         //$scope.items.splice(ndx, 1);
       }
     };
 
-    $scope.toggleEditState = function(entry){
+    $scope.toggleEditState = function (entry) {
 
-      if(entry.edit){
+      if (entry.edit) {
         entry.edit = undefined;
 
-      }else {
+      } else {
         entry.edit = true;
       }
     };
 
-    $scope.getTotal = function(){
+    $scope.getTotal = function () {
       var sum = 0.0;
-      $scope.items.forEach(function(entry){
+      $scope.items.forEach(function (entry) {
         sum += entry.amount * entry.item.price;
       })
 
       return sum;
     };
 
-    $scope.clearCart = function(){
+    $scope.clearCart = function () {
       Cart.clear();
     };
 
-    $scope.checkout = function(){
+    $scope.checkout = function () {
       Cart.checkout().then(
-        function success(response){
+        function success(response) {
           console.log(response);
           var url = response.headers('Location');
           console.log(url);
-          $window.open(url);
+          $window.location.href = url;
         },
-        function error(response){
+        function error(response) {
           console.log(response);
         });
     };
 
-    $scope.redirect = function(){
+    $scope.redirect = function () {
       $window.open("http://wikitravel.org");
     };
 
