@@ -202,7 +202,8 @@ public class BasketService extends ServiceBase {
 	private PaymentResponse callPaypalPayment(double a, String token) {
 		
 		Amount amount = new Amount();
-		amount.total = Double.toString(a);
+		amount.total = String.format("%.2f", a);
+		
 		amount.currency = "EUR";
 
 		Transaction trans = new Transaction();
