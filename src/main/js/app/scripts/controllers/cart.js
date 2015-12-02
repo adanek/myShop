@@ -1,5 +1,5 @@
 (function (app) {
-  app.controller('CartCtrl', ['$scope','Cart', function ($scope, Cart) {
+  app.controller('CartCtrl', ['$scope','Cart', '$window', function ($scope, Cart, $window) {
 
     $scope.items = [];
     $scope.items = Cart.getItems();
@@ -39,7 +39,8 @@
     $scope.checkout = function(){
       Cart.checkout().then(
         function success(response){
-          console.log(response);
+          var url = response.headers('Location');
+          $window.location = url;
         },
         function error(response){
           console.log(response);
