@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,12 +39,15 @@ import team1.myshop.web.model.paypal.Payer;
 import team1.myshop.web.model.paypal.Payment;
 import team1.myshop.web.model.paypal.PaymentResponse;
 import team1.myshop.web.model.paypal.RedirectUrls;
+import team1.myshop.web.model.paypal.TokenResponse;
 import team1.myshop.web.model.paypal.Transaction;
 
 @Path("/orders")
 public class BasketService extends ServiceBase {
 
-	private String token = "A101.tN_GXxT-B4MxI4KOMQ6-6gOJ8QyAN178kjQWg3og5YZgaVLLTBZNQbdzFTmr8cfy.RKmoB0qInoxFOmxWPY-4jkZnD6q";
+	//private String token = "A101.tN_GXxT-B4MxI4KOMQ6-6gOJ8QyAN178kjQWg3og5YZgaVLLTBZNQbdzFTmr8cfy.RKmoB0qInoxFOmxWPY-4jkZnD6q";
+	private static String client_id = "ASew5p32yz4tAteBGZmjju_zwFEwx6sI0LSUnN_G5TkNRHPvWJJBfspcnzjUMMDASc5_I6S-1vx3M2pe";
+	private static String secret = "EFmX2ZHHNpUYkXVlwE4FXD2zl1xWwoCuNAty0yfhcr_AM3FybMZy5PKCGomN0FwIK0GhG6iaIf924IPO";
 	
     public BasketService() {
         super();
@@ -81,7 +85,11 @@ public class BasketService extends ServiceBase {
 
         double amount = 1.12;
         
-        PaymentResponse pr = callPaypalPayment(amount);
+        //get access token
+        String token = getAccessToken();
+        
+        //call payment
+        PaymentResponse pr = callPaypalPayment(amount, token);
         
         for(Link l : pr.links){
         	if(l.rel.equals("approval_url") == true){
@@ -93,7 +101,8 @@ public class BasketService extends ServiceBase {
         
     }
 
-	private PaymentResponse callPaypalPayment(double a) {
+    //call payment
+	private PaymentResponse callPaypalPayment(double a, String token) {
 		
 		Amount amount = new Amount();
 		amount.total = Double.toString(a);
@@ -175,5 +184,79 @@ public class BasketService extends ServiceBase {
 		return pr;
 	}
 
+	//get access token
+	private String getAccessToken() {
+		URL url;
 
+		TokenResponse tr = null;
+
+		int code = 0;
+		try {
+			url = new URL("https://api.sandbox.paypal.com/v1/oauth2/token");
+
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+
+			connection.setDoOutput(true);
+			connection.setDoInput(true);
+			connection.setInstanceFollowRedirects(false);
+			connection.setRequestProperty("Accept", "application/json");
+			
+			String userpass = client_id + ":" + secret;
+			
+			String basic = new String(Base64.getEncoder().encode(userpass.getBytes()));
+			
+			connection.setRequestProperty("Authorization", "Basic " + basic);
+			
+			OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+			wr.write("grant_type=client_credentials");
+			wr.flush();
+			wr.close();
+			
+			connection.connect();
+
+			code = connection.getResponseCode();
+
+			// Fehler
+			if (code >= 300) {
+				System.out.println("Return code: " + code);
+				return null;
+			}
+
+			try {
+				// Object test = connection.getContent();
+				InputStreamReader in = new InputStreamReader((InputStream) connection.getContent());
+				BufferedReader buff = new BufferedReader(in);
+				String line;
+				StringBuffer buffer = new StringBuffer();
+				do {
+					line = buff.readLine();
+					if (line != null) {
+						buffer.append(line);
+					}
+				} while (line != null);
+
+				if (buffer != null) {
+					String returnValue = buffer.toString();
+
+					Gson gson = new Gson();
+					
+					tr = gson.fromJson(returnValue, new TypeToken<TokenResponse>() {
+					}.getType());
+
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if(tr != null){
+			return tr.access_token;
+		}
+		
+		return null;
+	}
+	
 }
