@@ -40,7 +40,7 @@
       Cart.checkout().then(
         function success(response){
           var url = response.headers('Location');
-          $window.location = url;
+          $window.location.href = url;
         },
         function error(response){
           console.log(response);
