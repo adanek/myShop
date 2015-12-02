@@ -11,9 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,22 +19,16 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import org.apache.http.protocol.HttpService;
 import org.apache.logging.log4j.LogManager;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import team1.myshop.contracts.UserRights;
-import team1.myshop.web.helper.JsonParser;
 import team1.myshop.web.model.CartItem;
-import team1.myshop.web.model.Category;
-import team1.myshop.web.model.Item;
 import team1.myshop.web.model.paypal.Amount;
 import team1.myshop.web.model.paypal.Execution;
 import team1.myshop.web.model.paypal.Link;
