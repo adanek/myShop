@@ -18,11 +18,13 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -31,9 +33,11 @@ import com.google.gson.reflect.TypeToken;
 
 import team1.myshop.contracts.UserRights;
 import team1.myshop.web.helper.JsonParser;
+import team1.myshop.web.model.CartItem;
 import team1.myshop.web.model.Category;
 import team1.myshop.web.model.Item;
 import team1.myshop.web.model.paypal.Amount;
+import team1.myshop.web.model.paypal.Execution;
 import team1.myshop.web.model.paypal.Link;
 import team1.myshop.web.model.paypal.Payer;
 import team1.myshop.web.model.paypal.Payment;
@@ -60,29 +64,32 @@ public class BasketService extends ServiceBase {
 	
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public String postOrder(@Context HttpServletRequest request,
+    public String postOrder(String orderString, @Context HttpServletRequest request,
                                    @Context HttpServletResponse response) {
 
         this.initialize();
 
-//        // check user rights
-//        if(!auth.userHasRight(request, UserRights.CAN_CREATE_ORDERS)){
-//            logger.info("User wants to create an order, but did not have the right to");
-//            http.cancelRequest(response, SC_UNAUTHORIZED);
-//            return;
-//        }
-//
-//        Gson gson = new Gson();
-//        
-//        //parse itemString to item Array
-//		Collection<Item> items = gson.fromJson(itemString, new TypeToken<ArrayList<Item>>() {
-//		}.getType());
-//        
-//        if (items == null || items.size() < 1) {
-//            http.cancelRequest(response, SC_BAD_REQUEST);
-//            return;
-//        }
+        // check user rights
+        if(!auth.userHasRight(request, UserRights.CAN_CREATE_ORDERS)){
+            logger.info("User wants to create an order, but did not have the right to");
+            http.cancelRequest(response, SC_UNAUTHORIZED);
+            return "Unauthorized";
+        }
 
+        Gson gson = new Gson();
+        
+        //parse itemString to item Array
+        Collection<CartItem> items = gson.fromJson(orderString, new TypeToken<ArrayList<CartItem>>() {
+		}.getType());
+        
+        if (items == null || items.size() < 1) {
+            http.cancelRequest(response, SC_BAD_REQUEST);
+            return "Bad request";
+        }
+
+        //calculate amount
+        
+        
         double amount = 1.12;
         
         //get access token
@@ -103,8 +110,72 @@ public class BasketService extends ServiceBase {
         return "Error";
         
     }
+    
+    @GET
+    @Path("/orders/execute")
+    public void executeOrder(@Context HttpServletRequest request,
+            @Context HttpServletResponse response) {
+    	
+        //get access token
+        String token = getAccessToken();
+        
+        //get request parameters
+        String payment = request.getParameter("paymentId");
+        String payer   = request.getParameter("PayerID");
+        
+        //execute payment
+        int code = callPaypalExecute(token, payer, payment);
+    	
+        //return status code
+        response.setStatus(code);
+        
+    }
 
-    //call payment
+    //call execution
+    private int callPaypalExecute(String token, String payer, String payment) {
+		
+		try {
+			URL url = new URL("https://api.sandbox.paypal.com/v1/payments/payment/" + payment + "/execute/");
+
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+
+			Execution exec = new Execution();
+			exec.payer_id = payer;
+			
+			Gson gson = new Gson();
+
+			// convert java object to JSON format,
+			// and returned as JSON formatted string
+			String json = gson.toJson(exec);
+			
+			if (json != null && json.length() > 0) {
+				connection.setDoOutput(true);
+				connection.setDoInput(true);
+				connection.setInstanceFollowRedirects(false);
+				connection.setRequestProperty("Content-Type", "application/json");
+				connection.setRequestProperty("Authorization", "Bearer " + token);
+
+				OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+				wr.write(json.toString());
+				wr.flush();
+			}
+
+			connection.connect();
+
+			//get response code
+			return connection.getResponseCode();
+				
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//internal server error
+		return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		
+	}
+
+	//call payment
 	private PaymentResponse callPaypalPayment(double a, String token) {
 		
 		Amount amount = new Amount();
