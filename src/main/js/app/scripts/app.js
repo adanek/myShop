@@ -63,9 +63,7 @@ angular
         controller: 'CartCtrl'
       })
       .when('/orders/accepted', {
-        templateUrl: 'views/pages/accepted.html',
-        controller: 'AcceptedCtrl',
-        controllerAs: 'accepted'
+        templateUrl: 'views/pages/accepted.html'
       })
       .otherwise({
         redirectTo: '/'
