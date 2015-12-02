@@ -123,7 +123,7 @@ public class BasketService extends ServiceBase {
 	}
 
 	@GET
-    @Path("/orders/execute")
+    @Path("/execute")
     public void executeOrder(@Context HttpServletRequest request,
             @Context HttpServletResponse response) {
     	
