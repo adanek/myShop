@@ -19,6 +19,37 @@
     };
     var user = defaultUser;
 
+    // Check existing session
+    var token = $localStorage.token;
+    if (token) {
+      getUserInfo(token);
+    }
+
+    function getUserInfo(token) {
+      var parts = token.split(".");
+      if (parts[1]) {
+        var uInfo = JSON.parse(atob(parts[1]));
+
+        if(!uInfo.uid){
+          console.log(uInfo);
+          return;
+        }
+
+        $http.get('api/users/' + uInfo.uid).then(
+          function success(response) {
+            user = response.data;
+            srv.setAuthenticated(true);
+            $rootScope.$broadcast('user-login');
+          },
+          function error() {
+            delete $localStorage.token;
+          });
+      } else {
+        delete $localStorage.token;
+      }
+    };
+
+
     srv.isAuthenticated = function () {
       return authenticated;
     };
@@ -27,7 +58,7 @@
       return user.role === 'admin';
     };
 
-    srv.canCreateCategory = function(){
+    srv.canCreateCategory = function () {
       return user.rights.canCreateCategory;
     };
 
@@ -77,15 +108,8 @@
       var hash = CryptoJS.SHA1(password).toString(CryptoJS.enc.Base64);
       return $http.post('api/users/login', {name: username, hash: hash}).then(
         function successCallback(response) {
-          user = response.data;
-
-          $localStorage.token = user.token;
-          $localStorage.uid= user.id;
-
-
-          srv.setAuthenticated(true);
-
-          $rootScope.$broadcast('user-login');
+          $localStorage.token = response.data.token;
+          getUserInfo($localStorage.token);
           return response;
         },
         function errorCallback(response) {
@@ -97,7 +121,6 @@
       return $http.post('api/users/logout').then(
         function successCallback(response) {
           delete $localStorage.token;
-          delete $localStorage.id;
           srv.setAuthenticated(false);
           user = defaultUser;
           $location.path('/#').replace();
@@ -128,19 +151,19 @@
       );
     };
 
-    srv.remove = function(user){
-      return $http.delete('api/users/'+ user.id, user);
+    srv.remove = function (user) {
+      return $http.delete('api/users/' + user.id, user);
     };
 
-    srv.changeRole = function(user){
-        return $http.put('api/users/'+user.id, user);
+    srv.changeRole = function (user) {
+      return $http.put('api/users/' + user.id, user);
     };
 
-    srv.all = function(){
+    srv.all = function () {
       return $http.get('api/users');
     };
 
-    srv.roles = function(){
+    srv.roles = function () {
       return $http.get('api/users/roles');
     };
 

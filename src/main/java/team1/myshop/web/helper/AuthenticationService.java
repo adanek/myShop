@@ -23,15 +23,17 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 public class AuthenticationService extends ServiceBase implements team1.myshop.contracts.IAuthenticationService {
 
     @Override
-    public boolean checkGetUserInfo(HttpServletRequest request, HttpServletResponse response, int userid) {
+    public boolean checkGetUserInfo(HttpServletRequest request, HttpServletResponse response, int userId) {
 
+        initialize();
         HttpSession session = request.getSession(false);
 
         if (session == null) {
             return false;
         }
-
-        return (int) session.getAttribute("userid") == userid;
+        final int storedId = (int) session.getAttribute("userid");
+        logger.debug(String.format("Comparing: %d with %d", userId, storedId));
+        return  storedId == userId;
     }
 
     @Override
