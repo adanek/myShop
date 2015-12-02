@@ -88,9 +88,7 @@ public class BasketService extends ServiceBase {
         }
 
         //calculate amount
-        
-        
-        double amount = 1.12;
+        double amount = calculateBasketAmount(items);
         
         //get access token
         String token = getAccessToken();
@@ -111,7 +109,20 @@ public class BasketService extends ServiceBase {
         
     }
     
-    @GET
+    //calculate basket amount
+    private double calculateBasketAmount(Collection<CartItem> items) {
+		
+    	double amount = 0;
+    	
+    	for(CartItem it : items){
+    		data.model.Item item = dh.getItemByID(it.itemId);
+    		amount += (item.getPrice() * it.amount);
+    	}
+    	
+		return amount;
+	}
+
+	@GET
     @Path("/orders/execute")
     public void executeOrder(@Context HttpServletRequest request,
             @Context HttpServletResponse response) {
