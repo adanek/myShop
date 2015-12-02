@@ -29,6 +29,7 @@ module.exports = function(config) {
       'bower_components/angular-route/angular-route.js',
       'bower_components/angular-bootstrap-show-errors/src/showErrors.js',
       'bower_components/ngstorage/ngStorage.js',
+      'bower_components/kjur/jsrsasign/jsrsasign-latest-all-min.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",

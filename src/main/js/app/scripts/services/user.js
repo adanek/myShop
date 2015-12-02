@@ -80,6 +80,9 @@
           user = response.data;
 
           $localStorage.token = user.token;
+          $localStorage.uid= user.id;
+
+
           srv.setAuthenticated(true);
 
           $rootScope.$broadcast('user-login');
@@ -94,6 +97,7 @@
       return $http.post('api/users/logout').then(
         function successCallback(response) {
           delete $localStorage.token;
+          delete $localStorage.id;
           srv.setAuthenticated(false);
           user = defaultUser;
           $location.path('/#').replace();

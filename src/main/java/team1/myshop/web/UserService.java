@@ -130,7 +130,11 @@ public class UserService extends ServiceBase {
 		session.setAttribute("userInfo", userInfo);
 
         JWTSigner signer = new JWTSigner("MY_SECRET");
-        userInfo.token = signer.sign(new HashMap<>(10));
+		final HashMap<String, Object> claims = new HashMap<>(10);
+        claims.put("uid", userInfo.id);
+        claims.put("alias", userInfo.alias);
+        claims.put("role", userInfo.role);
+		userInfo.token = signer.sign(claims);
 
         return userInfo;
 	}
