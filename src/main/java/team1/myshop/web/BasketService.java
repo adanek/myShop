@@ -152,7 +152,7 @@ public class BasketService extends ServiceBase {
     	
         //return status code
         try {
-			response.sendRedirect("#/orders/accepted");
+			response.sendRedirect("/#/orders/accepted");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
