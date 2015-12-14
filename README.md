@@ -1,8 +1,7 @@
 #Anleitung 
-#Anleitung    
   
-Um das Projekt lokal zu starten verwende
-gradle jettyRunWar
+Produktivlink:
+webinfo-myshop.herokuapp.com/
 
 Um die Tests auszuf�hren:
 gradle test
