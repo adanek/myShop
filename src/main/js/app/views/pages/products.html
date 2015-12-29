@@ -21,7 +21,8 @@
   <section class="products col-sm-9">
     <header>
       <span>{{ caption }}</span>
-      <span ng-show="userCanCreateProduct"><a ng-href="#/products/new"><span class="glyphicon glyphicon-plus-sign"></span></a></span>
+      <span ng-show="userCanCreateProduct"><a ng-href="#/products/new"><span
+        class="glyphicon glyphicon-plus-sign"></span></a></span>
     </header>
     <section class="product" ng-repeat="product in products">
 
@@ -37,10 +38,16 @@
           <span class="glyphicon glyphicon-plus"></span>
           <span class="glyphicon glyphicon-shopping-cart"></span>
         </a>
-          <span class="pull-right" ng-show="userCanEditProduct(product)">
-            <a ng-href="#/products/{{product.id}}/edit" class="btn btn-warning"><span class="glyphicon glyphicon-edit"></span></a>
-            <a ng-click="removeProduct(product)" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
-          </span>
+        <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Have%20you%20seen%20this%20amazing%20product">Tweet</a>
+
+        <span class="pull-right" ng-show="userCanEditProduct(product)">
+            <a ng-href="#/products/{{product.id}}/edit" class="btn btn-warning">
+              <span class="glyphicon glyphicon-edit"></span>
+            </a>
+            <a ng-click="removeProduct(product)" class="btn btn-danger">
+              <span class="glyphicon glyphicon-trash"></span>
+            </a>
+        </span>
       </footer>
       <hr>
 
