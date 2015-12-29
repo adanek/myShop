@@ -3,7 +3,7 @@
 (function(app){
   app.controller('MainCtrl', ['$scope', '$rootScope', 'User', 'Cart', function ($scope, $rootScope, User, Cart) {
 
-    $scope.title = 'Home';
+    $scope.title = 'Home Tab';
     $scope.authenticated = User.isAuthenticated();
     $scope.username = User.getUsername();
     $scope.role = User.getUserRole();
