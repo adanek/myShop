@@ -71,4 +71,3 @@
   }]);
 
 })(angular.module('myshopApp'));
-
