@@ -66,6 +66,9 @@ task copyToLib << {
 
 task stage(dependsOn: ["clean", "build", "copyToLib"])
 
+build.mustRunAfter clean
+copyToLib.mustRunAfter build
+
 test {
   // enable TestNG support (default is JUnit)
   // useTestNG()
