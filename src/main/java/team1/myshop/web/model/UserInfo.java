@@ -8,18 +8,19 @@ import data.model.SavedUser;
 
 public class UserInfo {
 
-	public int id;
+	public String id;
 	public String alias;
 	public int userid; //?
 	public String role;
 	public UserRights rights;
 	public String token;
+	public AuthenticationType authenticationType = AuthenticationType.LOCAL;
 
 	public static UserInfo parse(SavedUser user){
 		UserInfo ui = new UserInfo();
 		UserRights ur = new UserRights();
 
-		ui.id = user.getId();
+		ui.id = Integer.toString(user.getId());
 		ui.alias = user.getAlias();
 		ui.userid = user.getId();
 

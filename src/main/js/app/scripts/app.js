@@ -63,6 +63,10 @@ angular
       .when('/orders/accepted', {
         templateUrl: 'views/pages/accepted.html'
       })
+      .when('/login/oauth', {
+        templateUrl: 'views/pages/oauth.html',
+        controller: 'OauthCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

@@ -1,5 +1,6 @@
 package team1.myshop.web.helper;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -19,6 +20,20 @@ public class JsonParser {
 
         try {
             result = om.readValue(data, target);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static String get(String data, String name){
+        ObjectMapper mapper = new ObjectMapper();
+        String result = "";
+
+        try {
+            result = mapper.readTree(data).get(name).asText();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

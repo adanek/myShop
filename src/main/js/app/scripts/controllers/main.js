@@ -1,7 +1,7 @@
 'use strict';
 
 (function(app){
-  app.controller('MainCtrl', ['$scope', '$rootScope', 'User', 'Cart', function ($scope, $rootScope, User, Cart) {
+  app.controller('MainCtrl', ['$scope', '$rootScope', 'User', 'Cart', '$localStorage', '$location', function ($scope, $rootScope, User, Cart, $localStorage, $location) {
 
     $scope.title = 'Home Tab';
     $scope.authenticated = User.isAuthenticated();
@@ -30,6 +30,10 @@
     $scope.$watch(Cart.getItemCount, function(newValue){
       $scope.cartItemCount = newValue;
     });
+
+    if($localStorage.seed){
+      $location.path('/login/oauth').replace();
+    }
 
   }]);
 })(angular.module('myshopApp'));
