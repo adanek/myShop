@@ -2,6 +2,8 @@ package team1.myshop.web;
 
 import com.auth0.jwt.JWTSigner;
 
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.JWTVerifyException;
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
 import org.apache.logging.log4j.LogManager;
 
@@ -23,6 +25,9 @@ import javax.ws.rs.core.MediaType;
 import static javax.servlet.http.HttpServletResponse.*;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.*;
 
 @Path("/users")
@@ -72,29 +77,55 @@ public class UserService extends ServiceBase {
         return roles;
     }
 
+    private final String TOKEN_REGEX = "^Bearer ([a-zA-Z0-9\\-_]+\\.[a-zA-Z0-9\\-_]+\\.[a-zA-Z0-9\\-_]+)$";
+
     @GET
-    @Path("/{userid}")
+    @Path("/{alias}")
     @Produces(MediaType.APPLICATION_JSON)
-    public UserInfo getUser(@PathParam("userid") int userid, @Context HttpServletRequest request,
+    public UserInfo getUser(@PathParam("alias") String alias, @Context HttpServletRequest request,
                             @Context HttpServletResponse response) {
 
         this.initialize();
+        String authorizationHeader = request.getHeader("Authorization");
 
-        // check user rights
-        if (!auth.checkGetUserInfo(request, response, userid)) {
-            logger.info("User tried to access the userinfo of another user");
+        // Check exitence of token
+        if (authorizationHeader == null) {
             http.cancelRequest(response, SC_UNAUTHORIZED);
             return null;
         }
 
-        SavedUser user = dh.getUserByID(userid);
-
-        if (user == null) {
-            http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+        // Verify syntax of token
+        if (!authorizationHeader.matches(TOKEN_REGEX)) {
+            http.cancelRequest(response, SC_BAD_REQUEST);
             return null;
         }
 
-        return UserInfo.parse(user);
+        // Extract userdata form token
+        String token = authorizationHeader.replaceAll(TOKEN_REGEX, "$1");
+        UserInfo userInfo = parseAuthToken(token);
+        if(userInfo == null){
+            http.cancelRequest(response, SC_BAD_REQUEST);
+            return null;
+        }
+
+        // Check user right
+        if(!userInfo.alias.equals(alias)){
+            http.cancelRequest(response, SC_UNAUTHORIZED);
+            return null;
+        }
+
+        // Create userInfo
+        switch(userInfo.authenticationType){
+            case LOCAL:
+                userInfo = UserInfo.parse(dh.getUserByID(userInfo.userid));
+                break;
+            case OAUTH_GITHUB:
+                userInfo = getGitHubUserInfo(userInfo.id);
+                break;
+        }
+        userInfo.token = token;
+
+        return userInfo;
     }
 
     @POST
@@ -135,8 +166,37 @@ public class UserService extends ServiceBase {
         return userInfo;
     }
 
+    private final String SECRET = "MY_SECRET";
+
+    private UserInfo parseAuthToken(String token) {
+
+        UserInfo userInfo = null;
+        JWTVerifier verifier = new JWTVerifier(SECRET);
+        try {
+            Map<String, Object> payload = verifier.verify(token);
+
+            userInfo = new UserInfo();
+            userInfo.id = (String) payload.get("uid");
+            userInfo.alias = (String) payload.get("alias");
+            userInfo.role = (String) payload.get("role");
+            userInfo.authenticationType = AuthenticationType.valueOf((String) payload.get("auth_type"));
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (JWTVerifyException e) {
+            e.printStackTrace();
+        }
+        return userInfo;
+    }
+
     private void createAuthToken(UserInfo userInfo) {
-        JWTSigner signer = new JWTSigner("MY_SECRET");
+        JWTSigner signer = new JWTSigner(SECRET);
         final HashMap<String, Object> claims = new HashMap<>(10);
         claims.put("uid", userInfo.id);
         claims.put("alias", userInfo.alias);
@@ -172,6 +232,8 @@ public class UserService extends ServiceBase {
         userInfo.id = token;
         userInfo.role = "author";
         userInfo.authenticationType = AuthenticationType.OAUTH_GITHUB;
+        userInfo.rights = UserInfo.getRights(userInfo);
+
         return userInfo;
     }
 

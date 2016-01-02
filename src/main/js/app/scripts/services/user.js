@@ -30,12 +30,12 @@
       if (parts[1]) {
         var uInfo = JSON.parse(atob(parts[1]));
 
-        if(!uInfo.uid){
+        if (!uInfo.uid) {
           console.log(uInfo);
           return;
         }
 
-        $http.get('api/users/' + uInfo.uid).then(
+        $http.get('api/users/' + uInfo.alias).then(
           function success(response) {
             user = response.data;
             srv.setAuthenticated(true);
@@ -116,6 +116,20 @@
           return response;
         });
     };
+
+    srv.loginWithGitHub = function (code, state) {
+      return $http.get('api/users/login/oauth?code=' + code + '&state=' + state).then(
+        function successCallback(response) {
+          $localStorage.token = response.data.token;
+          getUserInfo($localStorage.token)
+          return response;
+        },
+        function errorCallback(response) {
+          return response
+        }
+      );
+    }
+
 
     srv.logout = function () {
       return $http.post('api/users/logout').then(

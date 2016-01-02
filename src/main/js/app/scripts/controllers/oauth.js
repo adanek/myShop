@@ -1,22 +1,25 @@
 'use strict';
 
-(function(app){
-  app.controller('OauthCtrl', ['$scope', '$localStorage', '$http', '$location', function ($scope, $localStorage, $http, $location) {
+(function (app) {
+  app.controller('OauthCtrl', ['$scope', '$localStorage', '$http', '$location', 'User', function ($scope, $localStorage, $http, $location, User) {
 
     var seed = $localStorage.seed;
     var code = getParameterByName('code');
-    var state =  getParameterByName('state');
+    var state = getParameterByName('state');
     console.log('seed: ' + seed);
     console.log('state: ' + state);
-    console.log('state: ' + code);
+    console.log('code: ' + code);
 
-    if(seed && state && code && (seed === state)){
+    if (seed && state && code && (seed === state)) {
 
-      $http.get('api/users/login/oauth?code=' + code + '&state=' + state);
-      delete $localStorage.seed;
-
+      User.loginWithGitHub(code, state).then(
+        function success() {
+          delete $localStorage.seed;
+          window.location.href = window.location.host;
+        }
+      );
     }
-    else{
+    else {
       console.log('no seed');
     }
 

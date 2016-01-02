@@ -27,8 +27,38 @@ public class UserInfo {
 		// fill user role
 		switch (user.getRole()) {
 			case 1:
-				ui.role = "admin";
+				ui.role = "admin";			
+				break;
+			case 2:
+				ui.role = "author";				
+				break;
+			case 3:
+				ui.role = "guest";			
+				break;
+		}
 
+		ui.rights = getRights(ui);
+
+		return ui;
+	}
+	
+	public static Collection<UserInfo> parse(Collection<SavedUser> users){
+
+		List<UserInfo> info = new ArrayList<>();
+		
+		for(SavedUser u : users){
+			info.add(UserInfo.parse(u));
+		}
+		return info;
+		
+	}
+
+
+	public static UserRights getRights(UserInfo user){
+
+        UserRights ur = new UserRights();
+        switch (user.role) {
+			case "admin":
 				ur.canCreateCategory = true;
 				ur.canCreateItem = true;
 				ur.canCreateComment = true;
@@ -44,33 +74,17 @@ public class UserInfo {
 				ur.canQueryRoles = true;
 				ur.canCreateOrders = true;
 				break;
-			case 2:
-				ui.role = "author";
+			case "author":
 				ur.canCreateComment = true;
 				ur.canEditComment = true;
 				ur.canCreateOrders = true;
-				
 				break;
-			case 3:
-				ui.role = "guest";
+			case "guest":
 				ur.canCreateComment = true;
 				break;
 		}
-
-		ui.rights = ur;
-
-		return ui;
-	}
-	
-	public static Collection<UserInfo> parse(Collection<SavedUser> users){
-
-		List<UserInfo> info = new ArrayList<>();
-		
-		for(SavedUser u : users){
-			info.add(UserInfo.parse(u));
-		}
-		return info;
-		
+     
+        return ur;
 	}
 	
 }
