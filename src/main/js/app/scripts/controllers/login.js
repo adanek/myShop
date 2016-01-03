@@ -31,9 +31,9 @@
     $scope.useGithub = function () {
 
       var clientId = '2cd8ce35fb2392ce6d04';
-      var redirect_uri = 'http://localhost:8000/';
+      var redirect_uri = 'https://webinfo-myshop.herokuapp.com/';
       var scope = 'user:email';
-      var state = 'NotGuessable';
+      var state = '968d6b12-ce2a-4c54-9a7d-994407c7be75';
       $localStorage.seed = state;
 
       window.location = 'https://github.com/login/oauth/authorize' +

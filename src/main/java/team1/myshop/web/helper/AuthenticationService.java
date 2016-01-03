@@ -65,7 +65,7 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
         // Create userInfo
         switch (userInfo.authenticationType) {
             case LOCAL:
-                userInfo = UserInfo.parse(dh.getUserByID(userInfo.userid));
+                userInfo = UserInfo.parse(dh.getUserByID(Integer.valueOf(userInfo.id)));
                 break;
             case OAUTH_GITHUB:
                 userInfo = getGitHubUserInfo(userInfo.id);
@@ -219,7 +219,7 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
             Map<String, Object> payload = verifier.verify(token);
 
             userInfo = new UserInfo();
-            userInfo.id = (String) payload.get("uid");
+            userInfo.id = (String) payload.get("sub");
             userInfo.alias = (String) payload.get("alias");
             userInfo.role = (String) payload.get("role");
             userInfo.authenticationType = AuthenticationType.valueOf((String) payload.get("auth_type"));

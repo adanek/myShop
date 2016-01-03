@@ -2,9 +2,6 @@
 
 }
 
-
-
-
 .myshop-products header {
   font-size: 2em;
   font-weight: bold;
@@ -12,4 +9,9 @@
 
 .product {
   margin-bottom: 3em;
+}
+
+.twitter-share-button {
+  display: inline-block;
+  vertical-align: middle;
 }

@@ -11,7 +11,6 @@ public class UserInfo {
 
 	public String id;
 	public String alias;
-	public int userid; //?
 	public String role;
 	public UserRights rights;
 	public String token;
@@ -23,7 +22,6 @@ public class UserInfo {
 
 		ui.id = Integer.toString(user.getId());
 		ui.alias = user.getAlias();
-		ui.userid = user.getId();
 
 		// fill user role
 		switch (user.getRole()) {

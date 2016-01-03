@@ -69,6 +69,7 @@
 <div class="scripts">
 
   <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
+  <script src="https://platform.twitter.com/widgets.js"></script>
 
   <!-- build:js(.) scripts/vendor.js -->
   <!-- bower:js -->
@@ -79,25 +80,6 @@
   <script src="bower_components/angular-bootstrap-show-errors/src/showErrors.js"></script>
   <script src="bower_components/ngstorage/ngStorage.js"></script>
   <!-- endbower -->
-
-  <!-- twitter widget.js -->
-  <script>
-    window.twttr = (function (d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0],
-        t = window.twttr || {};
-      if (d.getElementById(id)) return t;
-      js = d.createElement(s);
-      js.id = id;
-      js.src = "https://platform.twitter.com/widgets.js";
-      fjs.parentNode.insertBefore(js, fjs);
-
-      t._e = [];
-      t.ready = function (f) {
-        t._e.push(f);
-      };
-
-      return t;
-    }(document, "script", "twitter-wjs"));</script>
   <!-- endbuild -->
 
   <!-- build:js({.tmp,app}) scripts/scripts.js -->
