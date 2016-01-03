@@ -299,7 +299,6 @@ public class AuthenticationService extends ServiceBase implements team1.myshop.c
         Map<String, String> params = new HashMap<>();
         params.put("client_id", "2cd8ce35fb2392ce6d04");
         params.put("client_secret", "ef073352dc0ea7cb169ea75e8393d3f5dfa4a51e");
-        params.put("redirect_uri", "http://localhost:8000/api/users/login/oauth/response");
         params.put("code", request.getParameter("code"));
         params.put("state", request.getParameter("state"));
 
