@@ -13,9 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.*;
 
 @Path("/comments")
 public class CommentService extends ServiceBase {
@@ -59,27 +57,33 @@ public class CommentService extends ServiceBase {
 
         this.initialize();
 
-        // check user rights
-        auth.ensureUserRight(request, response, UserRights.CAN_CREATE_COMMENT);
+        try {
+            // check user rights
+            auth.ensureUserRight(request, UserRights.CAN_CREATE_COMMENT);
 
-        // Parse body data
-        Comment com = JsonParser.parse(commentString, Comment.class);
-        if (com == null) {
-            http.cancelRequest(response, SC_BAD_REQUEST);
+            // Parse body data
+            Comment com = JsonParser.parse(commentString, Comment.class);
+            if (com == null) {
+                http.cancelRequest(response, SC_BAD_REQUEST);
+            }
+
+            assert com != null;
+            ItemComment comment = dh.createItemComment(com.content, com.itemID, com.authorID);
+
+            if (comment == null) {
+                http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+            }
+
+            assert comment != null;
+            response.setHeader("Location", "api/comments/" + comment.getId());
+            response.setStatus(201);
+
+            return Comment.parse(comment);
+
+        } catch (NotAuthorizedException ex) {
+            return null;
         }
 
-        assert com != null;
-        ItemComment comment = dh.createItemComment(com.content, com.itemID, com.authorID);
-
-        if (comment == null) {
-            http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
-        }
-
-        assert comment != null;
-        response.setHeader("Location", "api/comments/" + comment.getId());
-        response.setStatus(201);
-
-        return Comment.parse(comment);
     }
 
     @PUT
@@ -91,27 +95,35 @@ public class CommentService extends ServiceBase {
 
         this.initialize();
 
-        // check user rights
-        auth.ensureUserRight(request, response, UserRights.CAN_EDIT_COMMENT);
+        try{
+            // check user rights
+            auth.ensureUserRight(request, UserRights.CAN_EDIT_COMMENT);
 
-        Comment com = JsonParser.parse(commentString, Comment.class);
-        if (com == null) {
-            http.cancelRequest(response, SC_BAD_REQUEST);
+            Comment com = JsonParser.parse(commentString, Comment.class);
+            if (com == null) {
+                http.cancelRequest(response, SC_BAD_REQUEST);
+                return null;
+            }
+
+            // Parameter müssen übereinstimmen
+            if (com.commentId != commentID) {
+                http.cancelRequest(response, SC_BAD_REQUEST);
+                return null;
+            }
+
+            data.model.ItemComment comment = dh.changeComment(com.commentId, com.content);
+
+            if (comment == null) {
+                http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
+                return null;
+            }
+
+            return Comment.parse(comment);
+
+        }catch (NotAuthorizedException ex){
+            http.cancelRequest(response, SC_UNAUTHORIZED);
+            return null;
         }
-
-        // Parameter müssen übereinstimmen
-        assert com != null;
-        if (com.commentId != commentID) {
-            http.cancelRequest(response, SC_BAD_REQUEST);
-        }
-
-        data.model.ItemComment comment = dh.changeComment(com.commentId, com.content);
-
-        if(comment == null){
-            http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
-        }
-
-        return Comment.parse(comment);
     }
 
     @DELETE
@@ -123,13 +135,18 @@ public class CommentService extends ServiceBase {
 
         this.initialize();
 
-        // check user rights
-        auth.ensureUserRight(request, response, UserRights.CAN_DELETE_COMMENT);
+        try{
+            // check user rights
+            auth.ensureUserRight(request, UserRights.CAN_DELETE_COMMENT);
 
-        // delete comment
-        dh.deleteComment(commentID);
+            // delete comment
+            dh.deleteComment(commentID);
 
-        response.setStatus(SC_NO_CONTENT);
+            response.setStatus(SC_NO_CONTENT);
+
+        } catch (NotAuthorizedException ex){
+            http.cancelRequest(response, SC_UNAUTHORIZED);
+        }
     }
 
     @Override

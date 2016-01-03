@@ -1,34 +1,22 @@
 package team1.myshop.web;
 
-import com.auth0.jwt.JWTSigner;
-
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.JWTVerifyException;
-import com.auth0.jwt.internal.com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
-import org.apache.logging.log4j.LogManager;
-
-import team1.myshop.web.model.AuthenticationType;
-import team1.myshop.web.model.UserCredentials;
-import team1.myshop.web.model.UserInfo;
 import data.model.SavedUser;
+import org.apache.logging.log4j.LogManager;
 import team1.myshop.contracts.UserRights;
 import team1.myshop.web.helper.JsonParser;
+import team1.myshop.web.model.UserCredentials;
+import team1.myshop.web.model.UserInfo;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static javax.servlet.http.HttpServletResponse.*;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.util.*;
 
 @Path("/users")
 public class UserService extends ServiceBase {
@@ -77,55 +65,35 @@ public class UserService extends ServiceBase {
         return roles;
     }
 
-    private final String TOKEN_REGEX = "^Bearer ([a-zA-Z0-9\\-_]+\\.[a-zA-Z0-9\\-_]+\\.[a-zA-Z0-9\\-_]+)$";
 
     @GET
     @Path("/{alias}")
     @Produces(MediaType.APPLICATION_JSON)
-    public UserInfo getUser(@PathParam("alias") String alias, @Context HttpServletRequest request,
+    public UserInfo getUser(@PathParam("alias") String alias,
+                            @Context HttpServletRequest request,
                             @Context HttpServletResponse response) {
 
         this.initialize();
-        String authorizationHeader = request.getHeader("Authorization");
 
-        // Check exitence of token
-        if (authorizationHeader == null) {
+        try {
+            UserInfo userInfo = this.auth.getUserInfo(request);
+
+            // Check user right
+            if (!userInfo.alias.equals(alias)) {
+                http.cancelRequest(response, SC_UNAUTHORIZED);
+                return null;
+            }
+
+            return userInfo;
+
+        } catch (NotAuthorizedException ex) {
             http.cancelRequest(response, SC_UNAUTHORIZED);
-            return null;
-        }
 
-        // Verify syntax of token
-        if (!authorizationHeader.matches(TOKEN_REGEX)) {
+        } catch (IllegalArgumentException ex) {
             http.cancelRequest(response, SC_BAD_REQUEST);
-            return null;
         }
 
-        // Extract userdata form token
-        String token = authorizationHeader.replaceAll(TOKEN_REGEX, "$1");
-        UserInfo userInfo = parseAuthToken(token);
-        if(userInfo == null){
-            http.cancelRequest(response, SC_BAD_REQUEST);
-            return null;
-        }
-
-        // Check user right
-        if(!userInfo.alias.equals(alias)){
-            http.cancelRequest(response, SC_UNAUTHORIZED);
-            return null;
-        }
-
-        // Create userInfo
-        switch(userInfo.authenticationType){
-            case LOCAL:
-                userInfo = UserInfo.parse(dh.getUserByID(userInfo.userid));
-                break;
-            case OAUTH_GITHUB:
-                userInfo = getGitHubUserInfo(userInfo.id);
-                break;
-        }
-        userInfo.token = token;
-
-        return userInfo;
+        return null;
     }
 
     @POST
@@ -151,124 +119,38 @@ public class UserService extends ServiceBase {
             return null;
         }
 
-        // create new session
-        HttpSession session = request.getSession(true);
-
-        // write userid to session
-        assert user != null;
-        session.setAttribute("userid", user.getId());
-
-        // save userinfo in session
+        // Create auth token
         UserInfo userInfo = UserInfo.parse(user);
-        session.setAttribute("userInfo", userInfo);
+        userInfo.token = this.auth.createAuthToken(userInfo);
 
-        createAuthToken(userInfo);
+
+//        // create new session
+//        HttpSession session = request.getSession(true);
+//
+//        // write userid to session
+//        assert user != null;
+//        session.setAttribute("userid", user.getId());
+//
+//        // save userinfo in session
+//        session.setAttribute("userInfo", userInfo);
+
         return userInfo;
-    }
-
-    private final String SECRET = "MY_SECRET";
-
-    private UserInfo parseAuthToken(String token) {
-
-        UserInfo userInfo = null;
-        JWTVerifier verifier = new JWTVerifier(SECRET);
-        try {
-            Map<String, Object> payload = verifier.verify(token);
-
-            userInfo = new UserInfo();
-            userInfo.id = (String) payload.get("uid");
-            userInfo.alias = (String) payload.get("alias");
-            userInfo.role = (String) payload.get("role");
-            userInfo.authenticationType = AuthenticationType.valueOf((String) payload.get("auth_type"));
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (JWTVerifyException e) {
-            e.printStackTrace();
-        }
-        return userInfo;
-    }
-
-    private void createAuthToken(UserInfo userInfo) {
-        JWTSigner signer = new JWTSigner(SECRET);
-        final HashMap<String, Object> claims = new HashMap<>(10);
-        claims.put("uid", userInfo.id);
-        claims.put("alias", userInfo.alias);
-        claims.put("role", userInfo.role);
-        claims.put("auth_type", userInfo.authenticationType);
-        userInfo.token = signer.sign(claims);
     }
 
 
     @GET
     @Path("/login/oauth")
     @Produces(MediaType.APPLICATION_JSON)
-    public UserInfo loginWithGithub(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+    public UserInfo loginWithGithub(@Context HttpServletRequest request,
+                                    @Context HttpServletResponse response) {
 
         this.initialize();
 
-        String token = getGitHubToken(request);
-        UserInfo userInfo = getGitHubUserInfo(token);
-        createAuthToken(userInfo);
+        String token = this.auth.getGitHubToken(request);
+        UserInfo userInfo = this.auth.getGitHubUserInfo(token);
+        userInfo.token = this.auth.createAuthToken(userInfo);
 
         return userInfo;
-    }
-
-    private UserInfo getGitHubUserInfo(String token) {
-        String url = "https://api.github.com/user";
-        Map<String, String> params = new HashMap<>();
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "token " + token);
-        String userdata = http.get(url, params, headers);
-
-        UserInfo userInfo = new UserInfo();
-        userInfo.alias = JsonParser.get(userdata, "login");
-        userInfo.id = token;
-        userInfo.role = "author";
-        userInfo.authenticationType = AuthenticationType.OAUTH_GITHUB;
-        userInfo.rights = UserInfo.getRights(userInfo);
-
-        return userInfo;
-    }
-
-    private String getGitHubToken(@Context HttpServletRequest request) {
-        String url = "https://github.com/login/oauth/access_token";
-
-        Map<String, String> params = new HashMap<>();
-        params.put("client_id", "2cd8ce35fb2392ce6d04");
-        params.put("client_secret", "ef073352dc0ea7cb169ea75e8393d3f5dfa4a51e");
-        params.put("redirect_uri", "http://localhost:8000/api/users/login/oauth/response");
-        params.put("code", request.getParameter("code"));
-        params.put("state", request.getParameter("state"));
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Accept", MediaType.APPLICATION_JSON);
-
-        String response = http.post(url, params, headers);
-        return JsonParser.get(response, "access_token");
-    }
-
-    @POST
-    @Path("/logout")
-    @Produces(MediaType.APPLICATION_JSON)
-    public void logout(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-
-        this.initialize();
-
-        HttpSession session = request.getSession(false);
-
-        // destroy session
-        if (session != null) {
-            session.invalidate();
-        }
-
-        response.setHeader("Location", "/");
     }
 
     @POST

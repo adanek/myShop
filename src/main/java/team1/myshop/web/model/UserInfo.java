@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import data.model.SavedUser;
+import team1.myshop.web.helper.AuthenticationService;
 
 public class UserInfo {
 
@@ -37,7 +38,7 @@ public class UserInfo {
 				break;
 		}
 
-		ui.rights = getRights(ui);
+		ui.rights = new AuthenticationService().getRights(ui);
 
 		return ui;
 	}
@@ -51,40 +52,6 @@ public class UserInfo {
 		}
 		return info;
 		
-	}
-
-
-	public static UserRights getRights(UserInfo user){
-
-        UserRights ur = new UserRights();
-        switch (user.role) {
-			case "admin":
-				ur.canCreateCategory = true;
-				ur.canCreateItem = true;
-				ur.canCreateComment = true;
-				ur.canDeleteCategory = true;
-				ur.canDeleteItem = true;
-				ur.canDeleteComment = true;
-				ur.canEditCategory = true;
-				ur.canEditItem = true;
-				ur.canEditComment = true;
-				ur.canDeleteUser = true;
-				ur.canEditUser = true;
-				ur.canQueryUsers = true;
-				ur.canQueryRoles = true;
-				ur.canCreateOrders = true;
-				break;
-			case "author":
-				ur.canCreateComment = true;
-				ur.canEditComment = true;
-				ur.canCreateOrders = true;
-				break;
-			case "guest":
-				ur.canCreateComment = true;
-				break;
-		}
-     
-        return ur;
 	}
 	
 }

@@ -15,7 +15,7 @@
       User.loginWithGitHub(code, state).then(
         function success() {
           delete $localStorage.seed;
-          window.location.href = window.location.host;
+          $location.url($location.path());
         }
       );
     }

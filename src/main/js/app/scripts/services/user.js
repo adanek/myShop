@@ -30,7 +30,7 @@
       if (parts[1]) {
         var uInfo = JSON.parse(atob(parts[1]));
 
-        if (!uInfo.uid) {
+        if (!uInfo.sub) {
           console.log(uInfo);
           return;
         }
@@ -132,17 +132,11 @@
 
 
     srv.logout = function () {
-      return $http.post('api/users/logout').then(
-        function successCallback(response) {
-          delete $localStorage.token;
-          srv.setAuthenticated(false);
-          user = defaultUser;
-          $location.path('/#').replace();
-          return response;
-        },
-        function errorCallback(response) {
-          return $q.reject(response);
-        });
+
+      delete $localStorage.token;
+      srv.setAuthenticated(false);
+      user = defaultUser;
+      $location.path('/#').replace();
     };
 
     /**

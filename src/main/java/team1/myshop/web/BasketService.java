@@ -1,9 +1,5 @@
 package team1.myshop.web;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +35,8 @@ import team1.myshop.web.model.paypal.RedirectUrls;
 import team1.myshop.web.model.paypal.TokenResponse;
 import team1.myshop.web.model.paypal.Transaction;
 
+import static javax.servlet.http.HttpServletResponse.*;
+
 @Path("/orders")
 public class BasketService extends ServiceBase {
 
@@ -66,8 +64,8 @@ public class BasketService extends ServiceBase {
 		// check user rights
 		if (!auth.userHasRight(request, UserRights.CAN_CREATE_ORDERS)) {
 			logger.info("User wants to create an order, but did not have the right to");
-			http.cancelRequest(response, SC_UNAUTHORIZED);
-			return "Unauthorized";
+			http.cancelRequest(response, SC_FORBIDDEN);
+			return null;
 		}
 
 		Gson gson = new Gson();
