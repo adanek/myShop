@@ -45,7 +45,7 @@
         <myshop-navigation></myshop-navigation>
 
         <p class="navbar-text navbar-right">
-          <span ng-if="authenticated">Logged in as {{ username }} ({{ role }}) <a ng-click="logout()">logout</a></span>
+          <span ng-if="authenticated">Logged in as <a href="#/user">{{ username }}</a> ({{ role }}) <a ng-click="logout()">logout</a></span>
           <span ng-if="!authenticated"><a ng-href="#/login">login</a></span>
           <a ng-href="#/cart">
             <span class="glyphicon glyphicon-shopping-cart"></span>
