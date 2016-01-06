@@ -1,7 +1,19 @@
 package team1.myshop.web;
 
 import data.model.SavedUser;
+import javassist.bytecode.Descriptor.Iterator;
+
 import org.apache.logging.log4j.LogManager;
+
+import com.google.code.geocoder.Geocoder;
+import com.google.code.geocoder.GeocoderRequestBuilder;
+import com.google.code.geocoder.model.GeocodeResponse;
+import com.google.code.geocoder.model.GeocoderAddressComponent;
+import com.google.code.geocoder.model.GeocoderGeometry;
+import com.google.code.geocoder.model.GeocoderRequest;
+import com.google.code.geocoder.model.GeocoderResult;
+import com.google.code.geocoder.model.LatLngBounds;
+
 import team1.myshop.contracts.UserRights;
 import team1.myshop.web.helper.JsonParser;
 import team1.myshop.web.model.UserCredentials;
@@ -13,8 +25,11 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static javax.servlet.http.HttpServletResponse.*;
 
@@ -121,6 +136,7 @@ public class UserService extends ServiceBase {
 
         // Create auth token
         UserInfo userInfo = UserInfo.parse(user);
+        
         userInfo.token = this.auth.createAuthToken(userInfo);
 
 

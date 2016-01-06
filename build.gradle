@@ -36,6 +36,9 @@ dependencies {
 	
 	compile 'com.google.code.gson:gson:2.2.4'
 	
+	//Geocoder
+	compile 'com.google.code.geocoder-java:geocoder-java:0.16'
+	
 	//Logger
 	compile 'org.apache.logging.log4j:log4j-api:2.4.1'
 	runtime 'org.apache.logging.log4j:log4j-core:2.4.1'
