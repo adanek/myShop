@@ -55,6 +55,7 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.0.31-beta'
 }
 
+
 // Tasks for heroku deployment
 
 task copyToLib << {

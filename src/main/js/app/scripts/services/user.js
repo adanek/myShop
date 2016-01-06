@@ -49,7 +49,6 @@
       }
     };
 
-
     srv.isAuthenticated = function () {
       return authenticated;
     };
@@ -130,7 +129,6 @@
       );
     }
 
-
     srv.logout = function () {
 
       delete $localStorage.token;
@@ -145,10 +143,20 @@
      * @param password the password of the user in cleartext
      * @returns Promise<User>
      */
-    srv.register = function (name, password) {
-      var hash = CryptoJS.SHA1(password).toString(CryptoJS.enc.Base64);
+    srv.register = function (user) {
+      var hash = CryptoJS.SHA1(user.password).toString(CryptoJS.enc.Base64);
 
-      return $http.post('api/users/register', {name: name, hash: hash}).then(
+      return $http.post('api/users/register', {
+        name: user.username,
+        hash: hash,
+        address: {
+          zip: user.address.zip_code,
+          city: user.address.city,
+          street: user.address.street,
+          longitude: user.position.long,
+          latitude: user.position.lat
+        }
+      }).then(
         function successCallback(response) {
           return response;
         },

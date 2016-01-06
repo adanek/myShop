@@ -12,7 +12,8 @@ angular
   .module('myshopApp', [
     'ngRoute',
     'ui.bootstrap.showErrors',
-    'ngStorage'
+    'ngStorage',
+    'leaflet-directive'
   ])
 
   .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
@@ -54,7 +55,7 @@ angular
       })
       .when('/users', {
         templateUrl: 'views/pages/users.html',
-        controller: 'UserCtrl'
+        controller: 'UsersCtrl'
       })
       .when('/cart', {
         templateUrl: 'views/pages/cart.html',
@@ -66,6 +67,10 @@ angular
       .when('/login/oauth', {
         templateUrl: 'views/pages/oauth.html',
         controller: 'OauthCtrl'
+      })
+      .when('/user', {
+        templateUrl: 'views/pages/user.html',
+        controller: 'UserCtrl'
       })
       .otherwise({
         redirectTo: '/'

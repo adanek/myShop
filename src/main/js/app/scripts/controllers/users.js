@@ -1,7 +1,7 @@
 'use strict';
 
 (function (app) {
-  app.controller('UserCtrl', ['$scope', 'User', function ($scope, User) {
+  app.controller('UsersCtrl', ['$scope', 'User', function ($scope, User) {
 
     $scope.loading = true;
     $scope.user = undefined;

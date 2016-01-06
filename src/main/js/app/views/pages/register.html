@@ -5,19 +5,42 @@
 </header>
 
 <section>
-  <div>
+  <div class="register-form">
     <form name="registerForm" novalidate ng-submit="registerUser()">
 
       <div class="form-group" show-errors>
         <label for="username">Benutzername:</label>
-        <input type="text" id="username" name="username" placeholder="Schreib hier deinen Namen rein" class="form-control" ng-model="username" required>
+        <input type="text" id="username" name="username" placeholder="Schreib hier deinen Namen rein" class="form-control" ng-model="user.username" required>
         <div class="help-block">Deinen Namen brauche ich</div>
       </div>
 
       <div class="form-group" show-errors>
         <label for="password">Passwort:</label>
-        <input type="password" class="form-control" id="password" name="password" placeholder="und hier dein gewünschtes Passwort" ng-model="password" required>
-        <div class="help-block">Passwort ist <notwendig></notwendig></div>
+        <input type="password" class="form-control" id="password" name="password" placeholder="und hier dein gewünschtes Passwort" ng-model="user.password" required>
+        <div class="help-block">Passwort ist notwendig</div>
+      </div>
+
+      <div class="form-group">
+        <label for="ff-street">Straße:</label>
+        <input type="text" class="form-control" id="ff-street" name="ff-street" ng-model="user.address.street" required>
+        <div class="help-block">Straße ist erforderlich</div>
+      </div>
+
+      <div class="form-group">
+        <label for="ff-zip">PLZ:</label>
+        <input type="tel" class="form-control" id="ff-zip" name="ff-zip" ng-model="user.address.zip_code" required>
+        <div class="help-block">Postleitzahl ist erforderlich</div>
+      </div>
+
+      <div class="form-group">
+        <label for="ff-city">Ort: </label>
+        <input type="text" class="form-control" id="ff-city" name="ff-city" ng-model="user.address.city" required>
+        <div class="help-block">Ort ist erforderlich</div>
+      </div>
+
+      <div class="form-group">
+        <input type="text" id="ff-long" name="ff-long" ng-model="user.position.long">
+        <input type="text" id="ff-lat" name="ff-lat" ng-model="user.position.lat">
       </div>
 
       <div class="form-group">

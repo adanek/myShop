@@ -14,6 +14,7 @@
   <!-- endbuild -->
   <!-- build:css(.tmp) styles/main.css -->
   <link rel="stylesheet" href="styles/loader.css">
+  <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css" />
   <!-- endbuild -->
 </head>
 <body>
@@ -70,7 +71,10 @@
 
   <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
   <script src="https://platform.twitter.com/widgets.js"></script>
-
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=geometry"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>
+  <script src="../bower_components/leaflet-plugins/layer/tile/Google.js"></script>
+  <script src="../bower_components/tether/dist/js/tether.js"></script>
   <!-- build:js(.) scripts/vendor.js -->
   <!-- bower:js -->
   <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -98,6 +102,7 @@
   <script src="scripts/directives/myshop-product-comment.js"></script>
   <script src="scripts/directives/myshop-navigation.js"></script>
   <script src="scripts/directives/twitter.js"></script>
+  <script src="scripts/directives/angular-leaflet-directive.js"></script>
 
   <script src="scripts/controllers/main.js"></script>
   <script src="scripts/controllers/about.js"></script>
@@ -111,6 +116,7 @@
   <script src="scripts/controllers/users.js"></script>
   <script src="scripts/controllers/cart.js"></script>
   <script src="scripts/controllers/oauth.js"></script>
+  <script src="scripts/controllers/user.js"></script>
   <!-- endbuild -->
 
 </div>

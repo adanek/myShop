@@ -13,3 +13,5 @@
 /* Pages */
 @import "pages/products.css";
 @import "pages/cart.css";
+@import "pages/register.css";
+@import "pages/user.css";
