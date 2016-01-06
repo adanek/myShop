@@ -21,14 +21,14 @@ public interface IDataHandler {
 			throws IllegalArgumentException, IllegalStateException;
 
 	// change category
-	Category changeCategory(int categoryID, String name) throws IllegalArgumentException, IllegalStateException;
+	Category changeCategory(int categoryID, String name, String searchtoken) throws IllegalArgumentException, IllegalStateException;
 
 	// change user
 	SavedUser changeUser(int userID, int role) throws IllegalArgumentException, IllegalStateException;
 
 	SavedUser createUser(String alias, String password, int role, Address address) throws IllegalStateException;
 
-	Category createCategory(String name) throws IllegalStateException;
+	Category createCategory(String name, String searchtoken) throws IllegalStateException;
 
 	Item createItem(String title, String description, int category, int author, double price)
 			throws IllegalStateException, IllegalArgumentException;

@@ -107,7 +107,7 @@ public class CategoryServiceTest {
         dhCategory.setName("New Category");
 
         when(auth.userHasRight(request, UserRights.CAN_CREATE_CATEGORY)).thenReturn(true);
-        when(dh.createCategory("New Category")).thenReturn(dhCategory);
+        when(dh.createCategory("New Category", "general")).thenReturn(dhCategory);
 
         Category expected = new Category();
         expected.name = "New Category";
@@ -141,12 +141,14 @@ public class CategoryServiceTest {
 
         dhCategory.setId(categoryId);
         dhCategory.setName("Changed Category");
+        dhCategory.setSearchtoken("general");
 
         when(auth.userHasRight(request, UserRights.CAN_EDIT_CATEGORY)).thenReturn(true);
-        when(dh.changeCategory(categoryId, "Changed Category")).thenReturn(dhCategory);
+        when(dh.changeCategory(categoryId, "Changed Category", "general")).thenReturn(dhCategory);
 
         Category expected = new Category();
         expected.name = "Changed Category";
+        expected.searchtoken = "general";
         expected.id = categoryId;
 
         Category actual = sut.changeCategory(categoryId, catString, request, response);

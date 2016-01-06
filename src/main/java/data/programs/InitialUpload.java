@@ -11,8 +11,8 @@ public class InitialUpload {
 		IDataHandler handler = new DataHandler(true);
 
 		//categories
-		int categoryID1 = handler.createCategory("Sport").getId();
-		int categoryID2 = handler.createCategory("IT").getId();
+		int categoryID1 = handler.createCategory("Sport", "sports").getId();
+		int categoryID2 = handler.createCategory("IT", "electronics").getId();
 		
 		Address addr1 = new Address();
 		addr1.zip = 6020;

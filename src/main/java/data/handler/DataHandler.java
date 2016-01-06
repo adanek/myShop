@@ -326,7 +326,7 @@ public class DataHandler implements IDataHandler {
 	 * java.lang.String)
 	 */
 	@Override
-	public Category changeCategory(int categoryID, String name) throws IllegalArgumentException, IllegalStateException {
+	public Category changeCategory(int categoryID, String name, String searchtoken) throws IllegalArgumentException, IllegalStateException {
 
 		Session session = openSession();
 
@@ -347,6 +347,8 @@ public class DataHandler implements IDataHandler {
 
 			// change category name
 			category.setName(name);
+			// change category searchtoken
+			category.setSearchtoken(searchtoken);
 
 			// update category
 			session.update(category);
@@ -474,11 +476,12 @@ public class DataHandler implements IDataHandler {
 	 * @see team1.myshop.contracts.IDataHandler#createCategory(java.lang.String)
 	 */
 	@Override
-	public Category createCategory(String name) throws IllegalStateException {
+	public Category createCategory(String name, String searchtoken) throws IllegalStateException {
 
 		// create category instance
 		Category category = new Category();
 		category.setName(name);
+		category.setSearchtoken(searchtoken);
 
 		saveObjectToDb(category);
 		return category;

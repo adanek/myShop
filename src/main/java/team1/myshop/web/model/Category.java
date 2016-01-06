@@ -20,6 +20,7 @@ import team1.myshop.web.model.shops.OverpassResponse;
 public class Category {
     public int id;
     public String name;
+    public String searchtoken;
     public OverpassResponse or;
 
     private final static double SEARCH_RADIUS = 20;
@@ -46,6 +47,7 @@ public class Category {
 
         cat.id = category.getId();
         cat.name = category.getName();
+        cat.searchtoken	 = category.getSearchtoken();
 
         Position pos = new Position();
         pos.latitude = 47.263472;    //default

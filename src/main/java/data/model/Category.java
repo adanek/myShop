@@ -20,6 +20,7 @@ public class Category {
 	@GeneratedValue
 	private int id;
 	private String name;
+	private String searchtoken;
 	@OneToMany(mappedBy = "category")
 	@Cascade({ CascadeType.DELETE })
 	private Collection<Item> items = new LinkedList<>();
@@ -46,6 +47,14 @@ public class Category {
 
 	public void setItems(Collection<Item> items) {
 		this.items = items;
+	}
+
+	public String getSearchtoken() {
+		return searchtoken;
+	}
+
+	public void setSearchtoken(String searchtoken) {
+		this.searchtoken = searchtoken;
 	}
 	
 }

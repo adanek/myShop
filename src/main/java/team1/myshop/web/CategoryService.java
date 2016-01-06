@@ -68,7 +68,7 @@ public class CategoryService extends ServiceBase {
 
         // Save the new category
         assert cat != null;
-        data.model.Category category = dh.createCategory(cat.name);
+        data.model.Category category = dh.createCategory(cat.name, cat.searchtoken);
 
         if (category == null) {
             http.cancelRequest(response, SC_INTERNAL_SERVER_ERROR);
@@ -107,7 +107,7 @@ public class CategoryService extends ServiceBase {
 
         // Save category
         assert cat != null;
-        data.model.Category categoryDB = dh.changeCategory(category, cat.name);
+        data.model.Category categoryDB = dh.changeCategory(category, cat.name, cat.searchtoken);
 
         return Category.parse(categoryDB);
     }
