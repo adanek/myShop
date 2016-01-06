@@ -19,8 +19,8 @@ public class InitialUpload {
 		addr1.street = "Technikerstraße 21a";
 		addr1.city   = "Innsbruck";
 		addr1.country = "Austria";
-		addr1.longitude = 47.263720;
-		addr1.latitude = 11.345897;
+		addr1.longitude = 11.345897;
+		addr1.latitude = 47.263720;
 		
 		//user
 		int userID1 = handler.createUser("Andi", "d033e22ae348aeb5660fc2140aec35850c4da997", 1, addr1).getId();
