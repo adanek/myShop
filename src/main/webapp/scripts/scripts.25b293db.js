@@ -1,5 +1,197 @@
 'use strict';
 
+/**
+ * @ngdoc overview
+ * @name myshopApp
+ * @description
+ * # myshopApp
+ *
+ * Main module of the application.
+ */
+angular
+  .module('myshopApp', [
+    'ngRoute',
+    'ui.bootstrap.showErrors',
+    'ngStorage',
+    'leaflet-directive'
+  ])
+
+  .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
+    $routeProvider
+      .when('/', {
+        templateUrl: 'views/pages/main.html',
+        controller: 'HomeCtrl',
+        controllerAs: 'home'
+      })
+      .when('/about', {
+        templateUrl: 'views/pages/about.html',
+        controller: 'AboutCtrl',
+        controllerAs: 'about'
+      })
+      .when('/login', {
+        templateUrl: 'views/pages/login.html',
+        controller: 'LoginCtrl'
+      })
+      .when('/register', {
+        templateUrl: 'views/pages/register.html',
+        controller: 'RegisterCtrl',
+        controllerAs: 'register'
+      })
+      .when('/products', {
+        templateUrl: 'views/pages/products.html',
+        controller: 'ProductsCtrl'
+      })
+      .when('/categories', {
+        templateUrl: 'views/pages/categories.html',
+        controller: 'CategoriesCtrl'
+      })
+      .when('/products/new', {
+        templateUrl: 'views/pages/product-edit.html',
+        controller: 'ProductNewCtrl'
+      })
+      .when('/products/:id/edit', {
+        templateUrl: 'views/pages/product-edit.html',
+        controller: 'ProductEditCtrl'
+      })
+      .when('/users', {
+        templateUrl: 'views/pages/users.html',
+        controller: 'UsersCtrl'
+      })
+      .when('/cart', {
+        templateUrl: 'views/pages/cart.html',
+        controller: 'CartCtrl'
+      })
+      .when('/orders/accepted', {
+        templateUrl: 'views/pages/accepted.html'
+      })
+      .when('/login/oauth', {
+        templateUrl: 'views/pages/oauth.html',
+        controller: 'OauthCtrl'
+      })
+      .when('/user', {
+        templateUrl: 'views/pages/user.html',
+        controller: 'UserCtrl'
+      })
+      .otherwise({
+        redirectTo: '/'
+      });
+
+    $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function($q, $location, $localStorage){
+      return {
+        'request': function(config){
+          config.headers = config.headers || {};
+          if($localStorage.token){
+            config.headers.Authorization = 'Bearer '+ $localStorage.token;
+          }
+          return config;
+        },
+        'responseError': function(response){
+          if(response.status === 401){
+            $location.path('#/login');
+          }
+
+          return $q.reject(response);
+        }
+      }
+    }]);
+  }]);
+//
+//!function (d, s, id) {
+//  var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https';
+//  if (!d.getElementById(id)) {
+//    js = d.createElement(s);
+//    js.id = id;
+//    js.src = p + '://platform.twitter.com/widgets.js';
+//    fjs.parentNode.insertBefore(js, fjs);
+//  }
+//}(document, 'script', 'twitter-wjs');
+
+'use strict';
+
+(function(app){
+  app.factory('Comments', ['$http', function CommentsFactory($http){
+    return {
+      formProduct: function (productId) {
+        return $http.get('api/comments/item/' + productId);
+      },
+
+      save: function(comment){
+        return $http.post('api/comments/new', comment);
+      },
+
+      update: function (comment){
+        return $http.put('api/comments/'+ comment.commentId, comment);
+      },
+
+      remove: function(comment){
+        return $http.delete('api/comments/'+ comment.commentId, comment);
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  //noinspection JSUnusedGlobalSymbols
+  app.factory('Categories', ['$http', function CategoriesFactory($http) {
+
+    return {
+      query: function () {
+        return $http.get('api/categories');
+      },
+
+      new: function(category){
+        return $http.post('api/categories', category);
+      },
+
+      update: function(category) {
+        return $http.put('api/categories/'+ category.id, category);
+      },
+
+      remove: function(category){
+        return $http.delete('api/categories/'+ category.id, category);
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  //noinspection JSUnusedGlobalSymbols
+  app.factory('Products', ['$http', function ProductsFactory($http) {
+    return {
+      new: function (product) {
+        return $http.post('api/items', product);
+      },
+
+      query: function () {
+        return $http.get('api/items');
+      },
+
+      fromCategory: function (categotryId) {
+        return $http.get('api/items/category/' + categotryId);
+      },
+
+      delete: function(product){
+        return $http.delete('api/items/' + product.id, product);
+      },
+
+      get: function(productId){
+        return $http.get('api/items/' + productId);
+      },
+
+      update: function(product){
+        return $http.put('api/items/' + product.id, product);
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+
+'use strict';
+
 (function (app) {
 
   //noinspection JSUnusedGlobalSymbols
@@ -219,3 +411,6752 @@ this.options.clickable&&e.DomUtil.addClass(a,"leaflet-clickable"),a.coordsize="1
   var b=CryptoJS,c=b.lib,d=c.Base,e=c.WordArray,f=c.BufferedBlockAlgorithm,g=b.enc.Base64,h=b.algo.EvpKDF,i=c.Cipher=f.extend({cfg:d.extend(),createEncryptor:function(a,b){return this.create(this._ENC_XFORM_MODE,a,b)},createDecryptor:function(a,b){return this.create(this._DEC_XFORM_MODE,a,b)},init:function(a,b,c){this.cfg=this.cfg.extend(c),this._xformMode=a,this._key=b,this.reset()},reset:function(){f.reset.call(this),this._doReset()},process:function(a){return this._append(a),this._process()},finalize:function(a){return a&&this._append(a),this._doFinalize()},keySize:4,ivSize:4,_ENC_XFORM_MODE:1,_DEC_XFORM_MODE:2,_createHelper:function(a){return{encrypt:function(b,c,d){return("string"==typeof c?o:n).encrypt(a,b,c,d)},decrypt:function(b,c,d){return("string"==typeof c?o:n).decrypt(a,b,c,d)}}}});c.StreamCipher=i.extend({_doFinalize:function(){return this._process(!0)},blockSize:1});var j=b.mode={},k=function(b,c,d){var e=this._iv;e?this._iv=a:e=this._prevBlock;for(var f=0;d>f;f++)b[c+f]^=e[f]},l=(c.BlockCipherMode=d.extend({createEncryptor:function(a,b){return this.Encryptor.create(a,b)},createDecryptor:function(a,b){return this.Decryptor.create(a,b)},init:function(a,b){this._cipher=a,this._iv=b}})).extend();l.Encryptor=l.extend({processBlock:function(a,b){var c=this._cipher,d=c.blockSize;k.call(this,a,b,d),c.encryptBlock(a,b),this._prevBlock=a.slice(b,b+d)}}),l.Decryptor=l.extend({processBlock:function(a,b){var c=this._cipher,d=c.blockSize,e=a.slice(b,b+d);c.decryptBlock(a,b),k.call(this,a,b,d),this._prevBlock=e}}),j=j.CBC=l,l=(b.pad={}).Pkcs7={pad:function(a,b){for(var c=4*b,c=c-a.sigBytes%c,d=c<<24|c<<16|c<<8|c,f=[],g=0;c>g;g+=4)f.push(d);c=e.create(f,c),a.concat(c)},unpad:function(a){a.sigBytes-=255&a.words[a.sigBytes-1>>>2]}},c.BlockCipher=i.extend({cfg:i.cfg.extend({mode:j,padding:l}),reset:function(){i.reset.call(this);var a=this.cfg,b=a.iv,a=a.mode;if(this._xformMode==this._ENC_XFORM_MODE)var c=a.createEncryptor;else c=a.createDecryptor,this._minBufferSize=1;this._mode=c.call(a,this,b&&b.words)},_doProcessBlock:function(a,b){this._mode.processBlock(a,b)},_doFinalize:function(){var a=this.cfg.padding;if(this._xformMode==this._ENC_XFORM_MODE){a.pad(this._data,this.blockSize);var b=this._process(!0)}else b=this._process(!0),a.unpad(b);return b},blockSize:4});var m=c.CipherParams=d.extend({init:function(a){this.mixIn(a)},toString:function(a){return(a||this.formatter).stringify(this)}}),j=(b.format={}).OpenSSL={stringify:function(a){var b=a.ciphertext;return a=a.salt,(a?e.create([1398893684,1701076831]).concat(a).concat(b):b).toString(g)},parse:function(a){a=g.parse(a);var b=a.words;if(1398893684==b[0]&&1701076831==b[1]){var c=e.create(b.slice(2,4));b.splice(0,4),a.sigBytes-=16}return m.create({ciphertext:a,salt:c})}},n=c.SerializableCipher=d.extend({cfg:d.extend({format:j}),encrypt:function(a,b,c,d){d=this.cfg.extend(d);var e=a.createEncryptor(c,d);return b=e.finalize(b),e=e.cfg,m.create({ciphertext:b,key:c,iv:e.iv,algorithm:a,mode:e.mode,padding:e.padding,blockSize:a.blockSize,formatter:d.format})},decrypt:function(a,b,c,d){return d=this.cfg.extend(d),b=this._parse(b,d.format),a.createDecryptor(c,d).finalize(b.ciphertext)},_parse:function(a,b){return"string"==typeof a?b.parse(a,this):a}}),b=(b.kdf={}).OpenSSL={execute:function(a,b,c,d){return d||(d=e.random(8)),a=h.create({keySize:b+c}).compute(a,d),c=e.create(a.words.slice(b),4*c),a.sigBytes=4*b,m.create({key:a,iv:c,salt:d})}},o=c.PasswordBasedCipher=n.extend({cfg:n.cfg.extend({kdf:b}),encrypt:function(a,b,c,d){return d=this.cfg.extend(d),c=d.kdf.execute(c,a.keySize,a.ivSize),d.iv=c.iv,a=n.encrypt.call(this,a,b,c.key,d),a.mixIn(c),a},decrypt:function(a,b,c,d){return d=this.cfg.extend(d),b=this._parse(b,d.format),c=d.kdf.execute(c,a.keySize,a.ivSize,b.salt),d.iv=c.iv,n.decrypt.call(this,a,b,c.key,d)}})}(),function(){function a(){for(var a=this._X,b=this._C,c=0;8>c;c++)e[c]=b[c];for(b[0]=b[0]+1295307597+this._b|0,b[1]=b[1]+3545052371+(b[0]>>>0<e[0]>>>0?1:0)|0,b[2]=b[2]+886263092+(b[1]>>>0<e[1]>>>0?1:0)|0,b[3]=b[3]+1295307597+(b[2]>>>0<e[2]>>>0?1:0)|0,b[4]=b[4]+3545052371+(b[3]>>>0<e[3]>>>0?1:0)|0,b[5]=b[5]+886263092+(b[4]>>>0<e[4]>>>0?1:0)|0,b[6]=b[6]+1295307597+(b[5]>>>0<e[5]>>>0?1:0)|0,b[7]=b[7]+3545052371+(b[6]>>>0<e[6]>>>0?1:0)|0,this._b=b[7]>>>0<e[7]>>>0?1:0,c=0;8>c;c++){var d=a[c]+b[c],g=65535&d,h=d>>>16;f[c]=((g*g>>>17)+g*h>>>15)+h*h^((4294901760&d)*d|0)+((65535&d)*d|0)}a[0]=f[0]+(f[7]<<16|f[7]>>>16)+(f[6]<<16|f[6]>>>16)|0,a[1]=f[1]+(f[0]<<8|f[0]>>>24)+f[7]|0,a[2]=f[2]+(f[1]<<16|f[1]>>>16)+(f[0]<<16|f[0]>>>16)|0,a[3]=f[3]+(f[2]<<8|f[2]>>>24)+f[1]|0,a[4]=f[4]+(f[3]<<16|f[3]>>>16)+(f[2]<<16|f[2]>>>16)|0,a[5]=f[5]+(f[4]<<8|f[4]>>>24)+f[3]|0,a[6]=f[6]+(f[5]<<16|f[5]>>>16)+(f[4]<<16|f[4]>>>16)|0,a[7]=f[7]+(f[6]<<8|f[6]>>>24)+f[5]|0}var b=CryptoJS,c=b.lib.StreamCipher,d=[],e=[],f=[],g=b.algo.Rabbit=c.extend({_doReset:function(){for(var b=this._key.words,c=this.cfg.iv,d=0;4>d;d++)b[d]=16711935&(b[d]<<8|b[d]>>>24)|4278255360&(b[d]<<24|b[d]>>>8);for(var e=this._X=[b[0],b[3]<<16|b[2]>>>16,b[1],b[0]<<16|b[3]>>>16,b[2],b[1]<<16|b[0]>>>16,b[3],b[2]<<16|b[1]>>>16],b=this._C=[b[2]<<16|b[2]>>>16,4294901760&b[0]|65535&b[1],b[3]<<16|b[3]>>>16,4294901760&b[1]|65535&b[2],b[0]<<16|b[0]>>>16,4294901760&b[2]|65535&b[3],b[1]<<16|b[1]>>>16,4294901760&b[3]|65535&b[0]],d=this._b=0;4>d;d++)a.call(this);for(d=0;8>d;d++)b[d]^=e[d+4&7];if(c){var d=c.words,c=d[0],d=d[1],c=16711935&(c<<8|c>>>24)|4278255360&(c<<24|c>>>8),d=16711935&(d<<8|d>>>24)|4278255360&(d<<24|d>>>8),e=c>>>16|4294901760&d,f=d<<16|65535&c;for(b[0]^=c,b[1]^=e,b[2]^=d,b[3]^=f,b[4]^=c,b[5]^=e,b[6]^=d,b[7]^=f,d=0;4>d;d++)a.call(this)}},_doProcessBlock:function(b,c){var e=this._X;for(a.call(this),d[0]=e[0]^e[5]>>>16^e[3]<<16,d[1]=e[2]^e[7]>>>16^e[5]<<16,d[2]=e[4]^e[1]>>>16^e[7]<<16,d[3]=e[6]^e[3]>>>16^e[1]<<16,e=0;4>e;e++)d[e]=16711935&(d[e]<<8|d[e]>>>24)|4278255360&(d[e]<<24|d[e]>>>8),b[c+e]^=d[e]},blockSize:4,ivSize:2});b.Rabbit=c._createHelper(g)}();var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(){var a=CryptoJS,b=a.lib.WordArray;a.enc.Base64={stringify:function(a){var b=a.words,c=a.sigBytes,d=this._map;a.clamp(),a=[];for(var e=0;c>e;e+=3)for(var f=(b[e>>>2]>>>24-8*(e%4)&255)<<16|(b[e+1>>>2]>>>24-8*((e+1)%4)&255)<<8|b[e+2>>>2]>>>24-8*((e+2)%4)&255,g=0;4>g&&c>e+.75*g;g++)a.push(d.charAt(f>>>6*(3-g)&63));if(b=d.charAt(64))for(;a.length%4;)a.push(b);return a.join("")},parse:function(a){var c=a.length,d=this._map,e=d.charAt(64);e&&(e=a.indexOf(e),-1!=e&&(c=e));for(var e=[],f=0,g=0;c>g;g++)if(g%4){var h=d.indexOf(a.charAt(g-1))<<2*(g%4),i=d.indexOf(a.charAt(g))>>>6-2*(g%4);e[f>>>2]|=(h|i)<<24-8*(f%4),f++}return b.create(e,f)},_map:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="}}(),function(a){function b(a,b,c,d,e,f,g){return a=a+(b&c|~b&d)+e+g,(a<<f|a>>>32-f)+b}function c(a,b,c,d,e,f,g){return a=a+(b&d|c&~d)+e+g,(a<<f|a>>>32-f)+b}function d(a,b,c,d,e,f,g){return a=a+(b^c^d)+e+g,(a<<f|a>>>32-f)+b}function e(a,b,c,d,e,f,g){return a=a+(c^(b|~d))+e+g,(a<<f|a>>>32-f)+b}for(var f=CryptoJS,g=f.lib,h=g.WordArray,i=g.Hasher,g=f.algo,j=[],k=0;64>k;k++)j[k]=4294967296*a.abs(a.sin(k+1))|0;g=g.MD5=i.extend({_doReset:function(){this._hash=new h.init([1732584193,4023233417,2562383102,271733878])},_doProcessBlock:function(a,f){for(var g=0;16>g;g++){var h=f+g,i=a[h];a[h]=16711935&(i<<8|i>>>24)|4278255360&(i<<24|i>>>8)}var g=this._hash.words,h=a[f+0],i=a[f+1],k=a[f+2],l=a[f+3],m=a[f+4],n=a[f+5],o=a[f+6],p=a[f+7],q=a[f+8],r=a[f+9],s=a[f+10],t=a[f+11],u=a[f+12],v=a[f+13],w=a[f+14],x=a[f+15],y=g[0],z=g[1],A=g[2],B=g[3],y=b(y,z,A,B,h,7,j[0]),B=b(B,y,z,A,i,12,j[1]),A=b(A,B,y,z,k,17,j[2]),z=b(z,A,B,y,l,22,j[3]),y=b(y,z,A,B,m,7,j[4]),B=b(B,y,z,A,n,12,j[5]),A=b(A,B,y,z,o,17,j[6]),z=b(z,A,B,y,p,22,j[7]),y=b(y,z,A,B,q,7,j[8]),B=b(B,y,z,A,r,12,j[9]),A=b(A,B,y,z,s,17,j[10]),z=b(z,A,B,y,t,22,j[11]),y=b(y,z,A,B,u,7,j[12]),B=b(B,y,z,A,v,12,j[13]),A=b(A,B,y,z,w,17,j[14]),z=b(z,A,B,y,x,22,j[15]),y=c(y,z,A,B,i,5,j[16]),B=c(B,y,z,A,o,9,j[17]),A=c(A,B,y,z,t,14,j[18]),z=c(z,A,B,y,h,20,j[19]),y=c(y,z,A,B,n,5,j[20]),B=c(B,y,z,A,s,9,j[21]),A=c(A,B,y,z,x,14,j[22]),z=c(z,A,B,y,m,20,j[23]),y=c(y,z,A,B,r,5,j[24]),B=c(B,y,z,A,w,9,j[25]),A=c(A,B,y,z,l,14,j[26]),z=c(z,A,B,y,q,20,j[27]),y=c(y,z,A,B,v,5,j[28]),B=c(B,y,z,A,k,9,j[29]),A=c(A,B,y,z,p,14,j[30]),z=c(z,A,B,y,u,20,j[31]),y=d(y,z,A,B,n,4,j[32]),B=d(B,y,z,A,q,11,j[33]),A=d(A,B,y,z,t,16,j[34]),z=d(z,A,B,y,w,23,j[35]),y=d(y,z,A,B,i,4,j[36]),B=d(B,y,z,A,m,11,j[37]),A=d(A,B,y,z,p,16,j[38]),z=d(z,A,B,y,s,23,j[39]),y=d(y,z,A,B,v,4,j[40]),B=d(B,y,z,A,h,11,j[41]),A=d(A,B,y,z,l,16,j[42]),z=d(z,A,B,y,o,23,j[43]),y=d(y,z,A,B,r,4,j[44]),B=d(B,y,z,A,u,11,j[45]),A=d(A,B,y,z,x,16,j[46]),z=d(z,A,B,y,k,23,j[47]),y=e(y,z,A,B,h,6,j[48]),B=e(B,y,z,A,p,10,j[49]),A=e(A,B,y,z,w,15,j[50]),z=e(z,A,B,y,n,21,j[51]),y=e(y,z,A,B,u,6,j[52]),B=e(B,y,z,A,l,10,j[53]),A=e(A,B,y,z,s,15,j[54]),z=e(z,A,B,y,i,21,j[55]),y=e(y,z,A,B,q,6,j[56]),B=e(B,y,z,A,x,10,j[57]),A=e(A,B,y,z,o,15,j[58]),z=e(z,A,B,y,v,21,j[59]),y=e(y,z,A,B,m,6,j[60]),B=e(B,y,z,A,t,10,j[61]),A=e(A,B,y,z,k,15,j[62]),z=e(z,A,B,y,r,21,j[63]);g[0]=g[0]+y|0,g[1]=g[1]+z|0,g[2]=g[2]+A|0,g[3]=g[3]+B|0},_doFinalize:function(){var b=this._data,c=b.words,d=8*this._nDataBytes,e=8*b.sigBytes;c[e>>>5]|=128<<24-e%32;var f=a.floor(d/4294967296);for(c[(e+64>>>9<<4)+15]=16711935&(f<<8|f>>>24)|4278255360&(f<<24|f>>>8),c[(e+64>>>9<<4)+14]=16711935&(d<<8|d>>>24)|4278255360&(d<<24|d>>>8),b.sigBytes=4*(c.length+1),this._process(),b=this._hash,c=b.words,d=0;4>d;d++)e=c[d],c[d]=16711935&(e<<8|e>>>24)|4278255360&(e<<24|e>>>8);return b},clone:function(){var a=i.clone.call(this);return a._hash=this._hash.clone(),a}}),f.MD5=i._createHelper(g),f.HmacMD5=i._createHmacHelper(g)}(Math),function(){var a=CryptoJS,b=a.lib,c=b.Base,d=b.WordArray,b=a.algo,e=b.EvpKDF=c.extend({cfg:c.extend({keySize:4,hasher:b.MD5,iterations:1}),init:function(a){this.cfg=this.cfg.extend(a)},compute:function(a,b){for(var c=this.cfg,e=c.hasher.create(),f=d.create(),g=f.words,h=c.keySize,c=c.iterations;g.length<h;){i&&e.update(i);var i=e.update(a).finalize(b);e.reset();for(var j=1;c>j;j++)i=e.finalize(i),e.reset();f.concat(i)}return f.sigBytes=4*h,f}});a.EvpKDF=function(a,b,c){return e.create(c).compute(a,b)}}(),CryptoJS.lib.Cipher||function(a){var b=CryptoJS,c=b.lib,d=c.Base,e=c.WordArray,f=c.BufferedBlockAlgorithm,g=b.enc.Base64,h=b.algo.EvpKDF,i=c.Cipher=f.extend({cfg:d.extend(),createEncryptor:function(a,b){return this.create(this._ENC_XFORM_MODE,a,b)},createDecryptor:function(a,b){return this.create(this._DEC_XFORM_MODE,a,b)},init:function(a,b,c){this.cfg=this.cfg.extend(c),this._xformMode=a,this._key=b,this.reset()},reset:function(){f.reset.call(this),this._doReset()},process:function(a){return this._append(a),this._process()},finalize:function(a){return a&&this._append(a),this._doFinalize()},keySize:4,ivSize:4,_ENC_XFORM_MODE:1,_DEC_XFORM_MODE:2,_createHelper:function(a){return{encrypt:function(b,c,d){return("string"==typeof c?o:n).encrypt(a,b,c,d)},decrypt:function(b,c,d){return("string"==typeof c?o:n).decrypt(a,b,c,d)}}}});c.StreamCipher=i.extend({_doFinalize:function(){return this._process(!0)},blockSize:1});var j=b.mode={},k=function(b,c,d){var e=this._iv;e?this._iv=a:e=this._prevBlock;for(var f=0;d>f;f++)b[c+f]^=e[f]},l=(c.BlockCipherMode=d.extend({createEncryptor:function(a,b){return this.Encryptor.create(a,b)},createDecryptor:function(a,b){return this.Decryptor.create(a,b)},init:function(a,b){this._cipher=a,this._iv=b}})).extend();l.Encryptor=l.extend({processBlock:function(a,b){var c=this._cipher,d=c.blockSize;k.call(this,a,b,d),c.encryptBlock(a,b),this._prevBlock=a.slice(b,b+d)}}),l.Decryptor=l.extend({processBlock:function(a,b){var c=this._cipher,d=c.blockSize,e=a.slice(b,b+d);c.decryptBlock(a,b),k.call(this,a,b,d),this._prevBlock=e}}),j=j.CBC=l,l=(b.pad={}).Pkcs7={pad:function(a,b){for(var c=4*b,c=c-a.sigBytes%c,d=c<<24|c<<16|c<<8|c,f=[],g=0;c>g;g+=4)f.push(d);c=e.create(f,c),a.concat(c)},unpad:function(a){a.sigBytes-=255&a.words[a.sigBytes-1>>>2]}},c.BlockCipher=i.extend({cfg:i.cfg.extend({mode:j,padding:l}),reset:function(){i.reset.call(this);var a=this.cfg,b=a.iv,a=a.mode;if(this._xformMode==this._ENC_XFORM_MODE)var c=a.createEncryptor;else c=a.createDecryptor,this._minBufferSize=1;this._mode=c.call(a,this,b&&b.words)},_doProcessBlock:function(a,b){this._mode.processBlock(a,b)},_doFinalize:function(){var a=this.cfg.padding;if(this._xformMode==this._ENC_XFORM_MODE){a.pad(this._data,this.blockSize);var b=this._process(!0)}else b=this._process(!0),a.unpad(b);return b},blockSize:4});var m=c.CipherParams=d.extend({init:function(a){this.mixIn(a)},toString:function(a){return(a||this.formatter).stringify(this)}}),j=(b.format={}).OpenSSL={stringify:function(a){var b=a.ciphertext;return a=a.salt,(a?e.create([1398893684,1701076831]).concat(a).concat(b):b).toString(g)},parse:function(a){a=g.parse(a);var b=a.words;if(1398893684==b[0]&&1701076831==b[1]){var c=e.create(b.slice(2,4));b.splice(0,4),a.sigBytes-=16}return m.create({ciphertext:a,salt:c})}},n=c.SerializableCipher=d.extend({cfg:d.extend({format:j}),encrypt:function(a,b,c,d){d=this.cfg.extend(d);var e=a.createEncryptor(c,d);return b=e.finalize(b),e=e.cfg,m.create({ciphertext:b,key:c,iv:e.iv,algorithm:a,mode:e.mode,padding:e.padding,blockSize:a.blockSize,formatter:d.format})},decrypt:function(a,b,c,d){return d=this.cfg.extend(d),b=this._parse(b,d.format),a.createDecryptor(c,d).finalize(b.ciphertext)},_parse:function(a,b){return"string"==typeof a?b.parse(a,this):a}}),b=(b.kdf={}).OpenSSL={execute:function(a,b,c,d){return d||(d=e.random(8)),a=h.create({keySize:b+c}).compute(a,d),c=e.create(a.words.slice(b),4*c),a.sigBytes=4*b,m.create({key:a,iv:c,salt:d})}},o=c.PasswordBasedCipher=n.extend({cfg:n.cfg.extend({kdf:b}),encrypt:function(a,b,c,d){return d=this.cfg.extend(d),c=d.kdf.execute(c,a.keySize,a.ivSize),d.iv=c.iv,a=n.encrypt.call(this,a,b,c.key,d),a.mixIn(c),a},decrypt:function(a,b,c,d){return d=this.cfg.extend(d),b=this._parse(b,d.format),c=d.kdf.execute(c,a.keySize,a.ivSize,b.salt),d.iv=c.iv,n.decrypt.call(this,a,b,c.key,d)}})}(),function(){function a(){for(var a=this._S,b=this._i,c=this._j,d=0,e=0;4>e;e++){var b=(b+1)%256,c=(c+a[b])%256,f=a[b];a[b]=a[c],a[c]=f,d|=a[(a[b]+a[c])%256]<<24-8*e}return this._i=b,this._j=c,d}var b=CryptoJS,c=b.lib.StreamCipher,d=b.algo,e=d.RC4=c.extend({_doReset:function(){for(var a=this._key,b=a.words,a=a.sigBytes,c=this._S=[],d=0;256>d;d++)c[d]=d;for(var e=d=0;256>d;d++){var f=d%a,e=(e+c[d]+(b[f>>>2]>>>24-8*(f%4)&255))%256,f=c[d];c[d]=c[e],c[e]=f}this._i=this._j=0},_doProcessBlock:function(b,c){b[c]^=a.call(this)},keySize:8,ivSize:0});b.RC4=c._createHelper(e),d=d.RC4Drop=e.extend({cfg:e.cfg.extend({drop:192}),_doReset:function(){e._doReset.call(this);for(var b=this.cfg.drop;b>0;b--)a.call(this)}}),b.RC4Drop=c._createHelper(d)}();var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(){var a=CryptoJS,b=a.lib,c=b.WordArray,d=b.Hasher,b=a.algo,e=c.create([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13]),f=c.create([5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11]),g=c.create([11,14,15,12,5,8,7,9,11,13,14,15,6,7,9,8,7,6,8,13,11,9,7,15,7,12,15,9,11,7,13,12,11,13,6,7,14,9,13,15,14,8,13,6,5,12,7,5,11,12,14,15,14,15,9,8,9,14,5,6,8,6,5,12,9,15,5,11,6,8,13,12,5,12,13,14,11,8,5,6]),h=c.create([8,9,9,11,13,15,15,5,7,7,8,11,14,14,12,6,9,13,15,7,12,8,9,11,7,7,12,7,6,15,13,11,9,7,15,11,8,6,6,14,12,13,5,14,13,13,7,5,15,5,8,11,14,14,6,14,6,9,12,9,12,5,15,8,8,5,12,9,12,5,14,6,8,13,6,5,15,13,11,11]),i=c.create([0,1518500249,1859775393,2400959708,2840853838]),j=c.create([1352829926,1548603684,1836072691,2053994217,0]),b=b.RIPEMD160=d.extend({_doReset:function(){this._hash=c.create([1732584193,4023233417,2562383102,271733878,3285377520])},_doProcessBlock:function(a,b){for(var c=0;16>c;c++){var d=b+c,k=a[d];a[d]=16711935&(k<<8|k>>>24)|4278255360&(k<<24|k>>>8)}var l,m,n,o,p,q,r,s,t,u,d=this._hash.words,k=i.words,v=j.words,w=e.words,x=f.words,y=g.words,z=h.words;q=l=d[0],r=m=d[1],s=n=d[2],t=o=d[3],u=p=d[4];for(var A,c=0;80>c;c+=1)A=l+a[b+w[c]]|0,A=16>c?A+((m^n^o)+k[0]):32>c?A+((m&n|~m&o)+k[1]):48>c?A+(((m|~n)^o)+k[2]):64>c?A+((m&o|n&~o)+k[3]):A+((m^(n|~o))+k[4]),A|=0,A=A<<y[c]|A>>>32-y[c],A=A+p|0,l=p,p=o,o=n<<10|n>>>22,n=m,m=A,A=q+a[b+x[c]]|0,A=16>c?A+((r^(s|~t))+v[0]):32>c?A+((r&t|s&~t)+v[1]):48>c?A+(((r|~s)^t)+v[2]):64>c?A+((r&s|~r&t)+v[3]):A+((r^s^t)+v[4]),A|=0,A=A<<z[c]|A>>>32-z[c],A=A+u|0,q=u,u=t,t=s<<10|s>>>22,s=r,r=A;A=d[1]+n+t|0,d[1]=d[2]+o+u|0,d[2]=d[3]+p+q|0,d[3]=d[4]+l+r|0,d[4]=d[0]+m+s|0,d[0]=A},_doFinalize:function(){var a=this._data,b=a.words,c=8*this._nDataBytes,d=8*a.sigBytes;for(b[d>>>5]|=128<<24-d%32,b[(d+64>>>9<<4)+14]=16711935&(c<<8|c>>>24)|4278255360&(c<<24|c>>>8),a.sigBytes=4*(b.length+1),this._process(),a=this._hash,b=a.words,c=0;5>c;c++)d=b[c],b[c]=16711935&(d<<8|d>>>24)|4278255360&(d<<24|d>>>8);return a},clone:function(){var a=d.clone.call(this);return a._hash=this._hash.clone(),a}});a.RIPEMD160=d._createHelper(b),a.HmacRIPEMD160=d._createHmacHelper(b)}(Math);var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(){var a=CryptoJS,b=a.lib,c=b.WordArray,d=b.Hasher,e=[],b=a.algo.SHA1=d.extend({_doReset:function(){this._hash=new c.init([1732584193,4023233417,2562383102,271733878,3285377520])},_doProcessBlock:function(a,b){for(var c=this._hash.words,d=c[0],f=c[1],g=c[2],h=c[3],i=c[4],j=0;80>j;j++){if(16>j)e[j]=0|a[b+j];else{var k=e[j-3]^e[j-8]^e[j-14]^e[j-16];e[j]=k<<1|k>>>31}k=(d<<5|d>>>27)+i+e[j],k=20>j?k+((f&g|~f&h)+1518500249):40>j?k+((f^g^h)+1859775393):60>j?k+((f&g|f&h|g&h)-1894007588):k+((f^g^h)-899497514),i=h,h=g,g=f<<30|f>>>2,f=d,d=k}c[0]=c[0]+d|0,c[1]=c[1]+f|0,c[2]=c[2]+g|0,c[3]=c[3]+h|0,c[4]=c[4]+i|0},_doFinalize:function(){var a=this._data,b=a.words,c=8*this._nDataBytes,d=8*a.sigBytes;return b[d>>>5]|=128<<24-d%32,b[(d+64>>>9<<4)+14]=Math.floor(c/4294967296),b[(d+64>>>9<<4)+15]=c,a.sigBytes=4*b.length,this._process(),this._hash},clone:function(){var a=d.clone.call(this);return a._hash=this._hash.clone(),a}});a.SHA1=d._createHelper(b),a.HmacSHA1=d._createHmacHelper(b)}();var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(a){for(var b=CryptoJS,c=b.lib,d=c.WordArray,e=c.Hasher,c=b.algo,f=[],g=[],h=function(a){return 4294967296*(a-(0|a))|0},i=2,j=0;64>j;){var k;a:{k=i;for(var l=a.sqrt(k),m=2;l>=m;m++)if(!(k%m)){k=!1;break a}k=!0}k&&(8>j&&(f[j]=h(a.pow(i,.5))),g[j]=h(a.pow(i,1/3)),j++),i++}var n=[],c=c.SHA256=e.extend({_doReset:function(){this._hash=new d.init(f.slice(0))},_doProcessBlock:function(a,b){for(var c=this._hash.words,d=c[0],e=c[1],f=c[2],h=c[3],i=c[4],j=c[5],k=c[6],l=c[7],m=0;64>m;m++){if(16>m)n[m]=0|a[b+m];else{var o=n[m-15],p=n[m-2];n[m]=((o<<25|o>>>7)^(o<<14|o>>>18)^o>>>3)+n[m-7]+((p<<15|p>>>17)^(p<<13|p>>>19)^p>>>10)+n[m-16]}o=l+((i<<26|i>>>6)^(i<<21|i>>>11)^(i<<7|i>>>25))+(i&j^~i&k)+g[m]+n[m],p=((d<<30|d>>>2)^(d<<19|d>>>13)^(d<<10|d>>>22))+(d&e^d&f^e&f),l=k,k=j,j=i,i=h+o|0,h=f,f=e,e=d,d=o+p|0}c[0]=c[0]+d|0,c[1]=c[1]+e|0,c[2]=c[2]+f|0,c[3]=c[3]+h|0,c[4]=c[4]+i|0,c[5]=c[5]+j|0,c[6]=c[6]+k|0,c[7]=c[7]+l|0},_doFinalize:function(){var b=this._data,c=b.words,d=8*this._nDataBytes,e=8*b.sigBytes;return c[e>>>5]|=128<<24-e%32,c[(e+64>>>9<<4)+14]=a.floor(d/4294967296),c[(e+64>>>9<<4)+15]=d,b.sigBytes=4*c.length,this._process(),this._hash},clone:function(){var a=e.clone.call(this);return a._hash=this._hash.clone(),a}});b.SHA256=e._createHelper(c),
   b.HmacSHA256=e._createHmacHelper(c)}(Math),function(){var a=CryptoJS,b=a.lib.WordArray,c=a.algo,d=c.SHA256,c=c.SHA224=d.extend({_doReset:function(){this._hash=new b.init([3238371032,914150663,812702999,4144912697,4290775857,1750603025,1694076839,3204075428])},_doFinalize:function(){var a=d._doFinalize.call(this);return a.sigBytes-=4,a}});a.SHA224=d._createHelper(c),a.HmacSHA224=d._createHmacHelper(c)}();var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(a){for(var b=CryptoJS,c=b.lib,d=c.WordArray,e=c.Hasher,c=b.algo,f=[],g=[],h=function(a){return 4294967296*(a-(0|a))|0},i=2,j=0;64>j;){var k;a:{k=i;for(var l=a.sqrt(k),m=2;l>=m;m++)if(!(k%m)){k=!1;break a}k=!0}k&&(8>j&&(f[j]=h(a.pow(i,.5))),g[j]=h(a.pow(i,1/3)),j++),i++}var n=[],c=c.SHA256=e.extend({_doReset:function(){this._hash=new d.init(f.slice(0))},_doProcessBlock:function(a,b){for(var c=this._hash.words,d=c[0],e=c[1],f=c[2],h=c[3],i=c[4],j=c[5],k=c[6],l=c[7],m=0;64>m;m++){if(16>m)n[m]=0|a[b+m];else{var o=n[m-15],p=n[m-2];n[m]=((o<<25|o>>>7)^(o<<14|o>>>18)^o>>>3)+n[m-7]+((p<<15|p>>>17)^(p<<13|p>>>19)^p>>>10)+n[m-16]}o=l+((i<<26|i>>>6)^(i<<21|i>>>11)^(i<<7|i>>>25))+(i&j^~i&k)+g[m]+n[m],p=((d<<30|d>>>2)^(d<<19|d>>>13)^(d<<10|d>>>22))+(d&e^d&f^e&f),l=k,k=j,j=i,i=h+o|0,h=f,f=e,e=d,d=o+p|0}c[0]=c[0]+d|0,c[1]=c[1]+e|0,c[2]=c[2]+f|0,c[3]=c[3]+h|0,c[4]=c[4]+i|0,c[5]=c[5]+j|0,c[6]=c[6]+k|0,c[7]=c[7]+l|0},_doFinalize:function(){var b=this._data,c=b.words,d=8*this._nDataBytes,e=8*b.sigBytes;return c[e>>>5]|=128<<24-e%32,c[(e+64>>>9<<4)+14]=a.floor(d/4294967296),c[(e+64>>>9<<4)+15]=d,b.sigBytes=4*c.length,this._process(),this._hash},clone:function(){var a=e.clone.call(this);return a._hash=this._hash.clone(),a}});b.SHA256=e._createHelper(c),b.HmacSHA256=e._createHmacHelper(c)}(Math);var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(a){var b=CryptoJS,c=b.lib,d=c.Base,e=c.WordArray,b=b.x64={};b.Word=d.extend({init:function(a,b){this.high=a,this.low=b}}),b.WordArray=d.extend({init:function(b,c){b=this.words=b||[],this.sigBytes=c!=a?c:8*b.length},toX32:function(){for(var a=this.words,b=a.length,c=[],d=0;b>d;d++){var f=a[d];c.push(f.high),c.push(f.low)}return e.create(c,this.sigBytes)},clone:function(){for(var a=d.clone.call(this),b=a.words=this.words.slice(0),c=b.length,e=0;c>e;e++)b[e]=b[e].clone();return a}})}(),function(a){for(var b=CryptoJS,c=b.lib,d=c.WordArray,e=c.Hasher,f=b.x64.Word,c=b.algo,g=[],h=[],i=[],j=1,k=0,l=0;24>l;l++){g[j+5*k]=(l+1)*(l+2)/2%64;var m=(2*j+3*k)%5,j=k%5,k=m}for(j=0;5>j;j++)for(k=0;5>k;k++)h[j+5*k]=k+5*((2*j+3*k)%5);for(j=1,k=0;24>k;k++){for(var n=m=l=0;7>n;n++){if(1&j){var o=(1<<n)-1;32>o?m^=1<<o:l^=1<<o-32}j=128&j?j<<1^113:j<<1}i[k]=f.create(l,m)}for(var p=[],j=0;25>j;j++)p[j]=f.create();c=c.SHA3=e.extend({cfg:e.cfg.extend({outputLength:512}),_doReset:function(){for(var a=this._state=[],b=0;25>b;b++)a[b]=new f.init;this.blockSize=(1600-2*this.cfg.outputLength)/32},_doProcessBlock:function(a,b){for(var c=this._state,d=this.blockSize/2,e=0;d>e;e++){var f=a[b+2*e],j=a[b+2*e+1],f=16711935&(f<<8|f>>>24)|4278255360&(f<<24|f>>>8),j=16711935&(j<<8|j>>>24)|4278255360&(j<<24|j>>>8),k=c[e];k.high^=j,k.low^=f}for(d=0;24>d;d++){for(e=0;5>e;e++){for(var l=f=0,m=0;5>m;m++)k=c[e+5*m],f^=k.high,l^=k.low;k=p[e],k.high=f,k.low=l}for(e=0;5>e;e++)for(k=p[(e+4)%5],f=p[(e+1)%5],j=f.high,m=f.low,f=k.high^(j<<1|m>>>31),l=k.low^(m<<1|j>>>31),m=0;5>m;m++)k=c[e+5*m],k.high^=f,k.low^=l;for(j=1;25>j;j++)k=c[j],e=k.high,k=k.low,m=g[j],32>m?(f=e<<m|k>>>32-m,l=k<<m|e>>>32-m):(f=k<<m-32|e>>>64-m,l=e<<m-32|k>>>64-m),k=p[h[j]],k.high=f,k.low=l;for(k=p[0],e=c[0],k.high=e.high,k.low=e.low,e=0;5>e;e++)for(m=0;5>m;m++)j=e+5*m,k=c[j],f=p[j],j=p[(e+1)%5+5*m],l=p[(e+2)%5+5*m],k.high=f.high^~j.high&l.high,k.low=f.low^~j.low&l.low;k=c[0],e=i[d],k.high^=e.high,k.low^=e.low}},_doFinalize:function(){var b=this._data,c=b.words,e=8*b.sigBytes,f=32*this.blockSize;c[e>>>5]|=1<<24-e%32,c[(a.ceil((e+1)/f)*f>>>5)-1]|=128,b.sigBytes=4*c.length,this._process();for(var b=this._state,c=this.cfg.outputLength/8,e=c/8,f=[],g=0;e>g;g++){var h=b[g],i=h.high,h=h.low,i=16711935&(i<<8|i>>>24)|4278255360&(i<<24|i>>>8),h=16711935&(h<<8|h>>>24)|4278255360&(h<<24|h>>>8);f.push(h),f.push(i)}return new d.init(f,c)},clone:function(){for(var a=e.clone.call(this),b=a._state=this._state.slice(0),c=0;25>c;c++)b[c]=b[c].clone();return a}}),b.SHA3=e._createHelper(c),b.HmacSHA3=e._createHmacHelper(c)}(Math);var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(a){var b=CryptoJS,c=b.lib,d=c.Base,e=c.WordArray,b=b.x64={};b.Word=d.extend({init:function(a,b){this.high=a,this.low=b}}),b.WordArray=d.extend({init:function(b,c){b=this.words=b||[],this.sigBytes=c!=a?c:8*b.length},toX32:function(){for(var a=this.words,b=a.length,c=[],d=0;b>d;d++){var f=a[d];c.push(f.high),c.push(f.low)}return e.create(c,this.sigBytes)},clone:function(){for(var a=d.clone.call(this),b=a.words=this.words.slice(0),c=b.length,e=0;c>e;e++)b[e]=b[e].clone();return a}})}(),function(){function a(){return e.create.apply(e,arguments)}for(var b=CryptoJS,c=b.lib.Hasher,d=b.x64,e=d.Word,f=d.WordArray,d=b.algo,g=[a(1116352408,3609767458),a(1899447441,602891725),a(3049323471,3964484399),a(3921009573,2173295548),a(961987163,4081628472),a(1508970993,3053834265),a(2453635748,2937671579),a(2870763221,3664609560),a(3624381080,2734883394),a(310598401,1164996542),a(607225278,1323610764),a(1426881987,3590304994),a(1925078388,4068182383),a(2162078206,991336113),a(2614888103,633803317),a(3248222580,3479774868),a(3835390401,2666613458),a(4022224774,944711139),a(264347078,2341262773),a(604807628,2007800933),a(770255983,1495990901),a(1249150122,1856431235),a(1555081692,3175218132),a(1996064986,2198950837),a(2554220882,3999719339),a(2821834349,766784016),a(2952996808,2566594879),a(3210313671,3203337956),a(3336571891,1034457026),a(3584528711,2466948901),a(113926993,3758326383),a(338241895,168717936),a(666307205,1188179964),a(773529912,1546045734),a(1294757372,1522805485),a(1396182291,2643833823),a(1695183700,2343527390),a(1986661051,1014477480),a(2177026350,1206759142),a(2456956037,344077627),a(2730485921,1290863460),a(2820302411,3158454273),a(3259730800,3505952657),a(3345764771,106217008),a(3516065817,3606008344),a(3600352804,1432725776),a(4094571909,1467031594),a(275423344,851169720),a(430227734,3100823752),a(506948616,1363258195),a(659060556,3750685593),a(883997877,3785050280),a(958139571,3318307427),a(1322822218,3812723403),a(1537002063,2003034995),a(1747873779,3602036899),a(1955562222,1575990012),a(2024104815,1125592928),a(2227730452,2716904306),a(2361852424,442776044),a(2428436474,593698344),a(2756734187,3733110249),a(3204031479,2999351573),a(3329325298,3815920427),a(3391569614,3928383900),a(3515267271,566280711),a(3940187606,3454069534),a(4118630271,4000239992),a(116418474,1914138554),a(174292421,2731055270),a(289380356,3203993006),a(460393269,320620315),a(685471733,587496836),a(852142971,1086792851),a(1017036298,365543100),a(1126000580,2618297676),a(1288033470,3409855158),a(1501505948,4234509866),a(1607167915,987167468),a(1816402316,1246189591)],h=[],i=0;80>i;i++)h[i]=a();d=d.SHA512=c.extend({_doReset:function(){this._hash=new f.init([new e.init(1779033703,4089235720),new e.init(3144134277,2227873595),new e.init(1013904242,4271175723),new e.init(2773480762,1595750129),new e.init(1359893119,2917565137),new e.init(2600822924,725511199),new e.init(528734635,4215389547),new e.init(1541459225,327033209)])},_doProcessBlock:function(a,b){for(var c=this._hash.words,d=c[0],e=c[1],f=c[2],i=c[3],j=c[4],k=c[5],l=c[6],c=c[7],m=d.high,n=d.low,o=e.high,p=e.low,q=f.high,r=f.low,s=i.high,t=i.low,u=j.high,v=j.low,w=k.high,x=k.low,y=l.high,z=l.low,A=c.high,B=c.low,C=m,D=n,E=o,F=p,G=q,H=r,I=s,J=t,K=u,L=v,M=w,N=x,O=y,P=z,Q=A,R=B,S=0;80>S;S++){var T=h[S];if(16>S)var U=T.high=0|a[b+2*S],V=T.low=0|a[b+2*S+1];else{var U=h[S-15],V=U.high,W=U.low,U=(V>>>1|W<<31)^(V>>>8|W<<24)^V>>>7,W=(W>>>1|V<<31)^(W>>>8|V<<24)^(W>>>7|V<<25),X=h[S-2],V=X.high,Y=X.low,X=(V>>>19|Y<<13)^(V<<3|Y>>>29)^V>>>6,Y=(Y>>>19|V<<13)^(Y<<3|V>>>29)^(Y>>>6|V<<26),V=h[S-7],Z=V.high,$=h[S-16],_=$.high,$=$.low,V=W+V.low,U=U+Z+(W>>>0>V>>>0?1:0),V=V+Y,U=U+X+(Y>>>0>V>>>0?1:0),V=V+$,U=U+_+($>>>0>V>>>0?1:0);T.high=U,T.low=V}var Z=K&M^~K&O,$=L&N^~L&P,T=C&E^C&G^E&G,aa=D&F^D&H^F&H,W=(C>>>28|D<<4)^(C<<30|D>>>2)^(C<<25|D>>>7),X=(D>>>28|C<<4)^(D<<30|C>>>2)^(D<<25|C>>>7),Y=g[S],ba=Y.high,ca=Y.low,Y=R+((L>>>14|K<<18)^(L>>>18|K<<14)^(L<<23|K>>>9)),_=Q+((K>>>14|L<<18)^(K>>>18|L<<14)^(K<<23|L>>>9))+(R>>>0>Y>>>0?1:0),Y=Y+$,_=_+Z+($>>>0>Y>>>0?1:0),Y=Y+ca,_=_+ba+(ca>>>0>Y>>>0?1:0),Y=Y+V,_=_+U+(V>>>0>Y>>>0?1:0),V=X+aa,T=W+T+(X>>>0>V>>>0?1:0),Q=O,R=P,O=M,P=N,M=K,N=L,L=J+Y|0,K=I+_+(J>>>0>L>>>0?1:0)|0,I=G,J=H,G=E,H=F,E=C,F=D,D=Y+V|0,C=_+T+(Y>>>0>D>>>0?1:0)|0}n=d.low=n+D,d.high=m+C+(D>>>0>n>>>0?1:0),p=e.low=p+F,e.high=o+E+(F>>>0>p>>>0?1:0),r=f.low=r+H,f.high=q+G+(H>>>0>r>>>0?1:0),t=i.low=t+J,i.high=s+I+(J>>>0>t>>>0?1:0),v=j.low=v+L,j.high=u+K+(L>>>0>v>>>0?1:0),x=k.low=x+N,k.high=w+M+(N>>>0>x>>>0?1:0),z=l.low=z+P,l.high=y+O+(P>>>0>z>>>0?1:0),B=c.low=B+R,c.high=A+Q+(R>>>0>B>>>0?1:0)},_doFinalize:function(){var a=this._data,b=a.words,c=8*this._nDataBytes,d=8*a.sigBytes;return b[d>>>5]|=128<<24-d%32,b[(d+128>>>10<<5)+30]=Math.floor(c/4294967296),b[(d+128>>>10<<5)+31]=c,a.sigBytes=4*b.length,this._process(),this._hash.toX32()},clone:function(){var a=c.clone.call(this);return a._hash=this._hash.clone(),a},blockSize:32}),b.SHA512=c._createHelper(d),b.HmacSHA512=c._createHmacHelper(d)}(),function(){var a=CryptoJS,b=a.x64,c=b.Word,d=b.WordArray,b=a.algo,e=b.SHA512,b=b.SHA384=e.extend({_doReset:function(){this._hash=new d.init([new c.init(3418070365,3238371032),new c.init(1654270250,914150663),new c.init(2438529370,812702999),new c.init(355462360,4144912697),new c.init(1731405415,4290775857),new c.init(2394180231,1750603025),new c.init(3675008525,1694076839),new c.init(1203062813,3204075428)])},_doFinalize:function(){var a=e._doFinalize.call(this);return a.sigBytes-=16,a}});a.SHA384=e._createHelper(b),a.HmacSHA384=e._createHmacHelper(b)}();var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(a){var b=CryptoJS,c=b.lib,d=c.Base,e=c.WordArray,b=b.x64={};b.Word=d.extend({init:function(a,b){this.high=a,this.low=b}}),b.WordArray=d.extend({init:function(b,c){b=this.words=b||[],this.sigBytes=c!=a?c:8*b.length},toX32:function(){for(var a=this.words,b=a.length,c=[],d=0;b>d;d++){var f=a[d];c.push(f.high),c.push(f.low)}return e.create(c,this.sigBytes)},clone:function(){for(var a=d.clone.call(this),b=a.words=this.words.slice(0),c=b.length,e=0;c>e;e++)b[e]=b[e].clone();return a}})}(),function(){function a(){return e.create.apply(e,arguments)}for(var b=CryptoJS,c=b.lib.Hasher,d=b.x64,e=d.Word,f=d.WordArray,d=b.algo,g=[a(1116352408,3609767458),a(1899447441,602891725),a(3049323471,3964484399),a(3921009573,2173295548),a(961987163,4081628472),a(1508970993,3053834265),a(2453635748,2937671579),a(2870763221,3664609560),a(3624381080,2734883394),a(310598401,1164996542),a(607225278,1323610764),a(1426881987,3590304994),a(1925078388,4068182383),a(2162078206,991336113),a(2614888103,633803317),a(3248222580,3479774868),a(3835390401,2666613458),a(4022224774,944711139),a(264347078,2341262773),a(604807628,2007800933),a(770255983,1495990901),a(1249150122,1856431235),a(1555081692,3175218132),a(1996064986,2198950837),a(2554220882,3999719339),a(2821834349,766784016),a(2952996808,2566594879),a(3210313671,3203337956),a(3336571891,1034457026),a(3584528711,2466948901),a(113926993,3758326383),a(338241895,168717936),a(666307205,1188179964),a(773529912,1546045734),a(1294757372,1522805485),a(1396182291,2643833823),a(1695183700,2343527390),a(1986661051,1014477480),a(2177026350,1206759142),a(2456956037,344077627),a(2730485921,1290863460),a(2820302411,3158454273),a(3259730800,3505952657),a(3345764771,106217008),a(3516065817,3606008344),a(3600352804,1432725776),a(4094571909,1467031594),a(275423344,851169720),a(430227734,3100823752),a(506948616,1363258195),a(659060556,3750685593),a(883997877,3785050280),a(958139571,3318307427),a(1322822218,3812723403),a(1537002063,2003034995),a(1747873779,3602036899),a(1955562222,1575990012),a(2024104815,1125592928),a(2227730452,2716904306),a(2361852424,442776044),a(2428436474,593698344),a(2756734187,3733110249),a(3204031479,2999351573),a(3329325298,3815920427),a(3391569614,3928383900),a(3515267271,566280711),a(3940187606,3454069534),a(4118630271,4000239992),a(116418474,1914138554),a(174292421,2731055270),a(289380356,3203993006),a(460393269,320620315),a(685471733,587496836),a(852142971,1086792851),a(1017036298,365543100),a(1126000580,2618297676),a(1288033470,3409855158),a(1501505948,4234509866),a(1607167915,987167468),a(1816402316,1246189591)],h=[],i=0;80>i;i++)h[i]=a();d=d.SHA512=c.extend({_doReset:function(){this._hash=new f.init([new e.init(1779033703,4089235720),new e.init(3144134277,2227873595),new e.init(1013904242,4271175723),new e.init(2773480762,1595750129),new e.init(1359893119,2917565137),new e.init(2600822924,725511199),new e.init(528734635,4215389547),new e.init(1541459225,327033209)])},_doProcessBlock:function(a,b){for(var c=this._hash.words,d=c[0],e=c[1],f=c[2],i=c[3],j=c[4],k=c[5],l=c[6],c=c[7],m=d.high,n=d.low,o=e.high,p=e.low,q=f.high,r=f.low,s=i.high,t=i.low,u=j.high,v=j.low,w=k.high,x=k.low,y=l.high,z=l.low,A=c.high,B=c.low,C=m,D=n,E=o,F=p,G=q,H=r,I=s,J=t,K=u,L=v,M=w,N=x,O=y,P=z,Q=A,R=B,S=0;80>S;S++){var T=h[S];if(16>S)var U=T.high=0|a[b+2*S],V=T.low=0|a[b+2*S+1];else{var U=h[S-15],V=U.high,W=U.low,U=(V>>>1|W<<31)^(V>>>8|W<<24)^V>>>7,W=(W>>>1|V<<31)^(W>>>8|V<<24)^(W>>>7|V<<25),X=h[S-2],V=X.high,Y=X.low,X=(V>>>19|Y<<13)^(V<<3|Y>>>29)^V>>>6,Y=(Y>>>19|V<<13)^(Y<<3|V>>>29)^(Y>>>6|V<<26),V=h[S-7],Z=V.high,$=h[S-16],_=$.high,$=$.low,V=W+V.low,U=U+Z+(W>>>0>V>>>0?1:0),V=V+Y,U=U+X+(Y>>>0>V>>>0?1:0),V=V+$,U=U+_+($>>>0>V>>>0?1:0);T.high=U,T.low=V}var Z=K&M^~K&O,$=L&N^~L&P,T=C&E^C&G^E&G,aa=D&F^D&H^F&H,W=(C>>>28|D<<4)^(C<<30|D>>>2)^(C<<25|D>>>7),X=(D>>>28|C<<4)^(D<<30|C>>>2)^(D<<25|C>>>7),Y=g[S],ba=Y.high,ca=Y.low,Y=R+((L>>>14|K<<18)^(L>>>18|K<<14)^(L<<23|K>>>9)),_=Q+((K>>>14|L<<18)^(K>>>18|L<<14)^(K<<23|L>>>9))+(R>>>0>Y>>>0?1:0),Y=Y+$,_=_+Z+($>>>0>Y>>>0?1:0),Y=Y+ca,_=_+ba+(ca>>>0>Y>>>0?1:0),Y=Y+V,_=_+U+(V>>>0>Y>>>0?1:0),V=X+aa,T=W+T+(X>>>0>V>>>0?1:0),Q=O,R=P,O=M,P=N,M=K,N=L,L=J+Y|0,K=I+_+(J>>>0>L>>>0?1:0)|0,I=G,J=H,G=E,H=F,E=C,F=D,D=Y+V|0,C=_+T+(Y>>>0>D>>>0?1:0)|0}n=d.low=n+D,d.high=m+C+(D>>>0>n>>>0?1:0),p=e.low=p+F,e.high=o+E+(F>>>0>p>>>0?1:0),r=f.low=r+H,f.high=q+G+(H>>>0>r>>>0?1:0),t=i.low=t+J,i.high=s+I+(J>>>0>t>>>0?1:0),v=j.low=v+L,j.high=u+K+(L>>>0>v>>>0?1:0),x=k.low=x+N,k.high=w+M+(N>>>0>x>>>0?1:0),z=l.low=z+P,l.high=y+O+(P>>>0>z>>>0?1:0),B=c.low=B+R,c.high=A+Q+(R>>>0>B>>>0?1:0)},_doFinalize:function(){var a=this._data,b=a.words,c=8*this._nDataBytes,d=8*a.sigBytes;return b[d>>>5]|=128<<24-d%32,b[(d+128>>>10<<5)+30]=Math.floor(c/4294967296),b[(d+128>>>10<<5)+31]=c,a.sigBytes=4*b.length,this._process(),this._hash.toX32()},clone:function(){var a=c.clone.call(this);return a._hash=this._hash.clone(),a},blockSize:32}),b.SHA512=c._createHelper(d),b.HmacSHA512=c._createHmacHelper(d)}();var CryptoJS=CryptoJS||function(a,b){var c={},d=c.lib={},e=function(){},f=d.Base={extend:function(a){e.prototype=this;var b=new e;return a&&b.mixIn(a),b.hasOwnProperty("init")||(b.init=function(){b.$super.init.apply(this,arguments)}),b.init.prototype=b,b.$super=this,b},create:function(){var a=this.extend();return a.init.apply(a,arguments),a},init:function(){},mixIn:function(a){for(var b in a)a.hasOwnProperty(b)&&(this[b]=a[b]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},g=d.WordArray=f.extend({init:function(a,c){a=this.words=a||[],this.sigBytes=c!=b?c:4*a.length},toString:function(a){return(a||i).stringify(this)},concat:function(a){var b=this.words,c=a.words,d=this.sigBytes;if(a=a.sigBytes,this.clamp(),d%4)for(var e=0;a>e;e++)b[d+e>>>2]|=(c[e>>>2]>>>24-8*(e%4)&255)<<24-8*((d+e)%4);else if(65535<c.length)for(e=0;a>e;e+=4)b[d+e>>>2]=c[e>>>2];else b.push.apply(b,c);return this.sigBytes+=a,this},clamp:function(){var b=this.words,c=this.sigBytes;b[c>>>2]&=4294967295<<32-8*(c%4),b.length=a.ceil(c/4)},clone:function(){var a=f.clone.call(this);return a.words=this.words.slice(0),a},random:function(b){for(var c=[],d=0;b>d;d+=4)c.push(4294967296*a.random()|0);return new g.init(c,b)}}),h=c.enc={},i=h.Hex={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++){var e=b[d>>>2]>>>24-8*(d%4)&255;c.push((e>>>4).toString(16)),c.push((15&e).toString(16))}return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d+=2)c[d>>>3]|=parseInt(a.substr(d,2),16)<<24-4*(d%8);return new g.init(c,b/2)}},j=h.Latin1={stringify:function(a){var b=a.words;a=a.sigBytes;for(var c=[],d=0;a>d;d++)c.push(String.fromCharCode(b[d>>>2]>>>24-8*(d%4)&255));return c.join("")},parse:function(a){for(var b=a.length,c=[],d=0;b>d;d++)c[d>>>2]|=(255&a.charCodeAt(d))<<24-8*(d%4);return new g.init(c,b)}},k=h.Utf8={stringify:function(a){try{return decodeURIComponent(escape(j.stringify(a)))}catch(b){throw Error("Malformed UTF-8 data")}},parse:function(a){return j.parse(unescape(encodeURIComponent(a)))}},l=d.BufferedBlockAlgorithm=f.extend({reset:function(){this._data=new g.init,this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=k.parse(a)),this._data.concat(a),this._nDataBytes+=a.sigBytes},_process:function(b){var c=this._data,d=c.words,e=c.sigBytes,f=this.blockSize,h=e/(4*f),h=b?a.ceil(h):a.max((0|h)-this._minBufferSize,0);if(b=h*f,e=a.min(4*b,e),b){for(var i=0;b>i;i+=f)this._doProcessBlock(d,i);i=d.splice(0,b),c.sigBytes-=e}return new g.init(i,e)},clone:function(){var a=f.clone.call(this);return a._data=this._data.clone(),a},_minBufferSize:0});d.Hasher=l.extend({cfg:f.extend(),init:function(a){this.cfg=this.cfg.extend(a),this.reset()},reset:function(){l.reset.call(this),this._doReset()},update:function(a){return this._append(a),this._process(),this},finalize:function(a){return a&&this._append(a),this._doFinalize()},blockSize:16,_createHelper:function(a){return function(b,c){return new a.init(c).finalize(b)}},_createHmacHelper:function(a){return function(b,c){return new m.HMAC.init(a,c).finalize(b)}}});var m=c.algo={};return c}(Math);!function(){var a=CryptoJS,b=a.lib.WordArray;a.enc.Base64={stringify:function(a){var b=a.words,c=a.sigBytes,d=this._map;a.clamp(),a=[];for(var e=0;c>e;e+=3)for(var f=(b[e>>>2]>>>24-8*(e%4)&255)<<16|(b[e+1>>>2]>>>24-8*((e+1)%4)&255)<<8|b[e+2>>>2]>>>24-8*((e+2)%4)&255,g=0;4>g&&c>e+.75*g;g++)a.push(d.charAt(f>>>6*(3-g)&63));if(b=d.charAt(64))for(;a.length%4;)a.push(b);return a.join("")},parse:function(a){var c=a.length,d=this._map,e=d.charAt(64);e&&(e=a.indexOf(e),-1!=e&&(c=e));for(var e=[],f=0,g=0;c>g;g++)if(g%4){var h=d.indexOf(a.charAt(g-1))<<2*(g%4),i=d.indexOf(a.charAt(g))>>>6-2*(g%4);e[f>>>2]|=(h|i)<<24-8*(f%4),f++}return b.create(e,f)},_map:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="}}(),function(a){function b(a,b,c,d,e,f,g){return a=a+(b&c|~b&d)+e+g,(a<<f|a>>>32-f)+b}function c(a,b,c,d,e,f,g){return a=a+(b&d|c&~d)+e+g,(a<<f|a>>>32-f)+b}function d(a,b,c,d,e,f,g){return a=a+(b^c^d)+e+g,(a<<f|a>>>32-f)+b}function e(a,b,c,d,e,f,g){return a=a+(c^(b|~d))+e+g,(a<<f|a>>>32-f)+b}for(var f=CryptoJS,g=f.lib,h=g.WordArray,i=g.Hasher,g=f.algo,j=[],k=0;64>k;k++)j[k]=4294967296*a.abs(a.sin(k+1))|0;g=g.MD5=i.extend({_doReset:function(){this._hash=new h.init([1732584193,4023233417,2562383102,271733878])},_doProcessBlock:function(a,f){for(var g=0;16>g;g++){var h=f+g,i=a[h];a[h]=16711935&(i<<8|i>>>24)|4278255360&(i<<24|i>>>8)}var g=this._hash.words,h=a[f+0],i=a[f+1],k=a[f+2],l=a[f+3],m=a[f+4],n=a[f+5],o=a[f+6],p=a[f+7],q=a[f+8],r=a[f+9],s=a[f+10],t=a[f+11],u=a[f+12],v=a[f+13],w=a[f+14],x=a[f+15],y=g[0],z=g[1],A=g[2],B=g[3],y=b(y,z,A,B,h,7,j[0]),B=b(B,y,z,A,i,12,j[1]),A=b(A,B,y,z,k,17,j[2]),z=b(z,A,B,y,l,22,j[3]),y=b(y,z,A,B,m,7,j[4]),B=b(B,y,z,A,n,12,j[5]),A=b(A,B,y,z,o,17,j[6]),z=b(z,A,B,y,p,22,j[7]),y=b(y,z,A,B,q,7,j[8]),B=b(B,y,z,A,r,12,j[9]),A=b(A,B,y,z,s,17,j[10]),z=b(z,A,B,y,t,22,j[11]),y=b(y,z,A,B,u,7,j[12]),B=b(B,y,z,A,v,12,j[13]),A=b(A,B,y,z,w,17,j[14]),z=b(z,A,B,y,x,22,j[15]),y=c(y,z,A,B,i,5,j[16]),B=c(B,y,z,A,o,9,j[17]),A=c(A,B,y,z,t,14,j[18]),z=c(z,A,B,y,h,20,j[19]),y=c(y,z,A,B,n,5,j[20]),B=c(B,y,z,A,s,9,j[21]),A=c(A,B,y,z,x,14,j[22]),z=c(z,A,B,y,m,20,j[23]),y=c(y,z,A,B,r,5,j[24]),B=c(B,y,z,A,w,9,j[25]),A=c(A,B,y,z,l,14,j[26]),z=c(z,A,B,y,q,20,j[27]),y=c(y,z,A,B,v,5,j[28]),B=c(B,y,z,A,k,9,j[29]),A=c(A,B,y,z,p,14,j[30]),z=c(z,A,B,y,u,20,j[31]),y=d(y,z,A,B,n,4,j[32]),B=d(B,y,z,A,q,11,j[33]),A=d(A,B,y,z,t,16,j[34]),z=d(z,A,B,y,w,23,j[35]),y=d(y,z,A,B,i,4,j[36]),B=d(B,y,z,A,m,11,j[37]),A=d(A,B,y,z,p,16,j[38]),z=d(z,A,B,y,s,23,j[39]),y=d(y,z,A,B,v,4,j[40]),B=d(B,y,z,A,h,11,j[41]),A=d(A,B,y,z,l,16,j[42]),z=d(z,A,B,y,o,23,j[43]),y=d(y,z,A,B,r,4,j[44]),B=d(B,y,z,A,u,11,j[45]),A=d(A,B,y,z,x,16,j[46]),z=d(z,A,B,y,k,23,j[47]),y=e(y,z,A,B,h,6,j[48]),B=e(B,y,z,A,p,10,j[49]),A=e(A,B,y,z,w,15,j[50]),z=e(z,A,B,y,n,21,j[51]),y=e(y,z,A,B,u,6,j[52]),B=e(B,y,z,A,l,10,j[53]),A=e(A,B,y,z,s,15,j[54]),z=e(z,A,B,y,i,21,j[55]),y=e(y,z,A,B,q,6,j[56]),B=e(B,y,z,A,x,10,j[57]),A=e(A,B,y,z,o,15,j[58]),z=e(z,A,B,y,v,21,j[59]),y=e(y,z,A,B,m,6,j[60]),B=e(B,y,z,A,t,10,j[61]),A=e(A,B,y,z,k,15,j[62]),z=e(z,A,B,y,r,21,j[63]);
   g[0]=g[0]+y|0,g[1]=g[1]+z|0,g[2]=g[2]+A|0,g[3]=g[3]+B|0},_doFinalize:function(){var b=this._data,c=b.words,d=8*this._nDataBytes,e=8*b.sigBytes;c[e>>>5]|=128<<24-e%32;var f=a.floor(d/4294967296);for(c[(e+64>>>9<<4)+15]=16711935&(f<<8|f>>>24)|4278255360&(f<<24|f>>>8),c[(e+64>>>9<<4)+14]=16711935&(d<<8|d>>>24)|4278255360&(d<<24|d>>>8),b.sigBytes=4*(c.length+1),this._process(),b=this._hash,c=b.words,d=0;4>d;d++)e=c[d],c[d]=16711935&(e<<8|e>>>24)|4278255360&(e<<24|e>>>8);return b},clone:function(){var a=i.clone.call(this);return a._hash=this._hash.clone(),a}}),f.MD5=i._createHelper(g),f.HmacMD5=i._createHmacHelper(g)}(Math),function(){var a=CryptoJS,b=a.lib,c=b.Base,d=b.WordArray,b=a.algo,e=b.EvpKDF=c.extend({cfg:c.extend({keySize:4,hasher:b.MD5,iterations:1}),init:function(a){this.cfg=this.cfg.extend(a)},compute:function(a,b){for(var c=this.cfg,e=c.hasher.create(),f=d.create(),g=f.words,h=c.keySize,c=c.iterations;g.length<h;){i&&e.update(i);var i=e.update(a).finalize(b);e.reset();for(var j=1;c>j;j++)i=e.finalize(i),e.reset();f.concat(i)}return f.sigBytes=4*h,f}});a.EvpKDF=function(a,b,c){return e.create(c).compute(a,b)}}(),CryptoJS.lib.Cipher||function(a){var b=CryptoJS,c=b.lib,d=c.Base,e=c.WordArray,f=c.BufferedBlockAlgorithm,g=b.enc.Base64,h=b.algo.EvpKDF,i=c.Cipher=f.extend({cfg:d.extend(),createEncryptor:function(a,b){return this.create(this._ENC_XFORM_MODE,a,b)},createDecryptor:function(a,b){return this.create(this._DEC_XFORM_MODE,a,b)},init:function(a,b,c){this.cfg=this.cfg.extend(c),this._xformMode=a,this._key=b,this.reset()},reset:function(){f.reset.call(this),this._doReset()},process:function(a){return this._append(a),this._process()},finalize:function(a){return a&&this._append(a),this._doFinalize()},keySize:4,ivSize:4,_ENC_XFORM_MODE:1,_DEC_XFORM_MODE:2,_createHelper:function(a){return{encrypt:function(b,c,d){return("string"==typeof c?o:n).encrypt(a,b,c,d)},decrypt:function(b,c,d){return("string"==typeof c?o:n).decrypt(a,b,c,d)}}}});c.StreamCipher=i.extend({_doFinalize:function(){return this._process(!0)},blockSize:1});var j=b.mode={},k=function(b,c,d){var e=this._iv;e?this._iv=a:e=this._prevBlock;for(var f=0;d>f;f++)b[c+f]^=e[f]},l=(c.BlockCipherMode=d.extend({createEncryptor:function(a,b){return this.Encryptor.create(a,b)},createDecryptor:function(a,b){return this.Decryptor.create(a,b)},init:function(a,b){this._cipher=a,this._iv=b}})).extend();l.Encryptor=l.extend({processBlock:function(a,b){var c=this._cipher,d=c.blockSize;k.call(this,a,b,d),c.encryptBlock(a,b),this._prevBlock=a.slice(b,b+d)}}),l.Decryptor=l.extend({processBlock:function(a,b){var c=this._cipher,d=c.blockSize,e=a.slice(b,b+d);c.decryptBlock(a,b),k.call(this,a,b,d),this._prevBlock=e}}),j=j.CBC=l,l=(b.pad={}).Pkcs7={pad:function(a,b){for(var c=4*b,c=c-a.sigBytes%c,d=c<<24|c<<16|c<<8|c,f=[],g=0;c>g;g+=4)f.push(d);c=e.create(f,c),a.concat(c)},unpad:function(a){a.sigBytes-=255&a.words[a.sigBytes-1>>>2]}},c.BlockCipher=i.extend({cfg:i.cfg.extend({mode:j,padding:l}),reset:function(){i.reset.call(this);var a=this.cfg,b=a.iv,a=a.mode;if(this._xformMode==this._ENC_XFORM_MODE)var c=a.createEncryptor;else c=a.createDecryptor,this._minBufferSize=1;this._mode=c.call(a,this,b&&b.words)},_doProcessBlock:function(a,b){this._mode.processBlock(a,b)},_doFinalize:function(){var a=this.cfg.padding;if(this._xformMode==this._ENC_XFORM_MODE){a.pad(this._data,this.blockSize);var b=this._process(!0)}else b=this._process(!0),a.unpad(b);return b},blockSize:4});var m=c.CipherParams=d.extend({init:function(a){this.mixIn(a)},toString:function(a){return(a||this.formatter).stringify(this)}}),j=(b.format={}).OpenSSL={stringify:function(a){var b=a.ciphertext;return a=a.salt,(a?e.create([1398893684,1701076831]).concat(a).concat(b):b).toString(g)},parse:function(a){a=g.parse(a);var b=a.words;if(1398893684==b[0]&&1701076831==b[1]){var c=e.create(b.slice(2,4));b.splice(0,4),a.sigBytes-=16}return m.create({ciphertext:a,salt:c})}},n=c.SerializableCipher=d.extend({cfg:d.extend({format:j}),encrypt:function(a,b,c,d){d=this.cfg.extend(d);var e=a.createEncryptor(c,d);return b=e.finalize(b),e=e.cfg,m.create({ciphertext:b,key:c,iv:e.iv,algorithm:a,mode:e.mode,padding:e.padding,blockSize:a.blockSize,formatter:d.format})},decrypt:function(a,b,c,d){return d=this.cfg.extend(d),b=this._parse(b,d.format),a.createDecryptor(c,d).finalize(b.ciphertext)},_parse:function(a,b){return"string"==typeof a?b.parse(a,this):a}}),b=(b.kdf={}).OpenSSL={execute:function(a,b,c,d){return d||(d=e.random(8)),a=h.create({keySize:b+c}).compute(a,d),c=e.create(a.words.slice(b),4*c),a.sigBytes=4*b,m.create({key:a,iv:c,salt:d})}},o=c.PasswordBasedCipher=n.extend({cfg:n.cfg.extend({kdf:b}),encrypt:function(a,b,c,d){return d=this.cfg.extend(d),c=d.kdf.execute(c,a.keySize,a.ivSize),d.iv=c.iv,a=n.encrypt.call(this,a,b,c.key,d),a.mixIn(c),a},decrypt:function(a,b,c,d){return d=this.cfg.extend(d),b=this._parse(b,d.format),c=d.kdf.execute(c,a.keySize,a.ivSize,b.salt),d.iv=c.iv,n.decrypt.call(this,a,b,c.key,d)}})}(),function(){function a(a,b){var c=(this._lBlock>>>a^this._rBlock)&b;this._rBlock^=c,this._lBlock^=c<<a}function b(a,b){var c=(this._rBlock>>>a^this._lBlock)&b;this._lBlock^=c,this._rBlock^=c<<a}var c=CryptoJS,d=c.lib,e=d.WordArray,d=d.BlockCipher,f=c.algo,g=[57,49,41,33,25,17,9,1,58,50,42,34,26,18,10,2,59,51,43,35,27,19,11,3,60,52,44,36,63,55,47,39,31,23,15,7,62,54,46,38,30,22,14,6,61,53,45,37,29,21,13,5,28,20,12,4],h=[14,17,11,24,1,5,3,28,15,6,21,10,23,19,12,4,26,8,16,7,27,20,13,2,41,52,31,37,47,55,30,40,51,45,33,48,44,49,39,56,34,53,46,42,50,36,29,32],i=[1,2,4,6,8,10,12,14,15,17,19,21,23,25,27,28],j=[{0:8421888,268435456:32768,536870912:8421378,805306368:2,1073741824:512,1342177280:8421890,1610612736:8389122,1879048192:8388608,2147483648:514,2415919104:8389120,2684354560:33280,2952790016:8421376,3221225472:32770,3489660928:8388610,3758096384:0,4026531840:33282,134217728:0,402653184:8421890,671088640:33282,939524096:32768,1207959552:8421888,1476395008:512,1744830464:8421378,2013265920:2,2281701376:8389120,2550136832:33280,2818572288:8421376,3087007744:8389122,3355443200:8388610,3623878656:32770,3892314112:514,4160749568:8388608,1:32768,268435457:2,536870913:8421888,805306369:8388608,1073741825:8421378,1342177281:33280,1610612737:512,1879048193:8389122,2147483649:8421890,2415919105:8421376,2684354561:8388610,2952790017:33282,3221225473:514,3489660929:8389120,3758096385:32770,4026531841:0,134217729:8421890,402653185:8421376,671088641:8388608,939524097:512,1207959553:32768,1476395009:8388610,1744830465:2,2013265921:33282,2281701377:32770,2550136833:8389122,2818572289:514,3087007745:8421888,3355443201:8389120,3623878657:0,3892314113:33280,4160749569:8421378},{0:1074282512,16777216:16384,33554432:524288,50331648:1074266128,67108864:1073741840,83886080:1074282496,100663296:1073758208,117440512:16,134217728:540672,150994944:1073758224,167772160:1073741824,184549376:540688,201326592:524304,218103808:0,234881024:16400,251658240:1074266112,8388608:1073758208,25165824:540688,41943040:16,58720256:1073758224,75497472:1074282512,92274688:1073741824,109051904:524288,125829120:1074266128,142606336:524304,159383552:0,176160768:16384,192937984:1074266112,209715200:1073741840,226492416:540672,243269632:1074282496,260046848:16400,268435456:0,285212672:1074266128,301989888:1073758224,318767104:1074282496,335544320:1074266112,352321536:16,369098752:540688,385875968:16384,402653184:16400,419430400:524288,436207616:524304,452984832:1073741840,469762048:540672,486539264:1073758208,503316480:1073741824,520093696:1074282512,276824064:540688,293601280:524288,310378496:1074266112,327155712:16384,343932928:1073758208,360710144:1074282512,377487360:16,394264576:1073741824,411041792:1074282496,427819008:1073741840,444596224:1073758224,461373440:524304,478150656:0,494927872:16400,511705088:1074266128,528482304:540672},{0:260,1048576:0,2097152:67109120,3145728:65796,4194304:65540,5242880:67108868,6291456:67174660,7340032:67174400,8388608:67108864,9437184:67174656,10485760:65792,11534336:67174404,12582912:67109124,13631488:65536,14680064:4,15728640:256,524288:67174656,1572864:67174404,2621440:0,3670016:67109120,4718592:67108868,5767168:65536,6815744:65540,7864320:260,8912896:4,9961472:256,11010048:67174400,12058624:65796,13107200:65792,14155776:67109124,15204352:67174660,16252928:67108864,16777216:67174656,17825792:65540,18874368:65536,19922944:67109120,20971520:256,22020096:67174660,23068672:67108868,24117248:0,25165824:67109124,26214400:67108864,27262976:4,28311552:65792,29360128:67174400,30408704:260,31457280:65796,32505856:67174404,17301504:67108864,18350080:260,19398656:67174656,20447232:0,21495808:65540,22544384:67109120,23592960:256,24641536:67174404,25690112:65536,26738688:67174660,27787264:65796,28835840:67108868,29884416:67109124,30932992:67174400,31981568:4,33030144:65792},{0:2151682048,65536:2147487808,131072:4198464,196608:2151677952,262144:0,327680:4198400,393216:2147483712,458752:4194368,524288:2147483648,589824:4194304,655360:64,720896:2147487744,786432:2151678016,851968:4160,917504:4096,983040:2151682112,32768:2147487808,98304:64,163840:2151678016,229376:2147487744,294912:4198400,360448:2151682112,425984:0,491520:2151677952,557056:4096,622592:2151682048,688128:4194304,753664:4160,819200:2147483648,884736:4194368,950272:4198464,1015808:2147483712,1048576:4194368,1114112:4198400,1179648:2147483712,1245184:0,1310720:4160,1376256:2151678016,1441792:2151682048,1507328:2147487808,1572864:2151682112,1638400:2147483648,1703936:2151677952,1769472:4198464,1835008:2147487744,1900544:4194304,1966080:64,2031616:4096,1081344:2151677952,1146880:2151682112,1212416:0,1277952:4198400,1343488:4194368,1409024:2147483648,1474560:2147487808,1540096:64,1605632:2147483712,1671168:4096,1736704:2147487744,1802240:2151678016,1867776:4160,1933312:2151682048,1998848:4194304,2064384:4198464},{0:128,4096:17039360,8192:262144,12288:536870912,16384:537133184,20480:16777344,24576:553648256,28672:262272,32768:16777216,36864:537133056,40960:536871040,45056:553910400,49152:553910272,53248:0,57344:17039488,61440:553648128,2048:17039488,6144:553648256,10240:128,14336:17039360,18432:262144,22528:537133184,26624:553910272,30720:536870912,34816:537133056,38912:0,43008:553910400,47104:16777344,51200:536871040,55296:553648128,59392:16777216,63488:262272,65536:262144,69632:128,73728:536870912,77824:553648256,81920:16777344,86016:553910272,90112:537133184,94208:16777216,98304:553910400,102400:553648128,106496:17039360,110592:537133056,114688:262272,118784:536871040,122880:0,126976:17039488,67584:553648256,71680:16777216,75776:17039360,79872:537133184,83968:536870912,88064:17039488,92160:128,96256:553910272,100352:262272,104448:553910400,108544:0,112640:553648128,116736:16777344,120832:262144,124928:537133056,129024:536871040},{0:268435464,256:8192,512:270532608,768:270540808,1024:268443648,1280:2097152,1536:2097160,1792:268435456,2048:0,2304:268443656,2560:2105344,2816:8,3072:270532616,3328:2105352,3584:8200,3840:270540800,128:270532608,384:270540808,640:8,896:2097152,1152:2105352,1408:268435464,1664:268443648,1920:8200,2176:2097160,2432:8192,2688:268443656,2944:270532616,3200:0,3456:270540800,3712:2105344,3968:268435456,4096:268443648,4352:270532616,4608:270540808,4864:8200,5120:2097152,5376:268435456,5632:268435464,5888:2105344,6144:2105352,6400:0,6656:8,6912:270532608,7168:8192,7424:268443656,7680:270540800,7936:2097160,4224:8,4480:2105344,4736:2097152,4992:268435464,5248:268443648,5504:8200,5760:270540808,6016:270532608,6272:270540800,6528:270532616,6784:8192,7040:2105352,7296:2097160,7552:0,7808:268435456,8064:268443656},{0:1048576,16:33555457,32:1024,48:1049601,64:34604033,80:0,96:1,112:34603009,128:33555456,144:1048577,160:33554433,176:34604032,192:34603008,208:1025,224:1049600,240:33554432,8:34603009,24:0,40:33555457,56:34604032,72:1048576,88:33554433,104:33554432,120:1025,136:1049601,152:33555456,168:34603008,184:1048577,200:1024,216:34604033,232:1,248:1049600,256:33554432,272:1048576,288:33555457,304:34603009,320:1048577,336:33555456,352:34604032,368:1049601,384:1025,400:34604033,416:1049600,432:1,448:0,464:34603008,480:33554433,496:1024,264:1049600,280:33555457,296:34603009,312:1,328:33554432,344:1048576,360:1025,376:34604032,392:33554433,408:34603008,424:0,440:34604033,456:1049601,472:1024,488:33555456,504:1048577},{0:134219808,1:131072,2:134217728,3:32,4:131104,5:134350880,6:134350848,7:2048,8:134348800,9:134219776,10:133120,11:134348832,12:2080,13:0,14:134217760,15:133152,2147483648:2048,2147483649:134350880,2147483650:134219808,2147483651:134217728,2147483652:134348800,2147483653:133120,2147483654:133152,2147483655:32,2147483656:134217760,2147483657:2080,2147483658:131104,2147483659:134350848,2147483660:0,2147483661:134348832,2147483662:134219776,2147483663:131072,16:133152,17:134350848,18:32,19:2048,20:134219776,21:134217760,22:134348832,23:131072,24:0,25:131104,26:134348800,27:134219808,28:134350880,29:133120,30:2080,31:134217728,2147483664:131072,2147483665:2048,2147483666:134348832,2147483667:133152,2147483668:32,2147483669:134348800,2147483670:134217728,2147483671:134219808,2147483672:134350880,2147483673:134217760,2147483674:134219776,2147483675:0,2147483676:133120,2147483677:2080,2147483678:131104,2147483679:134350848}],k=[4160749569,528482304,33030144,2064384,129024,8064,504,2147483679],l=f.DES=d.extend({_doReset:function(){for(var a=this._key.words,b=[],c=0;56>c;c++){var d=g[c]-1;b[c]=a[d>>>5]>>>31-d%32&1}for(a=this._subKeys=[],d=0;16>d;d++){for(var e=a[d]=[],f=i[d],c=0;24>c;c++)e[c/6|0]|=b[(h[c]-1+f)%28]<<31-c%6,e[4+(c/6|0)]|=b[28+(h[c+24]-1+f)%28]<<31-c%6;for(e[0]=e[0]<<1|e[0]>>>31,c=1;7>c;c++)e[c]>>>=4*(c-1)+3;e[7]=e[7]<<5|e[7]>>>27}for(b=this._invSubKeys=[],c=0;16>c;c++)b[c]=a[15-c]},encryptBlock:function(a,b){this._doCryptBlock(a,b,this._subKeys)},decryptBlock:function(a,b){this._doCryptBlock(a,b,this._invSubKeys)},_doCryptBlock:function(c,d,e){this._lBlock=c[d],this._rBlock=c[d+1],a.call(this,4,252645135),a.call(this,16,65535),b.call(this,2,858993459),b.call(this,8,16711935),a.call(this,1,1431655765);for(var f=0;16>f;f++){for(var g=e[f],h=this._lBlock,i=this._rBlock,l=0,m=0;8>m;m++)l|=j[m][((i^g[m])&k[m])>>>0];this._lBlock=i,this._rBlock=h^l}e=this._lBlock,this._lBlock=this._rBlock,this._rBlock=e,a.call(this,1,1431655765),b.call(this,8,16711935),b.call(this,2,858993459),a.call(this,16,65535),a.call(this,4,252645135),c[d]=this._lBlock,c[d+1]=this._rBlock},keySize:2,ivSize:2,blockSize:2});c.DES=d._createHelper(l),f=f.TripleDES=d.extend({_doReset:function(){var a=this._key.words;this._des1=l.createEncryptor(e.create(a.slice(0,2))),this._des2=l.createEncryptor(e.create(a.slice(2,4))),this._des3=l.createEncryptor(e.create(a.slice(4,6)))},encryptBlock:function(a,b){this._des1.encryptBlock(a,b),this._des2.decryptBlock(a,b),this._des3.encryptBlock(a,b)},decryptBlock:function(a,b){this._des3.decryptBlock(a,b),this._des2.encryptBlock(a,b),this._des1.decryptBlock(a,b)},keySize:6,ivSize:2,blockSize:2}),c.TripleDES=d._createHelper(f)}();
+
+'use strict';
+
+(function(app){
+  app.factory('Cart',  ['$http', function CartFactory($http){
+
+    var srv = this;
+    var items = [];
+
+    //// DemoData
+    //var items = [
+    //  {
+    //    amount: 12,
+    //    item: {
+    //      id: 1,
+    //      title: 'Turnschuh',
+    //      price: 12.50,
+    //      available: true
+    //    }
+    //  },
+    //  {
+    //    amount: 50,
+    //    item: {
+    //      id: 2,
+    //      title: 'Taschentuch',
+    //      price: 1.12,
+    //      available: true
+    //    }
+    //  }
+    //];
+
+    srv.getItems = function(){
+      return items;
+    }
+
+    srv.getItemCount = function(){
+      return items.length;
+    }
+
+    srv.add = function(item, amount){
+
+      var exist = false;
+
+      items.forEach(function(entry){
+        if(entry.item === item){
+          entry.amount += amount;
+          exist =true;
+        }
+      });
+
+      if(!exist){
+        items.push({amount: amount, item: item});
+      }
+    };
+
+    srv.remove = function(cartItem){
+      var ndx = items.indexOf(cartItem);
+      items.splice(ndx, 1);
+    };
+
+    srv.clear = function(){
+      items.splice(0, items.length)
+      console.log("ShoppingCart cleared");
+    };
+
+    srv.checkout = function(){
+
+      var order = [];
+      items.forEach(function (entry){
+        order.push({amount: entry.amount, itemId: entry.item.id})
+      });
+
+      return $http.post('api/orders', order);
+    };
+
+    return srv;
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  app.directive('myshopCategorySelect', ['Categories', function (Categories) {
+
+    return {
+      replace: true,
+      restrict: 'E',
+      templateUrl: 'views/directives/myshop-category-select.html',
+
+      scope: {
+        activeCategory: '='
+      },
+
+      link: function (scope) {
+
+        Categories.query().then(
+          function successCallback(response) {
+            scope.categories = response.data;
+          },
+          function errorCallback() {
+          }
+        );
+      },
+
+      controller: ['$scope', function ($scope) {
+
+        this.getActiveCategory = function () {
+          return $scope.activeCategory;
+        };
+
+        this.setActiveCategory = function (category) {
+          $scope.activeCategory = $scope.activeCategory === category.id ? undefined : category.id;
+          $scope.$emit('myshop-active-category-changed', $scope.activeCategory);
+        };
+      }]
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  app.directive('myshopCategoryItem', [function () {
+
+    return {
+      replace: true,
+      restrict: 'E',
+      templateUrl: 'views/directives/myshop-category-item.html',
+      scope: {
+        category: '='
+      },
+      require: '^myshopCategorySelect',
+      link: function (scope, element, attrs, myshopCategorySelectCtrl) {
+        scope.makeActive = function () {
+            myshopCategorySelectCtrl.setActiveCategory(scope.category);
+        };
+
+        scope.categoryActive = function () {
+          return myshopCategorySelectCtrl.getActiveCategory() === scope.category.id;
+        };
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+
+  app.directive('myshopProductDetails', function () {
+    return {
+      templateUrl: 'views/directives/myshop-product-details.html',
+      restrict: 'E',
+      controller: function(){
+        this.tab = 1;
+
+        this.selectTab = function(tab){
+          this.tab= tab;
+        };
+
+        this.isSelected = function(tab){
+          return this.tab === tab;
+        };
+      },
+
+      controllerAs: 'panel'
+    };
+  });
+
+})(angular.module('myshopApp'));
+
+
+'use strict';
+
+(function (app) {
+
+  app.directive('myshopProductComments', function () {
+    return {
+      templateUrl: 'views/directives/myshop-product-comments.html',
+      restrict: 'E',
+      controller: function ($scope, User, Comments) {
+
+        var srv = this;
+        $scope.comment = {};
+        srv.formVisible = false;
+
+        $scope.userCanCreateComment = User.canCreateComment();
+
+        $scope.userCanEditComment = function (comment) {
+          return User.canEditComment(comment);
+        };
+
+        $scope.comments = [];
+        Comments.formProduct($scope.product.id).then(
+          function successCallback(response) {
+            $scope.comments = response.data;
+          },
+          function errorCallback() {
+
+          }
+        );
+
+        srv.deleteComment = function (comment) {
+          var ndx = $scope.comments.indexOf(comment);
+
+          if (ndx > -1) {
+            Comments.remove(comment).then(
+              function successCallback() {
+                $scope.comments.splice(ndx, 1);
+              },
+              function successCallback() {
+              }
+            );
+          }
+        };
+
+        srv.editComment = function (comment) {
+          $scope.comment = comment;
+
+          srv.formVisible = true;
+        };
+
+        srv.showForm = function () {
+          $scope.comment.author = User.getUsername();
+          $scope.comment.authorID = User.getID();
+          $scope.comment.itemID = $scope.product.id;
+          $scope.comment.creationDate = Date.now();
+          $scope.comment.changeDate = $scope.comment.creationDate;
+          $scope.comment.content = '';
+
+          srv.formVisible = true;
+        };
+
+        srv.saveComment = function () {
+
+          $scope.$broadcast('show-errors-check-validity');
+
+          if ($scope.commentForm.$valid) {
+
+            if ($scope.comment.commentId) {
+
+              // Update existing comment
+              Comments.update($scope.comment).then(
+                function successCallback() {
+                  srv.formVisible = false;
+                },
+                function error(response) {
+                  console.log('Fail to save comment: ' + response.status);
+                }
+              );
+            } else {
+
+              // Create new comment
+              Comments.save($scope.comment).then(
+                function successCallback() {
+                  $scope.comments.push($scope.comment);
+                  srv.formVisible = false;
+                },
+                function error(response) {
+                  console.log('Fail to save comment: ' + response.status);
+                }
+              );
+            }
+          }
+        };
+
+      },
+      controllerAs: 'commentCtrl'
+    };
+  });
+
+})(angular.module('myshopApp'));
+
+
+'use strict';
+
+(function (app) {
+
+  app.directive('myshopProductComment', function () {
+    return {
+      templateUrl: 'views/directives/myshop-product-comment.html',
+      restrict: 'E'
+    };
+  });
+
+})(angular.module('myshopApp'));
+
+
+'use strict';
+
+(function (app) {
+
+  app.directive('myshopNavigation', function () {
+    return {
+      templateUrl: 'views/directives/myshop-navigation.html',
+      restrict: 'E',
+      controller: ['$location', 'User', function ($location, User) {
+
+        this.links = [
+          {
+            name: 'Home',
+            target: '/'
+          },
+          {
+            name: 'Produkte',
+            target: '/products'
+          },
+          {
+            name: 'About',
+            target: '/about'
+          },
+          {
+            name: 'Benutzer',
+            target: '/users',
+            adminOnly: true
+          }
+        ];
+
+        this.isSelected = function (link) {
+          return $location.path() === link.target;
+        };
+
+        this.linkVisible = function (link) {
+          if (link.adminOnly) {
+            return User.isAuthenticated() && User.isAdmin();
+          }
+
+          return true;
+        }
+      }],
+
+      controllerAs: 'nav'
+    };
+  });
+
+})(angular.module('myshopApp'));
+
+
+(function (app) {
+  app.directive('twitter', [
+    function() {
+      return {
+        link: function(scope, element, attr) {
+          setTimeout(function() {
+            twttr.widgets.createShareButton(
+              attr.url,
+              element[0],
+              function(el) {}, {
+                text: attr.text,
+                url: attr.url,
+                hashtags: attr.hashtags,
+                via: attr.via,
+                size: 'large'
+              }
+            );
+          });
+        }
+      }
+    }
+  ]);
+})(angular.module('myshopApp'));
+
+/**!
+ * The MIT License
+ *
+ * Copyright (c) 2013 the angular-leaflet-directive Team, http://tombatossals.github.io/angular-leaflet-directive
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * angular-leaflet-directive
+ * https://github.com/tombatossals/angular-leaflet-directive
+ *
+ * @authors https://github.com/tombatossals/angular-leaflet-directive/graphs/contributors
+ */
+
+/*!
+ *  angular-leaflet-directive  2015-11-06
+ *  angular-leaflet-directive - An AngularJS directive to easily interact with Leaflet maps
+ *  git: https://github.com/tombatossals/angular-leaflet-directive
+ */
+(function (angular) {
+  'use strict';
+  angular.module('leaflet-directive', []).directive('leaflet', ["$q", "leafletData", "leafletMapDefaults", "leafletHelpers", "leafletMapEvents", function ($q, leafletData, leafletMapDefaults, leafletHelpers, leafletMapEvents) {
+    return {
+      restrict: 'EA',
+      replace: true,
+      scope: {
+        center: '=',
+        lfCenter: '=',
+        defaults: '=',
+        maxbounds: '=',
+        bounds: '=',
+        markers: '=',
+        legend: '=',
+        geojson: '=',
+        paths: '=',
+        tiles: '=',
+        layers: '=',
+        controls: '=',
+        decorations: '=',
+        eventBroadcast: '=',
+        markersWatchOptions: '=',
+        geojsonWatchOptions: '=',
+      },
+      transclude: true,
+      template: '<div class="angular-leaflet-map"><div ng-transclude></div></div>',
+      controller: ["$scope", function ($scope) {
+        this._leafletMap = $q.defer();
+        this.getMap = function () {
+          return this._leafletMap.promise;
+        };
+
+        this.getLeafletScope = function () {
+          return $scope;
+        };
+      }],
+
+      link: function (scope, element, attrs, ctrl) {
+        var isDefined = leafletHelpers.isDefined;
+        var defaults = leafletMapDefaults.setDefaults(scope.defaults, attrs.id);
+        var mapEvents = leafletMapEvents.getAvailableMapEvents();
+        var addEvents = leafletMapEvents.addEvents;
+
+        scope.mapId = attrs.id;
+        leafletData.setDirectiveControls({}, attrs.id);
+
+        // Set width and height utility functions
+        function updateWidth() {
+          if (isNaN(attrs.width)) {
+            element.css('width', attrs.width);
+          } else {
+            element.css('width', attrs.width + 'px');
+          }
+        }
+
+        function updateHeight() {
+          if (isNaN(attrs.height)) {
+            element.css('height', attrs.height);
+          } else {
+            element.css('height', attrs.height + 'px');
+          }
+        }
+
+        // If the width attribute defined update css
+        // Then watch if bound property changes and update css
+        if (isDefined(attrs.width)) {
+          updateWidth();
+
+          scope.$watch(
+            function () {
+              return element[0].getAttribute('width');
+            },
+
+            function () {
+              updateWidth();
+              map.invalidateSize();
+            });
+        }
+
+        // If the height attribute defined update css
+        // Then watch if bound property changes and update css
+        if (isDefined(attrs.height)) {
+          updateHeight();
+
+          scope.$watch(
+            function () {
+              return element[0].getAttribute('height');
+            },
+
+            function () {
+              updateHeight();
+              map.invalidateSize();
+            });
+        }
+
+        // Create the Leaflet Map Object with the options
+        var map = new L.Map(element[0], leafletMapDefaults.getMapCreationDefaults(attrs.id));
+        ctrl._leafletMap.resolve(map);
+
+        if (!isDefined(attrs.center) && !isDefined(attrs.lfCenter)) {
+          map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
+        }
+
+        // If no layers nor tiles defined, set the default tileLayer
+        if (!isDefined(attrs.tiles) && (!isDefined(attrs.layers))) {
+          var tileLayerObj = L.tileLayer(defaults.tileLayer, defaults.tileLayerOptions);
+          tileLayerObj.addTo(map);
+          leafletData.setTiles(tileLayerObj, attrs.id);
+        }
+
+        // Set zoom control configuration
+        if (isDefined(map.zoomControl) &&
+          isDefined(defaults.zoomControlPosition)) {
+          map.zoomControl.setPosition(defaults.zoomControlPosition);
+        }
+
+        if (isDefined(map.zoomControl) && defaults.zoomControl === false) {
+          map.zoomControl.removeFrom(map);
+        }
+
+        if (isDefined(map.zoomsliderControl) &&
+          isDefined(defaults.zoomsliderControl) &&
+          defaults.zoomsliderControl === false) {
+          map.zoomsliderControl.removeFrom(map);
+        }
+
+        // if no event-broadcast attribute, all events are broadcasted
+        if (!isDefined(attrs.eventBroadcast)) {
+          var logic = 'broadcast';
+          addEvents(map, mapEvents, 'eventName', scope, logic);
+        }
+
+        // Resolve the map object to the promises
+        map.whenReady(function () {
+          leafletData.setMap(map, attrs.id);
+        });
+
+        scope.$on('$destroy', function () {
+          leafletMapDefaults.reset();
+          map.remove();
+          leafletData.unresolveMap(attrs.id);
+        });
+
+        //Handle request to invalidate the map size
+        //Up scope using $scope.$emit('invalidateSize')
+        //Down scope using $scope.$broadcast('invalidateSize')
+        scope.$on('invalidateSize', function () {
+          map.invalidateSize();
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').factory('leafletBoundsHelpers', ["$log", "leafletHelpers", function ($log, leafletHelpers) {
+
+    var isArray = leafletHelpers.isArray;
+    var isNumber = leafletHelpers.isNumber;
+    var isFunction = leafletHelpers.isFunction;
+    var isDefined = leafletHelpers.isDefined;
+
+    function _isValidBounds(bounds) {
+      return angular.isDefined(bounds) && angular.isDefined(bounds.southWest) &&
+        angular.isDefined(bounds.northEast) && angular.isNumber(bounds.southWest.lat) &&
+        angular.isNumber(bounds.southWest.lng) && angular.isNumber(bounds.northEast.lat) &&
+        angular.isNumber(bounds.northEast.lng);
+    }
+
+    return {
+      createLeafletBounds: function (bounds) {
+        if (_isValidBounds(bounds)) {
+          return L.latLngBounds([bounds.southWest.lat, bounds.southWest.lng],
+            [bounds.northEast.lat, bounds.northEast.lng]);
+        }
+      },
+
+      isValidBounds: _isValidBounds,
+
+      createBoundsFromArray: function (boundsArray) {
+        if (!(isArray(boundsArray) && boundsArray.length === 2 &&
+          isArray(boundsArray[0]) && isArray(boundsArray[1]) &&
+          boundsArray[0].length === 2 && boundsArray[1].length === 2 &&
+          isNumber(boundsArray[0][0]) && isNumber(boundsArray[0][1]) &&
+          isNumber(boundsArray[1][0]) && isNumber(boundsArray[1][1]))) {
+          $log.error('[AngularJS - Leaflet] The bounds array is not valid.');
+          return;
+        }
+
+        return {
+          northEast: {
+            lat: boundsArray[0][0],
+            lng: boundsArray[0][1],
+          },
+          southWest: {
+            lat: boundsArray[1][0],
+            lng: boundsArray[1][1],
+          },
+        };
+      },
+
+      createBoundsFromLeaflet: function (lfBounds) {
+        if (!(isDefined(lfBounds) && isFunction(lfBounds.getNorthEast) && isFunction(lfBounds.getSouthWest))) {
+          $log.error('[AngularJS - Leaflet] The leaflet bounds is not valid object.');
+          return;
+        }
+
+        var northEast = lfBounds.getNorthEast();
+        var southWest = lfBounds.getSouthWest();
+
+        return {
+          northEast: {
+            lat: northEast.lat,
+            lng: northEast.lng,
+          },
+          southWest: {
+            lat: southWest.lat,
+            lng: southWest.lng,
+          },
+        };
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').factory('leafletControlHelpers', ["$rootScope", "$log", "leafletHelpers", "leafletLayerHelpers", "leafletMapDefaults", function ($rootScope, $log, leafletHelpers, leafletLayerHelpers, leafletMapDefaults) {
+    var isDefined = leafletHelpers.isDefined;
+    var isObject = leafletHelpers.isObject;
+    var createLayer = leafletLayerHelpers.createLayer;
+    var _controls = {};
+    var errorHeader = leafletHelpers.errorHeader + ' [Controls] ';
+
+    var _controlLayersMustBeVisible = function (baselayers, overlays, mapId) {
+      var defaults = leafletMapDefaults.getDefaults(mapId);
+      if (!defaults.controls.layers.visible) {
+        return false;
+      }
+
+      var atLeastOneControlItemMustBeShown = false;
+
+      if (isObject(baselayers)) {
+        Object.keys(baselayers).forEach(function (key) {
+          var layer = baselayers[key];
+          if (!isDefined(layer.layerOptions) || layer.layerOptions.showOnSelector !== false) {
+            atLeastOneControlItemMustBeShown = true;
+          }
+        });
+      }
+
+      if (isObject(overlays)) {
+        Object.keys(overlays).forEach(function (key) {
+          var layer = overlays[key];
+          if (!isDefined(layer.layerParams) || layer.layerParams.showOnSelector !== false) {
+            atLeastOneControlItemMustBeShown = true;
+          }
+        });
+      }
+
+      return atLeastOneControlItemMustBeShown;
+    };
+
+    var _createLayersControl = function (mapId) {
+      var defaults = leafletMapDefaults.getDefaults(mapId);
+      var controlOptions = {
+        collapsed: defaults.controls.layers.collapsed,
+        position: defaults.controls.layers.position,
+        autoZIndex: false,
+      };
+
+      angular.extend(controlOptions, defaults.controls.layers.options);
+
+      var control;
+      if (defaults.controls.layers && isDefined(defaults.controls.layers.control)) {
+        control = defaults.controls.layers.control.apply(this, [[], [], controlOptions]);
+      } else {
+        control = new L.control.layers([], [], controlOptions);
+      }
+
+      return control;
+    };
+
+    var controlTypes = {
+      draw: {
+        isPluginLoaded: function () {
+          if (!angular.isDefined(L.Control.Draw)) {
+            $log.error(errorHeader + ' Draw plugin is not loaded.');
+            return false;
+          }
+
+          return true;
+        },
+
+        checkValidParams: function (/* params */) {
+          return true;
+        },
+
+        createControl: function (params) {
+          return new L.Control.Draw(params);
+        },
+      },
+      scale: {
+        isPluginLoaded: function () {
+          return true;
+        },
+
+        checkValidParams: function (/* params */) {
+          return true;
+        },
+
+        createControl: function (params) {
+          return new L.control.scale(params);
+        },
+      },
+      fullscreen: {
+        isPluginLoaded: function () {
+          if (!angular.isDefined(L.Control.Fullscreen)) {
+            $log.error(errorHeader + ' Fullscreen plugin is not loaded.');
+            return false;
+          }
+
+          return true;
+        },
+
+        checkValidParams: function (/* params */) {
+          return true;
+        },
+
+        createControl: function (params) {
+          return new L.Control.Fullscreen(params);
+        },
+      },
+      search: {
+        isPluginLoaded: function () {
+          if (!angular.isDefined(L.Control.Search)) {
+            $log.error(errorHeader + ' Search plugin is not loaded.');
+            return false;
+          }
+
+          return true;
+        },
+
+        checkValidParams: function (/* params */) {
+          return true;
+        },
+
+        createControl: function (params) {
+          return new L.Control.Search(params);
+        },
+      },
+      custom: {},
+      minimap: {
+        isPluginLoaded: function () {
+          if (!angular.isDefined(L.Control.MiniMap)) {
+            $log.error(errorHeader + ' Minimap plugin is not loaded.');
+            return false;
+          }
+
+          return true;
+        },
+
+        checkValidParams: function (params) {
+          if (!isDefined(params.layer)) {
+            $log.warn(errorHeader + ' minimap "layer" option should be defined.');
+            return false;
+          }
+
+          return true;
+        },
+
+        createControl: function (params) {
+          var layer = createLayer(params.layer);
+
+          if (!isDefined(layer)) {
+            $log.warn(errorHeader + ' minimap control "layer" could not be created.');
+            return;
+          }
+
+          return new L.Control.MiniMap(layer, params);
+        },
+      },
+    };
+
+    return {
+      layersControlMustBeVisible: _controlLayersMustBeVisible,
+
+      isValidControlType: function (type) {
+        return Object.keys(controlTypes).indexOf(type) !== -1;
+      },
+
+      createControl: function (type, params) {
+        if (!controlTypes[type].checkValidParams(params)) {
+          return;
+        }
+
+        return controlTypes[type].createControl(params);
+      },
+
+      updateLayersControl: function (map, mapId, loaded, baselayers, overlays, leafletLayers) {
+        var i;
+        var _layersControl = _controls[mapId];
+        var mustBeLoaded = _controlLayersMustBeVisible(baselayers, overlays, mapId);
+
+        if (isDefined(_layersControl) && loaded) {
+          for (i in leafletLayers.baselayers) {
+            _layersControl.removeLayer(leafletLayers.baselayers[i]);
+          }
+
+          for (i in leafletLayers.overlays) {
+            _layersControl.removeLayer(leafletLayers.overlays[i]);
+          }
+
+          map.removeControl(_layersControl);
+          delete _controls[mapId];
+        }
+
+        if (mustBeLoaded) {
+          _layersControl = _createLayersControl(mapId);
+          _controls[mapId] = _layersControl;
+          for (i in baselayers) {
+            var hideOnSelector = isDefined(baselayers[i].layerOptions) &&
+              baselayers[i].layerOptions.showOnSelector === false;
+            if (!hideOnSelector && isDefined(leafletLayers.baselayers[i])) {
+              _layersControl.addBaseLayer(leafletLayers.baselayers[i], baselayers[i].name);
+            }
+          }
+
+          for (i in overlays) {
+            var hideOverlayOnSelector = isDefined(overlays[i].layerParams) &&
+              overlays[i].layerParams.showOnSelector === false;
+            if (!hideOverlayOnSelector && isDefined(leafletLayers.overlays[i])) {
+              _layersControl.addOverlay(leafletLayers.overlays[i], overlays[i].name);
+            }
+          }
+
+          map.addControl(_layersControl);
+        }
+
+        return mustBeLoaded;
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').service('leafletData', ["$log", "$q", "leafletHelpers", function ($log, $q, leafletHelpers) {
+    var getDefer = leafletHelpers.getDefer,
+      getUnresolvedDefer = leafletHelpers.getUnresolvedDefer,
+      setResolvedDefer = leafletHelpers.setResolvedDefer;
+
+    var _private = {};
+    var self = this;
+
+    var upperFirst = function (string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
+    var _privateItems = [
+      'map',
+      'tiles',
+      'layers',
+      'paths',
+      'markers',
+      'geoJSON',
+      'UTFGrid', //odd ball on naming convention keeping to not break
+      'decorations',
+      'directiveControls',];
+
+    //init
+    _privateItems.forEach(function (itemName) {
+      _private[itemName] = {};
+    });
+
+    this.unresolveMap = function (scopeId) {
+      var id = leafletHelpers.obtainEffectiveMapId(_private.map, scopeId);
+      _privateItems.forEach(function (itemName) {
+        _private[itemName][id] = undefined;
+      });
+    };
+
+    //int repetitive stuff (get and sets)
+    _privateItems.forEach(function (itemName) {
+      var name = upperFirst(itemName);
+      self['set' + name] = function (lObject, scopeId) {
+        var defer = getUnresolvedDefer(_private[itemName], scopeId);
+        defer.resolve(lObject);
+        setResolvedDefer(_private[itemName], scopeId);
+      };
+
+      self['get' + name] = function (scopeId) {
+        var defer = getDefer(_private[itemName], scopeId);
+        return defer.promise;
+      };
+    });
+  }]);
+
+  angular.module('leaflet-directive')
+    .service('leafletDirectiveControlsHelpers', ["$log", "leafletData", "leafletHelpers", function ($log, leafletData, leafletHelpers) {
+      var _isDefined = leafletHelpers.isDefined;
+      var _isString = leafletHelpers.isString;
+      var _isObject = leafletHelpers.isObject;
+      var _mainErrorHeader = leafletHelpers.errorHeader;
+
+      var _errorHeader = _mainErrorHeader + '[leafletDirectiveControlsHelpers';
+
+      var _extend = function (id, thingToAddName, createFn, cleanFn) {
+        var _fnHeader = _errorHeader + '.extend] ';
+        var extender = {};
+        if (!_isDefined(thingToAddName)) {
+          $log.error(_fnHeader + 'thingToAddName cannot be undefined');
+          return;
+        }
+
+        if (_isString(thingToAddName) && _isDefined(createFn) && _isDefined(cleanFn)) {
+          extender[thingToAddName] = {
+            create: createFn,
+            clean: cleanFn,
+          };
+        } else if (_isObject(thingToAddName) && !_isDefined(createFn) && !_isDefined(cleanFn)) {
+          extender = thingToAddName;
+        } else {
+          $log.error(_fnHeader + 'incorrect arguments');
+          return;
+        }
+
+        //add external control to create / destroy markers without a watch
+        leafletData.getDirectiveControls().then(function (controls) {
+          angular.extend(controls, extender);
+          leafletData.setDirectiveControls(controls, id);
+        });
+      };
+
+      return {
+        extend: _extend,
+      };
+    }]);
+
+  angular.module('leaflet-directive')
+    .service('leafletGeoJsonHelpers', ["leafletHelpers", "leafletIterators", function (leafletHelpers, leafletIterators) {
+      var lHlp = leafletHelpers;
+      var lIt = leafletIterators;
+      var Point = function (lat, lng) {
+        this.lat = lat;
+        this.lng = lng;
+        return this;
+      };
+
+      var _getLat = function (value) {
+        if (Array.isArray(value) && value.length === 2) {
+          return value[1];
+        } else if (lHlp.isDefined(value.type) && value.type === 'Point') {
+          return +value.coordinates[1];
+        } else {
+          return +value.lat;
+        }
+      };
+
+      var _getLng = function (value) {
+        if (Array.isArray(value) && value.length === 2) {
+          return value[0];
+        } else if (lHlp.isDefined(value.type) && value.type === 'Point') {
+          return +value.coordinates[0];
+        } else {
+          return +value.lng;
+        }
+      };
+
+      var _validateCoords = function (coords) {
+        if (lHlp.isUndefined(coords)) {
+          return false;
+        }
+
+        if (lHlp.isArray(coords)) {
+          if (coords.length === 2 && lHlp.isNumber(coords[0]) && lHlp.isNumber(coords[1])) {
+            return true;
+          }
+        } else if (lHlp.isDefined(coords.type)) {
+          if (
+            coords.type === 'Point' && lHlp.isArray(coords.coordinates) &&
+            coords.coordinates.length === 2 &&
+            lHlp.isNumber(coords.coordinates[0]) &&
+            lHlp.isNumber(coords.coordinates[1])) {
+            return true;
+          }
+        }
+
+        var ret = lIt.all(['lat', 'lng'], function (pos) {
+          return lHlp.isDefined(coords[pos]) && lHlp.isNumber(coords[pos]);
+        });
+
+        return ret;
+      };
+
+      var _getCoords = function (value) {
+        if (!value || !_validateCoords(value)) {
+          return;
+        }
+
+        var p = null;
+        if (Array.isArray(value) && value.length === 2) {
+          p = new Point(value[1], value[0]);
+        } else if (lHlp.isDefined(value.type) && value.type === 'Point') {
+          p = new Point(value.coordinates[1], value.coordinates[0]);
+        } else {
+          return value;
+        }
+
+        //note angular.merge is avail in angular 1.4.X we might want to fill it here
+        return angular.extend(value, p);//tap on lat, lng if it doesnt exist
+      };
+
+      return {
+        getLat: _getLat,
+        getLng: _getLng,
+        validateCoords: _validateCoords,
+        getCoords: _getCoords,
+      };
+    }]);
+
+  angular.module('leaflet-directive').service('leafletHelpers', ["$q", "$log", function ($q, $log) {
+    var _errorHeader = '[AngularJS - Leaflet] ';
+    var _copy = angular.copy;
+    var _clone = _copy;
+    /*
+     For parsing paths to a field in an object
+
+     Example:
+     var obj = {
+     bike:{
+     1: 'hi'
+     2: 'foo'
+     }
+     };
+     _getObjectValue(obj,"bike.1") returns 'hi'
+     this is getPath in ui-gmap
+     */
+    var _getObjectValue = function (object, pathStr) {
+      var obj;
+      if (!object || !angular.isObject(object)) {
+        return;
+      }
+
+      //if the key is not a sting then we already have the value
+      if ((pathStr === null) || !angular.isString(pathStr)) {
+        return pathStr;
+      }
+
+      obj = object;
+      pathStr.split('.').forEach(function (value) {
+        if (obj) {
+          obj = obj[value];
+        }
+      });
+
+      return obj;
+    };
+
+    /*
+     Object Array Notation
+     _getObjectArrayPath("bike.one.two")
+     returns:
+     'bike["one"]["two"]'
+     */
+    var _getObjectArrayPath = function (pathStr) {
+      return pathStr.split('.').reduce(function (previous, current) {
+        return previous + '["' + current + '"]';
+      });
+    };
+
+    /* Object Dot Notation
+     _getObjectPath(["bike","one","two"])
+     returns:
+     "bike.one.two"
+     */
+    var _getObjectDotPath = function (arrayOfStrings) {
+      return arrayOfStrings.reduce(function (previous, current) {
+        return previous + '.' + current;
+      });
+    };
+
+    function _obtainEffectiveMapId(d, mapId) {
+      var id;
+      var i;
+      if (!angular.isDefined(mapId)) {
+        if (Object.keys(d).length === 0) {
+          id = 'main';
+        } else if (Object.keys(d).length >= 1) {
+          for (i in d) {
+            if (d.hasOwnProperty(i)) {
+              id = i;
+            }
+          }
+        } else {
+          $log.error(_errorHeader + '- You have more than 1 map on the DOM, you must provide the map ID to the leafletData.getXXX call');
+        }
+      } else {
+        id = mapId;
+      }
+
+      return id;
+    }
+
+    function _getUnresolvedDefer(d, mapId) {
+      var id = _obtainEffectiveMapId(d, mapId);
+      var defer;
+
+      if (!angular.isDefined(d[id]) || d[id].resolvedDefer === true) {
+        defer = $q.defer();
+        d[id] = {
+          defer: defer,
+          resolvedDefer: false,
+        };
+      } else {
+        defer = d[id].defer;
+      }
+
+      return defer;
+    }
+
+    var _isDefined = function (value) {
+      return angular.isDefined(value) && value !== null;
+    };
+
+    var _isUndefined = function (value) {
+      return !_isDefined(value);
+    };
+
+    // BEGIN DIRECT PORT FROM AngularJS code base
+
+    var SPECIAL_CHARS_REGEXP = /([\:\-\_]+(.))/g;
+
+    var MOZ_HACK_REGEXP = /^moz([A-Z])/;
+
+    var PREFIX_REGEXP = /^((?:x|data)[\:\-_])/i;
+
+    /**
+     Converts snake_case to camelCase.
+     Also there is special case for Moz prefix starting with upper case letter.
+     @param name Name to normalize
+     */
+
+    var camelCase = function (name) {
+      return name.replace(SPECIAL_CHARS_REGEXP, function (_, separator, letter, offset) {
+        if (offset) {
+          return letter.toUpperCase();
+        } else {
+          return letter;
+        }
+      }).replace(MOZ_HACK_REGEXP, 'Moz$1');
+    };
+
+    /**
+     Converts all accepted directives format into proper directive name.
+     @param name Name to normalize
+     */
+
+    var directiveNormalize = function (name) {
+      return camelCase(name.replace(PREFIX_REGEXP, ''));
+    };
+
+    // END AngularJS port
+
+    return {
+      camelCase: camelCase,
+      directiveNormalize: directiveNormalize,
+      copy: _copy,
+      clone: _clone,
+      errorHeader: _errorHeader,
+      getObjectValue: _getObjectValue,
+      getObjectArrayPath: _getObjectArrayPath,
+      getObjectDotPath: _getObjectDotPath,
+      defaultTo: function (val, _default) {
+        return _isDefined(val) ? val : _default;
+      },
+
+      //mainly for checking attributes of directives lets keep this minimal (on what we accept)
+      isTruthy: function (val) {
+        return val === 'true' || val === true;
+      },
+
+      //Determine if a reference is {}
+      isEmpty: function (value) {
+        return Object.keys(value).length === 0;
+      },
+
+      //Determine if a reference is undefined or {}
+      isUndefinedOrEmpty: function (value) {
+        return (angular.isUndefined(value) || value === null) || Object.keys(value).length === 0;
+      },
+
+      // Determine if a reference is defined
+      isDefined: _isDefined,
+      isUndefined: _isUndefined,
+      isNumber: angular.isNumber,
+      isString: angular.isString,
+      isArray: angular.isArray,
+      isObject: angular.isObject,
+      isFunction: angular.isFunction,
+      equals: angular.equals,
+
+      isValidCenter: function (center) {
+        return angular.isDefined(center) && angular.isNumber(center.lat) &&
+          angular.isNumber(center.lng) && angular.isNumber(center.zoom);
+      },
+
+      isValidPoint: function (point) {
+        if (!angular.isDefined(point)) {
+          return false;
+        }
+
+        if (angular.isArray(point)) {
+          return point.length === 2 && angular.isNumber(point[0]) && angular.isNumber(point[1]);
+        }
+
+        return angular.isNumber(point.lat) && angular.isNumber(point.lng);
+      },
+
+      isSameCenterOnMap: function (centerModel, map) {
+        var mapCenter = map.getCenter();
+        var zoom = map.getZoom();
+        if (centerModel.lat && centerModel.lng &&
+          mapCenter.lat.toFixed(4) === centerModel.lat.toFixed(4) &&
+          mapCenter.lng.toFixed(4) === centerModel.lng.toFixed(4) &&
+          zoom === centerModel.zoom) {
+          return true;
+        }
+
+        return false;
+      },
+
+      safeApply: function ($scope, fn) {
+        var phase = $scope.$root.$$phase;
+        if (phase === '$apply' || phase === '$digest') {
+          $scope.$eval(fn);
+        } else {
+          $scope.$evalAsync(fn);
+        }
+      },
+
+      obtainEffectiveMapId: _obtainEffectiveMapId,
+
+      getDefer: function (d, mapId) {
+        var id = _obtainEffectiveMapId(d, mapId);
+        var defer;
+        if (!angular.isDefined(d[id]) || d[id].resolvedDefer === false) {
+          defer = _getUnresolvedDefer(d, mapId);
+        } else {
+          defer = d[id].defer;
+        }
+
+        return defer;
+      },
+
+      getUnresolvedDefer: _getUnresolvedDefer,
+
+      setResolvedDefer: function (d, mapId) {
+        var id = _obtainEffectiveMapId(d, mapId);
+        d[id].resolvedDefer = true;
+      },
+
+      rangeIsSupported: function () {
+        var testrange = document.createElement('input');
+        testrange.setAttribute('type', 'range');
+        return testrange.type === 'range';
+      },
+
+      FullScreenControlPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.Control.Fullscreen);
+        },
+      },
+
+      MiniMapControlPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.Control.MiniMap);
+        },
+      },
+
+      AwesomeMarkersPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.AwesomeMarkers) && angular.isDefined(L.AwesomeMarkers.Icon);
+        },
+
+        is: function (icon) {
+          if (this.isLoaded()) {
+            return icon instanceof L.AwesomeMarkers.Icon;
+          } else {
+            return false;
+          }
+        },
+
+        equal: function (iconA, iconB) {
+          if (!this.isLoaded()) {
+            return false;
+          }
+
+          if (this.is(iconA)) {
+            return angular.equals(iconA, iconB);
+          } else {
+            return false;
+          }
+        },
+      },
+
+      VectorMarkersPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.VectorMarkers) && angular.isDefined(L.VectorMarkers.Icon);
+        },
+
+        is: function (icon) {
+          if (this.isLoaded()) {
+            return icon instanceof L.VectorMarkers.Icon;
+          } else {
+            return false;
+          }
+        },
+
+        equal: function (iconA, iconB) {
+          if (!this.isLoaded()) {
+            return false;
+          }
+
+          if (this.is(iconA)) {
+            return angular.equals(iconA, iconB);
+          } else {
+            return false;
+          }
+        },
+      },
+
+      DomMarkersPlugin: {
+        isLoaded: function () {
+          if (angular.isDefined(L.DomMarkers) && angular.isDefined(L.DomMarkers.Icon)) {
+            return true;
+          } else {
+            return false;
+          }
+        },
+
+        is: function (icon) {
+          if (this.isLoaded()) {
+            return icon instanceof L.DomMarkers.Icon;
+          } else {
+            return false;
+          }
+        },
+
+        equal: function (iconA, iconB) {
+          if (!this.isLoaded()) {
+            return false;
+          }
+
+          if (this.is(iconA)) {
+            return angular.equals(iconA, iconB);
+          } else {
+            return false;
+          }
+        },
+      },
+
+      PolylineDecoratorPlugin: {
+        isLoaded: function () {
+          if (angular.isDefined(L.PolylineDecorator)) {
+            return true;
+          } else {
+            return false;
+          }
+        },
+
+        is: function (decoration) {
+          if (this.isLoaded()) {
+            return decoration instanceof L.PolylineDecorator;
+          } else {
+            return false;
+          }
+        },
+
+        equal: function (decorationA, decorationB) {
+          if (!this.isLoaded()) {
+            return false;
+          }
+
+          if (this.is(decorationA)) {
+            return angular.equals(decorationA, decorationB);
+          } else {
+            return false;
+          }
+        },
+      },
+
+      MakiMarkersPlugin: {
+        isLoaded: function () {
+          if (angular.isDefined(L.MakiMarkers) && angular.isDefined(L.MakiMarkers.Icon)) {
+            return true;
+          } else {
+            return false;
+          }
+        },
+
+        is: function (icon) {
+          if (this.isLoaded()) {
+            return icon instanceof L.MakiMarkers.Icon;
+          } else {
+            return false;
+          }
+        },
+
+        equal: function (iconA, iconB) {
+          if (!this.isLoaded()) {
+            return false;
+          }
+
+          if (this.is(iconA)) {
+            return angular.equals(iconA, iconB);
+          } else {
+            return false;
+          }
+        },
+      },
+      ExtraMarkersPlugin: {
+        isLoaded: function () {
+          if (angular.isDefined(L.ExtraMarkers) && angular.isDefined(L.ExtraMarkers.Icon)) {
+            return true;
+          } else {
+            return false;
+          }
+        },
+
+        is: function (icon) {
+          if (this.isLoaded()) {
+            return icon instanceof L.ExtraMarkers.Icon;
+          } else {
+            return false;
+          }
+        },
+
+        equal: function (iconA, iconB) {
+          if (!this.isLoaded()) {
+            return false;
+          }
+
+          if (this.is(iconA)) {
+            return angular.equals(iconA, iconB);
+          } else {
+            return false;
+          }
+        },
+      },
+      LabelPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.Label);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.MarkerClusterGroup;
+          } else {
+            return false;
+          }
+        },
+      },
+      MarkerClusterPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.MarkerClusterGroup);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.MarkerClusterGroup;
+          } else {
+            return false;
+          }
+        },
+      },
+      GoogleLayerPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.Google);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.Google;
+          } else {
+            return false;
+          }
+        },
+      },
+      LeafletProviderPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.TileLayer.Provider);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.TileLayer.Provider;
+          } else {
+            return false;
+          }
+        },
+      },
+      ChinaLayerPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.tileLayer.chinaProvider);
+        },
+      },
+      HeatLayerPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.heatLayer);
+        },
+      },
+      WebGLHeatMapLayerPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.TileLayer.WebGLHeatMap);
+        },
+      },
+      BingLayerPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.BingLayer);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.BingLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      WFSLayerPlugin: {
+        isLoaded: function () {
+          return L.GeoJSON.WFS !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.GeoJSON.WFS;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSBaseLayerPlugin: {
+        isLoaded: function () {
+          return L.esri !== undefined && L.esri.basemapLayer !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.esri.basemapLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSLayerPlugin: {
+        isLoaded: function () {
+          return lvector !== undefined && lvector.AGS !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof lvector.AGS;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSFeatureLayerPlugin: {
+        isLoaded: function () {
+          return L.esri !== undefined && L.esri.featureLayer !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.esri.featureLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSTiledMapLayerPlugin: {
+        isLoaded: function () {
+          return L.esri !== undefined && L.esri.tiledMapLayer !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.esri.tiledMapLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSDynamicMapLayerPlugin: {
+        isLoaded: function () {
+          return L.esri !== undefined && L.esri.dynamicMapLayer !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.esri.dynamicMapLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSImageMapLayerPlugin: {
+        isLoaded: function () {
+          return L.esri !== undefined && L.esri.imageMapLayer !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.esri.imageMapLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSClusteredLayerPlugin: {
+        isLoaded: function () {
+          return L.esri !== undefined && L.esri.clusteredFeatureLayer !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.esri.clusteredFeatureLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      AGSHeatmapLayerPlugin: {
+        isLoaded: function () {
+          return L.esri !== undefined && L.esri.heatmapFeatureLayer !== undefined;
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.esri.heatmapFeatureLayer;
+          } else {
+            return false;
+          }
+        },
+      },
+      YandexLayerPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.Yandex);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.Yandex;
+          } else {
+            return false;
+          }
+        },
+      },
+      GeoJSONPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.TileLayer.GeoJSON);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.TileLayer.GeoJSON;
+          } else {
+            return false;
+          }
+        },
+      },
+      UTFGridPlugin: {
+        isLoaded: function () {
+          return angular.isDefined(L.UtfGrid);
+        },
+
+        is: function (layer) {
+          if (this.isLoaded()) {
+            return layer instanceof L.UtfGrid;
+          } else {
+            $log.error('[AngularJS - Leaflet] No UtfGrid plugin found.');
+            return false;
+          }
+        },
+      },
+      CartoDB: {
+        isLoaded: function () {
+          return cartodb;
+        },
+
+        is: function (/*layer*/) {
+          return true;
+          /*
+           if (this.isLoaded()) {
+           return layer instanceof L.TileLayer.GeoJSON;
+           } else {
+           return false;
+           }*/
+        },
+      },
+      Leaflet: {
+        DivIcon: {
+          is: function (icon) {
+            return icon instanceof L.DivIcon;
+          },
+
+          equal: function (iconA, iconB) {
+            if (this.is(iconA)) {
+              return angular.equals(iconA, iconB);
+            } else {
+              return false;
+            }
+          },
+        },
+        Icon: {
+          is: function (icon) {
+            return icon instanceof L.Icon;
+          },
+
+          equal: function (iconA, iconB) {
+            if (this.is(iconA)) {
+              return angular.equals(iconA, iconB);
+            } else {
+              return false;
+            }
+          },
+        },
+      },
+      /*
+       watchOptions - object to set deep nested watches and turn off watches all together
+       (rely on control / functional updates)
+       watchOptions - Object
+       doWatch:boolean
+       isDeep:boolean (sets $watch(function,isDeep))
+       individual
+       doWatch:boolean
+       isDeep:boolean
+       */
+
+      //legacy defaults
+      watchOptions: {
+        doWatch: true,
+        isDeep: true,
+        individual: {
+          doWatch: true,
+          isDeep: true,
+        },
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').service('leafletIterators', ["$log", "leafletHelpers", function ($log, leafletHelpers) {
+
+    var lHlp = leafletHelpers;
+    var errorHeader = leafletHelpers.errorHeader + 'leafletIterators: ';
+
+    //BEGIN COPY from underscore
+    var _keys = Object.keys;
+    var _isFunction = lHlp.isFunction;
+    var _isObject = lHlp.isObject;
+
+    // Helper for collection methods to determine whether a collection
+    // should be iterated as an array or as an object
+    // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
+    var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+
+    var _isArrayLike = function (collection) {
+      var length = collection !== null && collection.length;
+      return lHlp.isNumber(length) && length >= 0 && length <= MAX_ARRAY_INDEX;
+    };
+
+    // Keep the identity function around for default iteratees.
+    var _identity = function (value) {
+      return value;
+    };
+
+    var _property = function (key) {
+      return function (obj) {
+        return obj === null ? void 0 : obj[key];
+      };
+    };
+
+    // Internal function that returns an efficient (for current engines) version
+    // of the passed-in callback, to be repeatedly applied in other Underscore
+    // functions.
+    var optimizeCb = function (func, context, argCount) {
+      if (context === void 0) return func;
+      switch (argCount === null ? 3 : argCount) {
+        case 1:
+          return function (value) {
+            return func.call(context, value);
+          };
+
+        case 2:
+          return function (value, other) {
+            return func.call(context, value, other);
+          };
+
+        case 3:
+          return function (value, index, collection) {
+            return func.call(context, value, index, collection);
+          };
+
+        case 4:
+          return function (accumulator, value, index, collection) {
+            return func.call(context, accumulator, value, index, collection);
+          };
+      }
+      return function () {
+        return func.apply(context, arguments);
+      };
+    };
+
+    // An internal function for creating assigner functions.
+    var createAssigner = function (keysFunc, undefinedOnly) {
+      return function (obj) {
+        var length = arguments.length;
+        if (length < 2 || obj === null) return obj;
+        for (var index = 1; index < length; index++) {
+          var source = arguments[index];
+          var keys = keysFunc(source);
+          var l = keys.length;
+
+          for (var i = 0; i < l; i++) {
+            var key = keys[i];
+            if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
+          }
+        }
+
+        return obj;
+      };
+    };
+
+    // Assigns a given object with all the own properties in the passed-in object(s)
+    // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+    var _extendOwn;
+    var _assign = null;
+    _extendOwn = _assign = createAssigner(_keys);
+
+    // Returns whether an object has a given set of `key:value` pairs.
+    var _isMatch = function (object, attrs) {
+      var keys = _keys(attrs);
+      var length = keys.length;
+      if (object === null) return !length;
+      var obj = Object(object);
+      for (var i = 0; i < length; i++) {
+        var key = keys[i];
+        if (attrs[key] !== obj[key] || !(key in obj)) return false;
+      }
+
+      return true;
+    };
+
+    // Returns a predicate for checking whether an object has a given set of
+    // `key:value` pairs.
+    var _matcher;
+    var _matches = null;
+    _matcher = _matches = function (attrs) {
+      attrs = _extendOwn({}, attrs);
+      return function (obj) {
+        return _isMatch(obj, attrs);
+      };
+    };
+
+    // A mostly-internal function to generate callbacks that can be applied
+    // to each element in a collection, returning the desired result — either
+    // identity, an arbitrary callback, a property matcher, or a property accessor.
+    var cb = function (value, context, argCount) {
+      if (value === null) return _identity;
+      if (_isFunction(value)) return optimizeCb(value, context, argCount);
+      if (_isObject(value)) return _matcher(value);
+      return _property(value);
+    };
+
+    var _every;
+    var _all = null;
+    _every = _all = function (obj, predicate, context) {
+      predicate = cb(predicate, context);
+      var keys = !_isArrayLike(obj) && _keys(obj);
+      var length = (keys || obj).length;
+      for (var index = 0; index < length; index++) {
+        var currentKey = keys ? keys[index] : index;
+        if (!predicate(obj[currentKey], currentKey, obj)) return false;
+      }
+
+      return true;
+    };
+
+    //END COPY fron underscore
+
+    var _hasErrors = function (collection, cb, ignoreCollection, cbName) {
+      if (!ignoreCollection) {
+        if (!lHlp.isDefined(collection) || !lHlp.isDefined(cb)) {
+          return true;
+        }
+      }
+
+      if (!lHlp.isFunction(cb)) {
+        cbName = lHlp.defaultTo(cb, 'cb');
+        $log.error(errorHeader + cbName + ' is not a function');
+        return true;
+      }
+
+      return false;
+    };
+
+    var _iterate = function (collection, externalCb, internalCb) {
+      if (_hasErrors(undefined, internalCb, true, 'internalCb')) {
+        return;
+      }
+
+      if (!_hasErrors(collection, externalCb)) {
+        for (var key in collection) {
+          if (collection.hasOwnProperty(key)) {
+            internalCb(collection[key], key);
+          }
+        }
+      }
+    };
+
+    //see http://jsperf.com/iterators/3
+    //utilizing for in is way faster
+    var _each = function (collection, cb) {
+      _iterate(collection, cb, function (val, key) {
+        cb(val, key);
+      });
+    };
+
+    return {
+      each: _each,
+      forEach: _each,
+      every: _every,
+      all: _all,
+    };
+  }]);
+
+  angular.module('leaflet-directive')
+    .factory('leafletLayerHelpers', ["$rootScope", "$log", "$q", "leafletHelpers", "leafletIterators", function ($rootScope, $log, $q, leafletHelpers, leafletIterators) {
+      var Helpers = leafletHelpers;
+      var isString = leafletHelpers.isString;
+      var isObject = leafletHelpers.isObject;
+      var isArray = leafletHelpers.isArray;
+      var isDefined = leafletHelpers.isDefined;
+      var errorHeader = leafletHelpers.errorHeader;
+      var $it = leafletIterators;
+
+      var utfGridCreateLayer = function (params) {
+        if (!Helpers.UTFGridPlugin.isLoaded()) {
+          $log.error('[AngularJS - Leaflet] The UTFGrid plugin is not loaded.');
+          return;
+        }
+
+        var utfgrid = new L.UtfGrid(params.url, params.pluginOptions);
+
+        utfgrid.on('mouseover', function (e) {
+          $rootScope.$broadcast('leafletDirectiveMap.utfgridMouseover', e);
+        });
+
+        utfgrid.on('mouseout', function (e) {
+          $rootScope.$broadcast('leafletDirectiveMap.utfgridMouseout', e);
+        });
+
+        utfgrid.on('click', function (e) {
+          $rootScope.$broadcast('leafletDirectiveMap.utfgridClick', e);
+        });
+
+        utfgrid.on('mousemove', function (e) {
+          $rootScope.$broadcast('leafletDirectiveMap.utfgridMousemove', e);
+        });
+
+        return utfgrid;
+      };
+
+      var layerTypes = {
+        xyz: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            return L.tileLayer(params.url, params.options);
+          },
+        },
+        mapbox: {
+          mustHaveKey: true,
+          createLayer: function (params) {
+            var version = 3;
+            if (isDefined(params.options.version) && params.options.version === 4) {
+              version = params.options.version;
+            }
+
+            var url = version === 3 ?
+            '//{s}.tiles.mapbox.com/v3/' + params.key + '/{z}/{x}/{y}.png' :
+            '//api.tiles.mapbox.com/v4/' + params.key + '/{z}/{x}/{y}.png?access_token=' + params.apiKey;
+            return L.tileLayer(url, params.options);
+          },
+        },
+        geoJSON: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.GeoJSONPlugin.isLoaded()) {
+              return;
+            }
+
+            return new L.TileLayer.GeoJSON(params.url, params.pluginOptions, params.options);
+          },
+        },
+        geoJSONShape: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            return new L.GeoJSON(params.data,
+              params.options);
+          },
+        },
+        geoJSONAwesomeMarker: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            return new L.geoJson(params.data, {
+              pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.AwesomeMarkers.icon(params.icon)});
+              },
+            });
+          },
+        },
+        geoJSONVectorMarker: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            return new L.geoJson(params.data, {
+              pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: L.VectorMarkers.icon(params.icon)});
+              },
+            });
+          },
+        },
+        utfGrid: {
+          mustHaveUrl: true,
+          createLayer: utfGridCreateLayer,
+        },
+        cartodbTiles: {
+          mustHaveKey: true,
+          createLayer: function (params) {
+            var url = '//' + params.user + '.cartodb.com/api/v1/map/' + params.key + '/{z}/{x}/{y}.png';
+            return L.tileLayer(url, params.options);
+          },
+        },
+        cartodbUTFGrid: {
+          mustHaveKey: true,
+          mustHaveLayer: true,
+          createLayer: function (params) {
+            params.url = '//' + params.user + '.cartodb.com/api/v1/map/' + params.key + '/' + params.layer + '/{z}/{x}/{y}.grid.json';
+            return utfGridCreateLayer(params);
+          },
+        },
+        cartodbInteractive: {
+          mustHaveKey: true,
+          mustHaveLayer: true,
+          createLayer: function (params) {
+            var tilesURL = '//' + params.user + '.cartodb.com/api/v1/map/' + params.key + '/{z}/{x}/{y}.png';
+            var tileLayer = L.tileLayer(tilesURL, params.options);
+            params.url = '//' + params.user + '.cartodb.com/api/v1/map/' + params.key + '/' + params.layer + '/{z}/{x}/{y}.grid.json';
+            var utfLayer = utfGridCreateLayer(params);
+            return L.layerGroup([tileLayer, utfLayer]);
+          },
+        },
+        wms: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            return L.tileLayer.wms(params.url, params.options);
+          },
+        },
+        wmts: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            return L.tileLayer.wmts(params.url, params.options);
+          },
+        },
+        wfs: {
+          mustHaveUrl: true,
+          mustHaveLayer: true,
+          createLayer: function (params) {
+            if (!Helpers.WFSLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            var options = angular.copy(params.options);
+            if (options.crs && typeof options.crs === 'string') {
+              /*jshint -W061 */
+              options.crs = eval(options.crs);
+            }
+
+            return new L.GeoJSON.WFS(params.url, params.layer, options);
+          },
+        },
+        group: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            var lyrs = [];
+            $it.each(params.options.layers, function (l) {
+              lyrs.push(createLayer(l));
+            });
+
+            params.options.loadedDefer = function () {
+              var defers = [];
+              if (isDefined(params.options.layers)) {
+                for (var i = 0; i < params.options.layers.length; i++) {
+                  var d = params.options.layers[i].layerOptions.loadedDefer;
+                  if (isDefined(d)) {
+                    defers.push(d);
+                  }
+                }
+              }
+
+              return defers;
+            };
+
+            return L.layerGroup(lyrs);
+          },
+        },
+        featureGroup: {
+          mustHaveUrl: false,
+          createLayer: function () {
+            return L.featureGroup();
+          },
+        },
+        google: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            var type = params.type || 'SATELLITE';
+            if (!Helpers.GoogleLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            return new L.Google(type, params.options);
+          },
+        },
+        here: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            var provider = params.provider || 'HERE.terrainDay';
+            if (!Helpers.LeafletProviderPlugin.isLoaded()) {
+              return;
+            }
+
+            return new L.TileLayer.Provider(provider, params.options);
+          },
+        },
+        china: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            var type = params.type || '';
+            if (!Helpers.ChinaLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            return L.tileLayer.chinaProvider(type, params.options);
+          },
+        },
+        agsBase: {
+          mustHaveLayer: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSBaseLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            return L.esri.basemapLayer(params.layer, params.options);
+          },
+        },
+        ags: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            var options = angular.copy(params.options);
+            angular.extend(options, {
+              url: params.url,
+            });
+            var layer = new lvector.AGS(options);
+            layer.onAdd = function (map) {
+              this.setMap(map);
+            };
+
+            layer.onRemove = function () {
+              this.setMap(null);
+            };
+
+            return layer;
+          },
+        },
+        agsFeature: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSFeatureLayerPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The esri plugin is not loaded.');
+              return;
+            }
+
+            params.options.url = params.url;
+
+            var layer = L.esri.featureLayer(params.options);
+            var load = function () {
+              if (isDefined(params.options.loadedDefer)) {
+                params.options.loadedDefer.resolve();
+              }
+            };
+
+            layer.on('loading', function () {
+              params.options.loadedDefer = $q.defer();
+              layer.off('load', load);
+              layer.on('load', load);
+            });
+
+            return layer;
+          },
+        },
+        agsTiled: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSTiledMapLayerPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The esri plugin is not loaded.');
+              return;
+            }
+
+            params.options.url = params.url;
+
+            return L.esri.tiledMapLayer(params.options);
+          },
+        },
+        agsDynamic: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSDynamicMapLayerPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The esri plugin is not loaded.');
+              return;
+            }
+
+            params.options.url = params.url;
+
+            return L.esri.dynamicMapLayer(params.options);
+          },
+        },
+        agsImage: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSImageMapLayerPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The esri plugin is not loaded.');
+              return;
+            }
+
+            params.options.url = params.url;
+
+            return L.esri.imageMapLayer(params.options);
+          },
+        },
+        agsClustered: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSClusteredLayerPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The esri clustered layer plugin is not loaded.');
+              return;
+            }
+
+            if (!Helpers.MarkerClusterPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The markercluster plugin is not loaded.');
+              return;
+            }
+
+            return L.esri.clusteredFeatureLayer(params.url, params.options);
+          },
+        },
+        agsHeatmap: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            if (!Helpers.AGSHeatmapLayerPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The esri heatmap layer plugin is not loaded.');
+              return;
+            }
+
+            if (!Helpers.HeatLayerPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The heatlayer plugin is not loaded.');
+              return;
+            }
+
+            return L.esri.heatmapFeatureLayer(params.url, params.options);
+          },
+        },
+        markercluster: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            if (!Helpers.MarkerClusterPlugin.isLoaded()) {
+              $log.warn(errorHeader + ' The markercluster plugin is not loaded.');
+              return;
+            }
+
+            return new L.MarkerClusterGroup(params.options);
+          },
+        },
+        bing: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            if (!Helpers.BingLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            return new L.BingLayer(params.key, params.options);
+          },
+        },
+        webGLHeatmap: {
+          mustHaveUrl: false,
+          mustHaveData: true,
+          createLayer: function (params) {
+            if (!Helpers.WebGLHeatMapLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            var layer = new L.TileLayer.WebGLHeatMap(params.options);
+            if (isDefined(params.data)) {
+              layer.setData(params.data);
+            }
+
+            return layer;
+          },
+        },
+        heat: {
+          mustHaveUrl: false,
+          mustHaveData: true,
+          createLayer: function (params) {
+            if (!Helpers.HeatLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            var layer = new L.heatLayer();
+
+            if (isArray(params.data)) {
+              layer.setLatLngs(params.data);
+            }
+
+            if (isObject(params.options)) {
+              layer.setOptions(params.options);
+            }
+
+            return layer;
+          },
+        },
+        yandex: {
+          mustHaveUrl: false,
+          createLayer: function (params) {
+            var type = params.type || 'map';
+            if (!Helpers.YandexLayerPlugin.isLoaded()) {
+              return;
+            }
+
+            return new L.Yandex(type, params.options);
+          },
+        },
+        imageOverlay: {
+          mustHaveUrl: true,
+          mustHaveBounds: true,
+          createLayer: function (params) {
+            return L.imageOverlay(params.url, params.bounds, params.options);
+          },
+        },
+        iip: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            return L.tileLayer.iip(params.url, params.options);
+          },
+        },
+
+        // This "custom" type is used to accept every layer that user want to define himself.
+        // We can wrap these custom layers like heatmap or yandex, but it means a lot of work/code to wrap the world,
+        // so we let user to define their own layer outside the directive,
+        // and pass it on "createLayer" result for next processes
+        custom: {
+          createLayer: function (params) {
+            if (params.layer instanceof L.Class) {
+              return angular.copy(params.layer);
+            } else {
+              $log.error('[AngularJS - Leaflet] A custom layer must be a leaflet Class');
+            }
+          },
+        },
+        cartodb: {
+          mustHaveUrl: true,
+          createLayer: function (params) {
+            return cartodb.createLayer(params.map, params.url);
+          },
+        },
+      };
+
+      function isValidLayerType(layerDefinition) {
+        // Check if the baselayer has a valid type
+        if (!isString(layerDefinition.type)) {
+          $log.error('[AngularJS - Leaflet] A layer must have a valid type defined.');
+          return false;
+        }
+
+        if (Object.keys(layerTypes).indexOf(layerDefinition.type) === -1) {
+          $log.error('[AngularJS - Leaflet] A layer must have a valid type: ' + Object.keys(layerTypes));
+          return false;
+        }
+
+        // Check if the layer must have an URL
+        if (layerTypes[layerDefinition.type].mustHaveUrl && !isString(layerDefinition.url)) {
+          $log.error('[AngularJS - Leaflet] A base layer must have an url');
+          return false;
+        }
+
+        if (layerTypes[layerDefinition.type].mustHaveData && !isDefined(layerDefinition.data)) {
+          $log.error('[AngularJS - Leaflet] The base layer must have a "data" array attribute');
+          return false;
+        }
+
+        if (layerTypes[layerDefinition.type].mustHaveLayer && !isDefined(layerDefinition.layer)) {
+          $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have an layer defined');
+          return false;
+        }
+
+        if (layerTypes[layerDefinition.type].mustHaveBounds && !isDefined(layerDefinition.bounds)) {
+          $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have bounds defined');
+          return false;
+        }
+
+        if (layerTypes[layerDefinition.type].mustHaveKey && !isDefined(layerDefinition.key)) {
+          $log.error('[AngularJS - Leaflet] The type of layer ' + layerDefinition.type + ' must have key defined');
+          return false;
+        }
+
+        return true;
+      }
+
+      function createLayer(layerDefinition) {
+        if (!isValidLayerType(layerDefinition)) {
+          return;
+        }
+
+        if (!isString(layerDefinition.name)) {
+          $log.error('[AngularJS - Leaflet] A base layer must have a name');
+          return;
+        }
+
+        if (!isObject(layerDefinition.layerParams)) {
+          layerDefinition.layerParams = {};
+        }
+
+        if (!isObject(layerDefinition.layerOptions)) {
+          layerDefinition.layerOptions = {};
+        }
+
+        // Mix the layer specific parameters with the general Leaflet options. Although this is an overhead
+        // the definition of a base layers is more 'clean' if the two types of parameters are differentiated
+        for (var attrname in layerDefinition.layerParams) {
+          layerDefinition.layerOptions[attrname] = layerDefinition.layerParams[attrname];
+        }
+
+        var params = {
+          url: layerDefinition.url,
+          data: layerDefinition.data,
+          options: layerDefinition.layerOptions,
+          layer: layerDefinition.layer,
+          icon: layerDefinition.icon,
+          type: layerDefinition.layerType,
+          bounds: layerDefinition.bounds,
+          key: layerDefinition.key,
+          apiKey: layerDefinition.apiKey,
+          pluginOptions: layerDefinition.pluginOptions,
+          user: layerDefinition.user,
+        };
+
+        //TODO Add $watch to the layer properties
+        return layerTypes[layerDefinition.type].createLayer(params);
+      }
+
+      function safeAddLayer(map, layer) {
+        if (layer && typeof layer.addTo === 'function') {
+          layer.addTo(map);
+        } else {
+          map.addLayer(layer);
+        }
+      }
+
+      function safeRemoveLayer(map, layer, layerOptions) {
+        if (isDefined(layerOptions) && isDefined(layerOptions.loadedDefer)) {
+          if (angular.isFunction(layerOptions.loadedDefer)) {
+            var defers = layerOptions.loadedDefer();
+            $log.debug('Loaded Deferred', defers);
+            var count = defers.length;
+            if (count > 0) {
+              var resolve = function () {
+                count--;
+                if (count === 0) {
+                  map.removeLayer(layer);
+                }
+              };
+
+              for (var i = 0; i < defers.length; i++) {
+                defers[i].promise.then(resolve);
+              }
+            } else {
+              map.removeLayer(layer);
+            }
+          } else {
+            layerOptions.loadedDefer.promise.then(function () {
+              map.removeLayer(layer);
+            });
+          }
+        } else {
+          map.removeLayer(layer);
+        }
+      }
+
+      return {
+        createLayer: createLayer,
+        safeAddLayer: safeAddLayer,
+        safeRemoveLayer: safeRemoveLayer,
+      };
+    }]);
+
+  angular.module('leaflet-directive').factory('leafletLegendHelpers', function () {
+    var _updateLegend = function (div, legendData, type, url) {
+      div.innerHTML = '';
+      if (legendData.error) {
+        div.innerHTML += '<div class="info-title alert alert-danger">' + legendData.error.message + '</div>';
+      } else {
+        if (type === 'arcgis') {
+          for (var i = 0; i < legendData.layers.length; i++) {
+            var layer = legendData.layers[i];
+            div.innerHTML += '<div class="info-title" data-layerid="' + layer.layerId + '">' + layer.layerName + '</div>';
+            for (var j = 0; j < layer.legend.length; j++) {
+              var leg = layer.legend[j];
+              div.innerHTML +=
+                '<div class="inline" data-layerid="' + layer.layerId + '"><img src="data:' + leg.contentType + ';base64,' + leg.imageData + '" /></div>' +
+                '<div class="info-label" data-layerid="' + layer.layerId + '">' + leg.label + '</div>';
+            }
+          }
+        } else if (type === 'image') {
+          div.innerHTML = '<img src="' + url + '"/>';
+        }
+      }
+    };
+
+    var _getOnAddLegend = function (legendData, legendClass, type, url) {
+      return function (/*map*/) {
+        var div = L.DomUtil.create('div', legendClass);
+
+        if (!L.Browser.touch) {
+          L.DomEvent.disableClickPropagation(div);
+          L.DomEvent.on(div, 'mousewheel', L.DomEvent.stopPropagation);
+        } else {
+          L.DomEvent.on(div, 'click', L.DomEvent.stopPropagation);
+        }
+
+        _updateLegend(div, legendData, type, url);
+        return div;
+      };
+    };
+
+    var _getOnAddArrayLegend = function (legend, legendClass) {
+      return function (/*map*/) {
+        var div = L.DomUtil.create('div', legendClass);
+        for (var i = 0; i < legend.colors.length; i++) {
+          div.innerHTML +=
+            '<div class="outline"><i style="background:' + legend.colors[i] + '"></i></div>' +
+            '<div class="info-label">' + legend.labels[i] + '</div>';
+        }
+
+        if (!L.Browser.touch) {
+          L.DomEvent.disableClickPropagation(div);
+          L.DomEvent.on(div, 'mousewheel', L.DomEvent.stopPropagation);
+        } else {
+          L.DomEvent.on(div, 'click', L.DomEvent.stopPropagation);
+        }
+
+        return div;
+      };
+    };
+
+    return {
+      getOnAddLegend: _getOnAddLegend,
+      getOnAddArrayLegend: _getOnAddArrayLegend,
+      updateLegend: _updateLegend,
+    };
+  });
+
+  angular.module('leaflet-directive').factory('leafletMapDefaults', ["$q", "leafletHelpers", function ($q, leafletHelpers) {
+    function _getDefaults() {
+      return {
+        keyboard: true,
+        dragging: true,
+        worldCopyJump: false,
+        doubleClickZoom: true,
+        scrollWheelZoom: true,
+        tap: true,
+        touchZoom: true,
+        zoomControl: true,
+        zoomsliderControl: false,
+        zoomControlPosition: 'topleft',
+        attributionControl: true,
+        controls: {
+          layers: {
+            visible: true,
+            position: 'topright',
+            collapsed: true,
+          },
+        },
+        nominatim: {
+          server: ' http://nominatim.openstreetmap.org/search',
+        },
+        crs: L.CRS.EPSG3857,
+        tileLayer: '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        tileLayerOptions: {
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        },
+        path: {
+          weight: 10,
+          opacity: 1,
+          color: '#0000ff',
+        },
+        center: {
+          lat: 0,
+          lng: 0,
+          zoom: 1,
+        },
+      };
+    }
+
+    var isDefined = leafletHelpers.isDefined;
+    var isObject = leafletHelpers.isObject;
+    var obtainEffectiveMapId = leafletHelpers.obtainEffectiveMapId;
+    var defaults = {};
+
+    // Get the _defaults dictionary, and override the properties defined by the user
+    return {
+      reset: function () {
+        defaults = {};
+      },
+
+      getDefaults: function (scopeId) {
+        var mapId = obtainEffectiveMapId(defaults, scopeId);
+        return defaults[mapId];
+      },
+
+      getMapCreationDefaults: function (scopeId) {
+        var mapId = obtainEffectiveMapId(defaults, scopeId);
+        var d = defaults[mapId];
+
+        var mapDefaults = {
+          maxZoom: d.maxZoom,
+          keyboard: d.keyboard,
+          dragging: d.dragging,
+          zoomControl: d.zoomControl,
+          doubleClickZoom: d.doubleClickZoom,
+          scrollWheelZoom: d.scrollWheelZoom,
+          tap: d.tap,
+          touchZoom: d.touchZoom,
+          attributionControl: d.attributionControl,
+          worldCopyJump: d.worldCopyJump,
+          crs: d.crs,
+        };
+
+        if (isDefined(d.minZoom)) {
+          mapDefaults.minZoom = d.minZoom;
+        }
+
+        if (isDefined(d.zoomAnimation)) {
+          mapDefaults.zoomAnimation = d.zoomAnimation;
+        }
+
+        if (isDefined(d.fadeAnimation)) {
+          mapDefaults.fadeAnimation = d.fadeAnimation;
+        }
+
+        if (isDefined(d.markerZoomAnimation)) {
+          mapDefaults.markerZoomAnimation = d.markerZoomAnimation;
+        }
+
+        if (d.map) {
+          for (var option in d.map) {
+            mapDefaults[option] = d.map[option];
+          }
+        }
+
+        return mapDefaults;
+      },
+
+      setDefaults: function (userDefaults, scopeId) {
+        var newDefaults = _getDefaults();
+
+        if (isDefined(userDefaults)) {
+          newDefaults.doubleClickZoom = isDefined(userDefaults.doubleClickZoom) ? userDefaults.doubleClickZoom : newDefaults.doubleClickZoom;
+          newDefaults.scrollWheelZoom = isDefined(userDefaults.scrollWheelZoom) ? userDefaults.scrollWheelZoom : newDefaults.doubleClickZoom;
+          newDefaults.tap = isDefined(userDefaults.tap) ? userDefaults.tap : newDefaults.tap;
+          newDefaults.touchZoom = isDefined(userDefaults.touchZoom) ? userDefaults.touchZoom : newDefaults.doubleClickZoom;
+          newDefaults.zoomControl = isDefined(userDefaults.zoomControl) ? userDefaults.zoomControl : newDefaults.zoomControl;
+          newDefaults.zoomsliderControl = isDefined(userDefaults.zoomsliderControl) ? userDefaults.zoomsliderControl : newDefaults.zoomsliderControl;
+          newDefaults.attributionControl = isDefined(userDefaults.attributionControl) ? userDefaults.attributionControl : newDefaults.attributionControl;
+          newDefaults.tileLayer = isDefined(userDefaults.tileLayer) ? userDefaults.tileLayer : newDefaults.tileLayer;
+          newDefaults.zoomControlPosition = isDefined(userDefaults.zoomControlPosition) ? userDefaults.zoomControlPosition : newDefaults.zoomControlPosition;
+          newDefaults.keyboard = isDefined(userDefaults.keyboard) ? userDefaults.keyboard : newDefaults.keyboard;
+          newDefaults.dragging = isDefined(userDefaults.dragging) ? userDefaults.dragging : newDefaults.dragging;
+
+          if (isDefined(userDefaults.controls)) {
+            angular.extend(newDefaults.controls, userDefaults.controls);
+          }
+
+          if (isObject(userDefaults.crs)) {
+            newDefaults.crs = userDefaults.crs;
+          } else if (isDefined(L.CRS[userDefaults.crs])) {
+            newDefaults.crs = L.CRS[userDefaults.crs];
+          }
+
+          if (isDefined(userDefaults.center)) {
+            angular.copy(userDefaults.center, newDefaults.center);
+          }
+
+          if (isDefined(userDefaults.tileLayerOptions)) {
+            angular.copy(userDefaults.tileLayerOptions, newDefaults.tileLayerOptions);
+          }
+
+          if (isDefined(userDefaults.maxZoom)) {
+            newDefaults.maxZoom = userDefaults.maxZoom;
+          }
+
+          if (isDefined(userDefaults.minZoom)) {
+            newDefaults.minZoom = userDefaults.minZoom;
+          }
+
+          if (isDefined(userDefaults.zoomAnimation)) {
+            newDefaults.zoomAnimation = userDefaults.zoomAnimation;
+          }
+
+          if (isDefined(userDefaults.fadeAnimation)) {
+            newDefaults.fadeAnimation = userDefaults.fadeAnimation;
+          }
+
+          if (isDefined(userDefaults.markerZoomAnimation)) {
+            newDefaults.markerZoomAnimation = userDefaults.markerZoomAnimation;
+          }
+
+          if (isDefined(userDefaults.worldCopyJump)) {
+            newDefaults.worldCopyJump = userDefaults.worldCopyJump;
+          }
+
+          if (isDefined(userDefaults.map)) {
+            newDefaults.map = userDefaults.map;
+          }
+
+          if (isDefined(userDefaults.path)) {
+            newDefaults.path = userDefaults.path;
+          }
+        }
+
+        var mapId = obtainEffectiveMapId(defaults, scopeId);
+        defaults[mapId] = newDefaults;
+        return newDefaults;
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').service('leafletMarkersHelpers', ["$rootScope", "$timeout", "leafletHelpers", "$log", "$compile", "leafletGeoJsonHelpers", function ($rootScope, $timeout, leafletHelpers, $log, $compile, leafletGeoJsonHelpers) {
+    var isDefined = leafletHelpers.isDefined;
+    var defaultTo = leafletHelpers.defaultTo;
+    var MarkerClusterPlugin = leafletHelpers.MarkerClusterPlugin;
+    var AwesomeMarkersPlugin = leafletHelpers.AwesomeMarkersPlugin;
+    var VectorMarkersPlugin = leafletHelpers.VectorMarkersPlugin;
+    var MakiMarkersPlugin = leafletHelpers.MakiMarkersPlugin;
+    var ExtraMarkersPlugin = leafletHelpers.ExtraMarkersPlugin;
+    var DomMarkersPlugin = leafletHelpers.DomMarkersPlugin;
+    var safeApply = leafletHelpers.safeApply;
+    var Helpers = leafletHelpers;
+    var isString = leafletHelpers.isString;
+    var isNumber = leafletHelpers.isNumber;
+    var isObject = leafletHelpers.isObject;
+    var groups = {};
+    var geoHlp = leafletGeoJsonHelpers;
+    var errorHeader = leafletHelpers.errorHeader;
+
+    var _string = function (marker) {
+      //this exists since JSON.stringify barfs on cyclic
+      var retStr = '';
+      ['_icon', '_latlng', '_leaflet_id', '_map', '_shadow'].forEach(function (prop) {
+        retStr += prop + ': ' + defaultTo(marker[prop], 'undefined') + ' \n';
+      });
+
+      return '[leafletMarker] : \n' + retStr;
+    };
+
+    var _log = function (marker, useConsole) {
+      var logger = useConsole ? console : $log;
+      logger.debug(_string(marker));
+    };
+
+    var createLeafletIcon = function (iconData) {
+      if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'awesomeMarker') {
+        if (!AwesomeMarkersPlugin.isLoaded()) {
+          $log.error(errorHeader + ' The AwesomeMarkers Plugin is not loaded.');
+        }
+
+        return new L.AwesomeMarkers.icon(iconData);
+      }
+
+      if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'vectorMarker') {
+        if (!VectorMarkersPlugin.isLoaded()) {
+          $log.error(errorHeader + ' The VectorMarkers Plugin is not loaded.');
+        }
+
+        return new L.VectorMarkers.icon(iconData);
+      }
+
+      if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'makiMarker') {
+        if (!MakiMarkersPlugin.isLoaded()) {
+          $log.error(errorHeader + 'The MakiMarkers Plugin is not loaded.');
+        }
+
+        return new L.MakiMarkers.icon(iconData);
+      }
+
+      if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'extraMarker') {
+        if (!ExtraMarkersPlugin.isLoaded()) {
+          $log.error(errorHeader + 'The ExtraMarkers Plugin is not loaded.');
+        }
+
+        return new L.ExtraMarkers.icon(iconData);
+      }
+
+      if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'div') {
+        return new L.divIcon(iconData);
+      }
+
+      if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'dom') {
+        if (!DomMarkersPlugin.isLoaded()) {
+          $log.error(errorHeader + 'The DomMarkers Plugin is not loaded.');
+        }
+
+        var markerScope = angular.isFunction(iconData.getMarkerScope) ? iconData.getMarkerScope() : $rootScope;
+        var template = $compile(iconData.template)(markerScope);
+        var iconDataCopy = angular.copy(iconData);
+        iconDataCopy.element = template[0];
+        return new L.DomMarkers.icon(iconDataCopy);
+      }
+
+      // allow for any custom icon to be used... assumes the icon has already been initialized
+      if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'icon') {
+        return iconData.icon;
+      }
+
+      var base64icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAGmklEQVRYw7VXeUyTZxjvNnfELFuyIzOabermMZEeQC/OclkO49CpOHXOLJl/CAURuYbQi3KLgEhbrhZ1aDwmaoGqKII6odATmH/scDFbdC7LvFqOCc+e95s2VG50X/LLm/f4/Z7neY/ne18aANCmAr5E/xZf1uDOkTcGcWR6hl9247tT5U7Y6SNvWsKT63P58qbfeLJG8M5qcgTknrvvrdDbsT7Ml+tv82X6vVxJE33aRmgSyYtcWVMqX97Yv2JvW39UhRE2HuyBL+t+gK1116ly06EeWFNlAmHxlQE0OMiV6mQCScusKRlhS3QLeVJdl1+23h5dY4FNB3thrbYboqptEFlphTC1hSpJnbRvxP4NWgsE5Jyz86QNNi/5qSUTGuFk1gu54tN9wuK2wc3o+Wc13RCmsoBwEqzGcZsxsvCSy/9wJKf7UWf1mEY8JWfewc67UUoDbDjQC+FqK4QqLVMGGR9d2wurKzqBk3nqIT/9zLxRRjgZ9bqQgub+DdoeCC03Q8j+0QhFhBHR/eP3U/zCln7Uu+hihJ1+bBNffLIvmkyP0gpBZWYXhKussK6mBz5HT6M1Nqpcp+mBCPXosYQfrekGvrjewd59/GvKCE7TbK/04/ZV5QZYVWmDwH1mF3xa2Q3ra3DBC5vBT1oP7PTj4C0+CcL8c7C2CtejqhuCnuIQHaKHzvcRfZpnylFfXsYJx3pNLwhKzRAwAhEqG0SpusBHfAKkxw3w4627MPhoCH798z7s0ZnBJ/MEJbZSbXPhER2ih7p2ok/zSj2cEJDd4CAe+5WYnBCgR2uruyEw6zRoW6/DWJ/OeAP8pd/BGtzOZKpG8oke0SX6GMmRk6GFlyAc59K32OTEinILRJRchah8HQwND8N435Z9Z0FY1EqtxUg+0SO6RJ/mmXz4VuS+DpxXC3gXmZwIL7dBSH4zKE50wESf8qwVgrP1EIlTO5JP9Igu0aexdh28F1lmAEGJGfh7jE6ElyM5Rw/FDcYJjWhbeiBYoYNIpc2FT/SILivp0F1ipDWk4BIEo2VuodEJUifhbiltnNBIXPUFCMpthtAyqws/BPlEF/VbaIxErdxPphsU7rcCp8DohC+GvBIPJS/tW2jtvTmmAeuNO8BNOYQeG8G/2OzCJ3q+soYB5i6NhMaKr17FSal7GIHheuV3uSCY8qYVuEm1cOzqdWr7ku/R0BDoTT+DT+ohCM6/CCvKLKO4RI+dXPeAuaMqksaKrZ7L3FE5FIFbkIceeOZ2OcHO6wIhTkNo0ffgjRGxEqogXHYUPHfWAC/lADpwGcLRY3aeK4/oRGCKYcZXPVoeX/kelVYY8dUGf8V5EBRbgJXT5QIPhP9ePJi428JKOiEYhYXFBqou2Guh+p/mEB1/RfMw6rY7cxcjTrneI1FrDyuzUSRm9miwEJx8E/gUmqlyvHGkneiwErR21F3tNOK5Tf0yXaT+O7DgCvALTUBXdM4YhC/IawPU+2PduqMvuaR6eoxSwUk75ggqsYJ7VicsnwGIkZBSXKOUww73WGXyqP+J2/b9c+gi1YAg/xpwck3gJuucNrh5JvDPvQr0WFXf0piyt8f8/WI0hV4pRxxkQZdJDfDJNOAmM0Ag8jyT6hz0WGXWuP94Yh2jcfjmXAGvHCMslRimDHYuHuDsy2QtHuIavznhbYURq5R57KpzBBRZKPJi8eQg48h4j8SDdowifdIrEVdU+gbO6QNvRRt4ZBthUaZhUnjlYObNagV3keoeru3rU7rcuceqU1mJBxy+BWZYlNEBH+0eH4vRiB+OYybU2hnblYlTvkHinM4m54YnxSyaZYSF6R3jwgP7udKLGIX6r/lbNa9N6y5MFynjWDtrHd75ZvTYAPO/6RgF0k76mQla3FGq7dO+cH8sKn0Vo7nDllwAhqwLPkxrHwWmHJOo+AKJ4rab5OgrM7rVu8eWb2Pu0Dh4eDgXoOfvp7Y7QeqknRmvcTBEyq9m/HQQSCSz6LHq3z0yzsNySRfMS253wl2KyRDbcZPcfJKjZmSEOjcxyi+Y8dUOtsIEH6R2wNykdqrkYJ0RV92H0W58pkfQk7cKevsLK10Py8SdMGfXNXATY+pPbyJR/ET6n9nIfztNtZYRV9XniQu9IA2vOVgy4ir7GCLVmmd+zjkH0eAF9Po6K61pmCXHxU5rHMYd1ftc3owjwRSVRzLjKvqZEty6cRUD7jGqiOdu5HG6MdHjNcNYGqfDm5YRzLBBCCDl/2bk8a8gdbqcfwECu62Fg/HrggAAAABJRU5ErkJggg==';
+      var base64shadow = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAApCAYAAACoYAD2AAAC5ElEQVRYw+2YW4/TMBCF45S0S1luXZCABy5CgLQgwf//S4BYBLTdJLax0fFqmB07nnQfEGqkIydpVH85M+NLjPe++dcPc4Q8Qh4hj5D/AaQJx6H/4TMwB0PeBNwU7EGQAmAtsNfAzoZkgIa0ZgLMa4Aj6CxIAsjhjOCoL5z7Glg1JAOkaicgvQBXuncwJAWjksLtBTWZe04CnYRktUGdilALppZBOgHGZcBzL6OClABvMSVIzyBjazOgrvACf1ydC5mguqAVg6RhdkSWQFj2uxfaq/BrIZOLEWgZdALIDvcMcZLD8ZbLC9de4yR1sYMi4G20S4Q/PWeJYxTOZn5zJXANZHIxAd4JWhPIloTJZhzMQduM89WQ3MUVAE/RnhAXpTycqys3NZALOBbB7kFrgLesQl2h45Fcj8L1tTSohUwuxhy8H/Qg6K7gIs+3kkaigQCOcyEXCHN07wyQazhrmIulvKMQAwMcmLNqyCVyMAI+BuxSMeTk3OPikLY2J1uE+VHQk6ANrhds+tNARqBeaGc72cK550FP4WhXmFmcMGhTwAR1ifOe3EvPqIegFmF+C8gVy0OfAaWQPMR7gF1OQKqGoBjq90HPMP01BUjPOqGFksC4emE48tWQAH0YmvOgF3DST6xieJgHAWxPAHMuNhrImIdvoNOKNWIOcE+UXE0pYAnkX6uhWsgVXDxHdTfCmrEEmMB2zMFimLVOtiiajxiGWrbU52EeCdyOwPEQD8LqyPH9Ti2kgYMf4OhSKB7qYILbBv3CuVTJ11Y80oaseiMWOONc/Y7kJYe0xL2f0BaiFTxknHO5HaMGMublKwxFGzYdWsBF174H/QDknhTHmHHN39iWFnkZx8lPyM8WHfYELmlLKtgWNmFNzQcC1b47gJ4hL19i7o65dhH0Negbca8vONZoP7doIeOC9zXm8RjuL0Gf4d4OYaU5ljo3GYiqzrWQHfJxA6ALhDpVKv9qYeZA8eM3EhfPSCmpuD0AAAAASUVORK5CYII=';
+
+      if (!isDefined(iconData) || !isDefined(iconData.iconUrl)) {
+        return new L.Icon.Default({
+          iconUrl: base64icon,
+          shadowUrl: base64shadow,
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+        });
+      }
+
+      return new L.Icon(iconData);
+    };
+
+    var _resetMarkerGroup = function (groupName) {
+      if (isDefined(groups[groupName])) {
+        groups.splice(groupName, 1);
+      }
+    };
+
+    var _resetMarkerGroups = function () {
+      groups = {};
+    };
+
+    var _deleteMarker = function (marker, map, layers) {
+      marker.closePopup();
+
+      // There is no easy way to know if a marker is added to a layer, so we search for it
+      // if there are overlays
+      if (isDefined(layers) && isDefined(layers.overlays)) {
+        for (var key in layers.overlays) {
+          if (layers.overlays[key] instanceof L.LayerGroup || layers.overlays[key] instanceof L.FeatureGroup) {
+            if (layers.overlays[key].hasLayer(marker)) {
+              layers.overlays[key].removeLayer(marker);
+              return;
+            }
+          }
+        }
+      }
+
+      if (isDefined(groups)) {
+        for (var groupKey in groups) {
+          if (groups[groupKey].hasLayer(marker)) {
+            groups[groupKey].removeLayer(marker);
+          }
+        }
+      }
+
+      if (map.hasLayer(marker)) {
+        map.removeLayer(marker);
+      }
+    };
+
+    var adjustPopupPan = function (marker, map) {
+      var containerHeight = marker._popup._container.offsetHeight;
+      var layerPos = new L.Point(marker._popup._containerLeft, -containerHeight - marker._popup._containerBottom);
+      var containerPos = map.layerPointToContainerPoint(layerPos);
+      if (containerPos !== null) {
+        marker._popup._adjustPan();
+      }
+    };
+
+    var compilePopup = function (marker, markerScope) {
+      $compile(marker._popup._contentNode)(markerScope);
+    };
+
+    var updatePopup = function (marker, markerScope, map) {
+      //The innerText should be more than 1 once angular has compiled.
+      //We need to keep trying until angular has compiled before we _updateLayout and _updatePosition
+      //This should take care of any scenario , eg ngincludes, whatever.
+      //Is there a better way to check for this?
+      var innerText = marker._popup._contentNode.innerText || marker._popup._contentNode.textContent;
+      if (innerText.length < 1) {
+        $timeout(function () {
+          updatePopup(marker, markerScope, map);
+        });
+      }
+
+      //cause a reflow - this is also very important - if we don't do this then the widths are from before $compile
+      var reflow = marker._popup._contentNode.offsetWidth;
+
+      marker._popup._updateLayout();
+      marker._popup._updatePosition();
+
+      if (marker._popup.options.autoPan) {
+        adjustPopupPan(marker, map);
+      }
+
+      //using / returning reflow so jshint doesn't moan
+      return reflow;
+    };
+
+    var _manageOpenPopup = function (marker, markerData, map) {
+      // The marker may provide a scope returning function used to compile the message
+      // default to $rootScope otherwise
+      var markerScope = angular.isFunction(markerData.getMessageScope) ? markerData.getMessageScope() : $rootScope;
+      var compileMessage = isDefined(markerData.compileMessage) ? markerData.compileMessage : true;
+
+      if (compileMessage) {
+        if (!isDefined(marker._popup) || !isDefined(marker._popup._contentNode)) {
+          $log.error(errorHeader + 'Popup is invalid or does not have any content.');
+          return false;
+        }
+
+        compilePopup(marker, markerScope);
+        updatePopup(marker, markerData, map);
+      }
+    };
+
+    var _manageOpenLabel = function (marker, markerData) {
+      var markerScope = angular.isFunction(markerData.getMessageScope) ? markerData.getMessageScope() : $rootScope;
+      var labelScope = angular.isFunction(markerData.getLabelScope) ? markerData.getLabelScope() : markerScope;
+      var compileMessage = isDefined(markerData.compileMessage) ? markerData.compileMessage : true;
+
+      if (Helpers.LabelPlugin.isLoaded() && isDefined(markerData.label)) {
+        if (isDefined(markerData.label.options) && markerData.label.options.noHide === true) {
+          marker.showLabel();
+        }
+
+        if (compileMessage && isDefined(marker.label)) {
+          $compile(marker.label._container)(labelScope);
+        }
+      }
+    };
+
+    var _updateMarker = function (markerData, oldMarkerData, marker, name, leafletScope, layers, map) {
+      if (!isDefined(oldMarkerData)) {
+        return;
+      }
+
+      // Update the lat-lng property (always present in marker properties)
+      if (!geoHlp.validateCoords(markerData)) {
+        $log.warn('There are problems with lat-lng data, please verify your marker model');
+        _deleteMarker(marker, map, layers);
+        return;
+      }
+
+      // watch is being initialized if old and new object is the same
+      var isInitializing = markerData === oldMarkerData;
+
+      // Update marker rotation
+      if (isDefined(markerData.iconAngle) && oldMarkerData.iconAngle !== markerData.iconAngle) {
+        marker.setIconAngle(markerData.iconAngle);
+      }
+
+      // It is possible that the layer has been removed or the layer marker does not exist
+      // Update the layer group if present or move it to the map if not
+      if (!isString(markerData.layer)) {
+        // There is no layer information, we move the marker to the map if it was in a layer group
+        if (isString(oldMarkerData.layer)) {
+          // Remove from the layer group that is supposed to be
+          if (isDefined(layers.overlays[oldMarkerData.layer]) && layers.overlays[oldMarkerData.layer].hasLayer(marker)) {
+            layers.overlays[oldMarkerData.layer].removeLayer(marker);
+            marker.closePopup();
+          }
+
+          // Test if it is not on the map and add it
+          if (!map.hasLayer(marker)) {
+            map.addLayer(marker);
+          }
+        }
+      }
+
+      if ((isNumber(markerData.opacity) || isNumber(parseFloat(markerData.opacity))) && markerData.opacity !== oldMarkerData.opacity) {
+        // There was a different opacity so we update it
+        marker.setOpacity(markerData.opacity);
+      }
+
+      if (isString(markerData.layer) && oldMarkerData.layer !== markerData.layer) {
+        // If it was on a layer group we have to remove it
+        if (isString(oldMarkerData.layer) && isDefined(layers.overlays[oldMarkerData.layer]) && layers.overlays[oldMarkerData.layer].hasLayer(marker)) {
+          layers.overlays[oldMarkerData.layer].removeLayer(marker);
+        }
+
+        marker.closePopup();
+
+        // Remove it from the map in case the new layer is hidden or there is an error in the new layer
+        if (map.hasLayer(marker)) {
+          map.removeLayer(marker);
+        }
+
+        // The markerData.layer is defined so we add the marker to the layer if it is different from the old data
+        if (!isDefined(layers.overlays[markerData.layer])) {
+          $log.error(errorHeader + 'You must use a name of an existing layer');
+          return;
+        }
+
+        // Is a group layer?
+        var layerGroup = layers.overlays[markerData.layer];
+        if (!(layerGroup instanceof L.LayerGroup || layerGroup instanceof L.FeatureGroup)) {
+          $log.error(errorHeader + 'A marker can only be added to a layer of type "group" or "featureGroup"');
+          return;
+        }
+
+        // The marker goes to a correct layer group, so first of all we add it
+        layerGroup.addLayer(marker);
+
+        // The marker is automatically added to the map depending on the visibility
+        // of the layer, so we only have to open the popup if the marker is in the map
+        if (map.hasLayer(marker) && markerData.focus === true) {
+          marker.openPopup();
+        }
+      }
+
+      // Update the draggable property
+      if (markerData.draggable !== true && oldMarkerData.draggable === true && (isDefined(marker.dragging))) {
+        marker.dragging.disable();
+      }
+
+      if (markerData.draggable === true && oldMarkerData.draggable !== true) {
+        // The markerData.draggable property must be true so we update if there wasn't a previous value or it wasn't true
+        if (marker.dragging) {
+          marker.dragging.enable();
+        } else {
+          if (L.Handler.MarkerDrag) {
+            marker.dragging = new L.Handler.MarkerDrag(marker);
+            marker.options.draggable = true;
+            marker.dragging.enable();
+          }
+        }
+      }
+
+      // Update the icon property
+      if (!isObject(markerData.icon)) {
+        // If there is no icon property or it's not an object
+        if (isObject(oldMarkerData.icon)) {
+          // If there was an icon before restore to the default
+          marker.setIcon(createLeafletIcon());
+          marker.closePopup();
+          marker.unbindPopup();
+          if (isString(markerData.message)) {
+            marker.bindPopup(markerData.message, markerData.popupOptions);
+          }
+        }
+      }
+
+      if (isObject(markerData.icon) && isObject(oldMarkerData.icon) && !angular.equals(markerData.icon, oldMarkerData.icon)) {
+        var dragG = false;
+        if (marker.dragging) {
+          dragG = marker.dragging.enabled();
+        }
+
+        marker.setIcon(createLeafletIcon(markerData.icon));
+        if (dragG) {
+          marker.dragging.enable();
+        }
+
+        marker.closePopup();
+        marker.unbindPopup();
+        if (isString(markerData.message)) {
+          marker.bindPopup(markerData.message, markerData.popupOptions);
+
+          // if marker has been already focused, reopen popup
+          if (map.hasLayer(marker) && markerData.focus === true) {
+            marker.openPopup();
+          }
+        }
+      }
+
+      // Update the Popup message property
+      if (!isString(markerData.message) && isString(oldMarkerData.message)) {
+        marker.closePopup();
+        marker.unbindPopup();
+      }
+
+      // Update the label content or bind a new label if the old one has been removed.
+      if (Helpers.LabelPlugin.isLoaded()) {
+        if (isDefined(markerData.label) && isDefined(markerData.label.message)) {
+          if ('label' in oldMarkerData && 'message' in oldMarkerData.label && !angular.equals(markerData.label.message, oldMarkerData.label.message)) {
+            marker.updateLabelContent(markerData.label.message);
+          } else if (!angular.isFunction(marker.getLabel) || angular.isFunction(marker.getLabel) && !isDefined(marker.getLabel())) {
+            marker.bindLabel(markerData.label.message, markerData.label.options);
+            _manageOpenLabel(marker, markerData);
+          } else {
+            _manageOpenLabel(marker, markerData);
+          }
+        } else if (!('label' in markerData && !('message' in markerData.label))) {
+          if (angular.isFunction(marker.unbindLabel)) {
+            marker.unbindLabel();
+          }
+        }
+      }
+
+      // There is some text in the popup, so we must show the text or update existing
+      if (isString(markerData.message) && !isString(oldMarkerData.message)) {
+        // There was no message before so we create it
+        marker.bindPopup(markerData.message, markerData.popupOptions);
+      }
+
+      if (isString(markerData.message) && isString(oldMarkerData.message) && markerData.message !== oldMarkerData.message) {
+        // There was a different previous message so we update it
+        marker.setPopupContent(markerData.message);
+      }
+
+      // Update the focus property
+      var updatedFocus = false;
+      if (markerData.focus !== true && oldMarkerData.focus === true) {
+        // If there was a focus property and was true we turn it off
+        marker.closePopup();
+        updatedFocus = true;
+      }
+
+      // The markerData.focus property must be true so we update if there wasn't a previous value or it wasn't true
+      if (markerData.focus === true && (!isDefined(oldMarkerData.focus) || oldMarkerData.focus === false) || (isInitializing && markerData.focus === true)) {
+        // Reopen the popup when focus is still true
+        marker.openPopup();
+        updatedFocus = true;
+      }
+
+      // zIndexOffset adjustment
+      if (oldMarkerData.zIndexOffset !== markerData.zIndexOffset) {
+        marker.setZIndexOffset(markerData.zIndexOffset);
+      }
+
+      var markerLatLng = marker.getLatLng();
+      var isCluster = (isString(markerData.layer) && Helpers.MarkerClusterPlugin.is(layers.overlays[markerData.layer]));
+
+      // If the marker is in a cluster it has to be removed and added to the layer when the location is changed
+      if (isCluster) {
+        // The focus has changed even by a user click or programatically
+        if (updatedFocus) {
+          // We only have to update the location if it was changed programatically, because it was
+          // changed by a user drag the marker data has already been updated by the internal event
+          // listened by the directive
+          if ((markerData.lat !== oldMarkerData.lat) || (markerData.lng !== oldMarkerData.lng)) {
+            layers.overlays[markerData.layer].removeLayer(marker);
+            marker.setLatLng([markerData.lat, markerData.lng]);
+            layers.overlays[markerData.layer].addLayer(marker);
+          }
+        } else {
+          // The marker has possibly moved. It can be moved by a user drag (marker location and data are equal but old
+          // data is diferent) or programatically (marker location and data are diferent)
+          if ((markerLatLng.lat !== markerData.lat) || (markerLatLng.lng !== markerData.lng)) {
+            // The marker was moved by a user drag
+            layers.overlays[markerData.layer].removeLayer(marker);
+            marker.setLatLng([markerData.lat, markerData.lng]);
+            layers.overlays[markerData.layer].addLayer(marker);
+          } else if ((markerData.lat !== oldMarkerData.lat) || (markerData.lng !== oldMarkerData.lng)) {
+            // The marker was moved programatically
+            layers.overlays[markerData.layer].removeLayer(marker);
+            marker.setLatLng([markerData.lat, markerData.lng]);
+            layers.overlays[markerData.layer].addLayer(marker);
+          } else if (isObject(markerData.icon) && isObject(oldMarkerData.icon) && !angular.equals(markerData.icon, oldMarkerData.icon)) {
+            layers.overlays[markerData.layer].removeLayer(marker);
+            layers.overlays[markerData.layer].addLayer(marker);
+          }
+        }
+      } else if (markerLatLng.lat !== markerData.lat || markerLatLng.lng !== markerData.lng) {
+        marker.setLatLng([markerData.lat, markerData.lng]);
+      }
+    };
+
+    return {
+      resetMarkerGroup: _resetMarkerGroup,
+
+      resetMarkerGroups: _resetMarkerGroups,
+
+      deleteMarker: _deleteMarker,
+
+      manageOpenPopup: _manageOpenPopup,
+
+      manageOpenLabel: _manageOpenLabel,
+
+      createMarker: function (markerData) {
+        if (!isDefined(markerData) || !geoHlp.validateCoords(markerData)) {
+          $log.error(errorHeader + 'The marker definition is not valid.');
+          return;
+        }
+
+        var coords = geoHlp.getCoords(markerData);
+
+        if (!isDefined(coords)) {
+          $log.error(errorHeader + 'Unable to get coordinates from markerData.');
+          return;
+        }
+
+        var markerOptions = {
+          icon: createLeafletIcon(markerData.icon),
+          title: isDefined(markerData.title) ? markerData.title : '',
+          draggable: isDefined(markerData.draggable) ? markerData.draggable : false,
+          clickable: isDefined(markerData.clickable) ? markerData.clickable : true,
+          riseOnHover: isDefined(markerData.riseOnHover) ? markerData.riseOnHover : false,
+          zIndexOffset: isDefined(markerData.zIndexOffset) ? markerData.zIndexOffset : 0,
+          iconAngle: isDefined(markerData.iconAngle) ? markerData.iconAngle : 0,
+        };
+
+        // Add any other options not added above to markerOptions
+        for (var markerDatum in markerData) {
+          if (markerData.hasOwnProperty(markerDatum) && !markerOptions.hasOwnProperty(markerDatum)) {
+            markerOptions[markerDatum] = markerData[markerDatum];
+          }
+        }
+
+        var marker = new L.marker(coords, markerOptions);
+
+        if (!isString(markerData.message)) {
+          marker.unbindPopup();
+        }
+
+        return marker;
+      },
+
+      addMarkerToGroup: function (marker, groupName, groupOptions, map) {
+        if (!isString(groupName)) {
+          $log.error(errorHeader + 'The marker group you have specified is invalid.');
+          return;
+        }
+
+        if (!MarkerClusterPlugin.isLoaded()) {
+          $log.error(errorHeader + 'The MarkerCluster plugin is not loaded.');
+          return;
+        }
+
+        if (!isDefined(groups[groupName])) {
+          groups[groupName] = new L.MarkerClusterGroup(groupOptions);
+          map.addLayer(groups[groupName]);
+        }
+
+        groups[groupName].addLayer(marker);
+      },
+
+      listenMarkerEvents: function (marker, markerData, leafletScope, doWatch, map) {
+        marker.on('popupopen', function (/* event */) {
+          safeApply(leafletScope, function () {
+            if (isDefined(marker._popup) || isDefined(marker._popup._contentNode)) {
+              markerData.focus = true;
+              _manageOpenPopup(marker, markerData, map);//needed since markerData is now a copy
+            }
+          });
+        });
+
+        marker.on('popupclose', function (/* event */) {
+          safeApply(leafletScope, function () {
+            markerData.focus = false;
+          });
+        });
+
+        marker.on('add', function (/* event */) {
+          safeApply(leafletScope, function () {
+            if ('label' in markerData)
+              _manageOpenLabel(marker, markerData);
+          });
+        });
+      },
+
+      updateMarker: _updateMarker,
+
+      addMarkerWatcher: function (marker, name, leafletScope, layers, map, isDeepWatch) {
+        var markerWatchPath = Helpers.getObjectArrayPath('markers.' + name);
+        isDeepWatch = defaultTo(isDeepWatch, true);
+
+        var clearWatch = leafletScope.$watch(markerWatchPath, function (markerData, oldMarkerData) {
+          if (!isDefined(markerData)) {
+            _deleteMarker(marker, map, layers);
+            clearWatch();
+            return;
+          }
+
+          _updateMarker(markerData, oldMarkerData, marker, name, leafletScope, layers, map);
+        }, isDeepWatch);
+      },
+
+      string: _string,
+      log: _log,
+    };
+  }]);
+
+  angular.module('leaflet-directive').factory('leafletPathsHelpers', ["$rootScope", "$log", "leafletHelpers", function ($rootScope, $log, leafletHelpers) {
+    var isDefined = leafletHelpers.isDefined;
+    var isArray = leafletHelpers.isArray;
+    var isNumber = leafletHelpers.isNumber;
+    var isValidPoint = leafletHelpers.isValidPoint;
+
+    var availableOptions = [
+
+      // Path options
+      'stroke', 'weight', 'color', 'opacity',
+      'fill', 'fillColor', 'fillOpacity',
+      'dashArray', 'lineCap', 'lineJoin', 'clickable',
+      'pointerEvents', 'className',
+
+      // Polyline options
+      'smoothFactor', 'noClip',
+    ];
+
+    function _convertToLeafletLatLngs(latlngs) {
+      return latlngs.filter(function (latlng) {
+        return isValidPoint(latlng);
+      }).map(function (latlng) {
+        return _convertToLeafletLatLng(latlng);
+      });
+    }
+
+    function _convertToLeafletLatLng(latlng) {
+      if (isArray(latlng)) {
+        return new L.LatLng(latlng[0], latlng[1]);
+      } else {
+        return new L.LatLng(latlng.lat, latlng.lng);
+      }
+    }
+
+    function _convertToLeafletMultiLatLngs(paths) {
+      return paths.map(function (latlngs) {
+        return _convertToLeafletLatLngs(latlngs);
+      });
+    }
+
+    function _getOptions(path, defaults) {
+      var options = {};
+      for (var i = 0; i < availableOptions.length; i++) {
+        var optionName = availableOptions[i];
+
+        if (isDefined(path[optionName])) {
+          options[optionName] = path[optionName];
+        } else if (isDefined(defaults.path[optionName])) {
+          options[optionName] = defaults.path[optionName];
+        }
+      }
+
+      return options;
+    }
+
+    var _updatePathOptions = function (path, data) {
+      var updatedStyle = {};
+      for (var i = 0; i < availableOptions.length; i++) {
+        var optionName = availableOptions[i];
+        if (isDefined(data[optionName])) {
+          updatedStyle[optionName] = data[optionName];
+        }
+      }
+
+      path.setStyle(data);
+    };
+
+    var _isValidPolyline = function (latlngs) {
+      if (!isArray(latlngs)) {
+        return false;
+      }
+
+      for (var i = 0; i < latlngs.length; i++) {
+        var point = latlngs[i];
+        if (!isValidPoint(point)) {
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    var pathTypes = {
+      polyline: {
+        isValid: function (pathData) {
+          var latlngs = pathData.latlngs;
+          return _isValidPolyline(latlngs);
+        },
+
+        createPath: function (options) {
+          return new L.Polyline([], options);
+        },
+
+        setPath: function (path, data) {
+          path.setLatLngs(_convertToLeafletLatLngs(data.latlngs));
+          _updatePathOptions(path, data);
+          return;
+        },
+      },
+      multiPolyline: {
+        isValid: function (pathData) {
+          var latlngs = pathData.latlngs;
+          if (!isArray(latlngs)) {
+            return false;
+          }
+
+          for (var i in latlngs) {
+            var polyline = latlngs[i];
+            if (!_isValidPolyline(polyline)) {
+              return false;
+            }
+          }
+
+          return true;
+        },
+
+        createPath: function (options) {
+          return new L.multiPolyline([[[0, 0], [1, 1]]], options);
+        },
+
+        setPath: function (path, data) {
+          path.setLatLngs(_convertToLeafletMultiLatLngs(data.latlngs));
+          _updatePathOptions(path, data);
+          return;
+        },
+      },
+      polygon: {
+        isValid: function (pathData) {
+          var latlngs = pathData.latlngs;
+          return _isValidPolyline(latlngs);
+        },
+
+        createPath: function (options) {
+          return new L.Polygon([], options);
+        },
+
+        setPath: function (path, data) {
+          path.setLatLngs(_convertToLeafletLatLngs(data.latlngs));
+          _updatePathOptions(path, data);
+          return;
+        },
+      },
+      multiPolygon: {
+        isValid: function (pathData) {
+          var latlngs = pathData.latlngs;
+
+          if (!isArray(latlngs)) {
+            return false;
+          }
+
+          for (var i in latlngs) {
+            var polyline = latlngs[i];
+            if (!_isValidPolyline(polyline)) {
+              return false;
+            }
+          }
+
+          return true;
+        },
+
+        createPath: function (options) {
+          return new L.MultiPolygon([[[0, 0], [1, 1], [0, 1]]], options);
+        },
+
+        setPath: function (path, data) {
+          path.setLatLngs(_convertToLeafletMultiLatLngs(data.latlngs));
+          _updatePathOptions(path, data);
+          return;
+        },
+      },
+      rectangle: {
+        isValid: function (pathData) {
+          var latlngs = pathData.latlngs;
+
+          if (!isArray(latlngs) || latlngs.length !== 2) {
+            return false;
+          }
+
+          for (var i in latlngs) {
+            var point = latlngs[i];
+            if (!isValidPoint(point)) {
+              return false;
+            }
+          }
+
+          return true;
+        },
+
+        createPath: function (options) {
+          return new L.Rectangle([[0, 0], [1, 1]], options);
+        },
+
+        setPath: function (path, data) {
+          path.setBounds(new L.LatLngBounds(_convertToLeafletLatLngs(data.latlngs)));
+          _updatePathOptions(path, data);
+        },
+      },
+      circle: {
+        isValid: function (pathData) {
+          var point = pathData.latlngs;
+          return isValidPoint(point) && isNumber(pathData.radius);
+        },
+
+        createPath: function (options) {
+          return new L.Circle([0, 0], 1, options);
+        },
+
+        setPath: function (path, data) {
+          path.setLatLng(_convertToLeafletLatLng(data.latlngs));
+          if (isDefined(data.radius)) {
+            path.setRadius(data.radius);
+          }
+
+          _updatePathOptions(path, data);
+        },
+      },
+      circleMarker: {
+        isValid: function (pathData) {
+          var point = pathData.latlngs;
+          return isValidPoint(point) && isNumber(pathData.radius);
+        },
+
+        createPath: function (options) {
+          return new L.CircleMarker([0, 0], options);
+        },
+
+        setPath: function (path, data) {
+          path.setLatLng(_convertToLeafletLatLng(data.latlngs));
+          if (isDefined(data.radius)) {
+            path.setRadius(data.radius);
+          }
+
+          _updatePathOptions(path, data);
+        },
+      },
+    };
+
+    var _getPathData = function (path) {
+      var pathData = {};
+      if (path.latlngs) {
+        pathData.latlngs = path.latlngs;
+      }
+
+      if (path.radius) {
+        pathData.radius = path.radius;
+      }
+
+      return pathData;
+    };
+
+    return {
+      setPathOptions: function (leafletPath, pathType, data) {
+        if (!isDefined(pathType)) {
+          pathType = 'polyline';
+        }
+
+        pathTypes[pathType].setPath(leafletPath, data);
+      },
+
+      createPath: function (name, path, defaults) {
+        if (!isDefined(path.type)) {
+          path.type = 'polyline';
+        }
+
+        var options = _getOptions(path, defaults);
+        var pathData = _getPathData(path);
+
+        if (!pathTypes[path.type].isValid(pathData)) {
+          $log.error('[AngularJS - Leaflet] Invalid data passed to the ' + path.type + ' path');
+          return;
+        }
+
+        return pathTypes[path.type].createPath(options);
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive')
+    .service('leafletWatchHelpers', function () {
+
+      var _maybe = function (scope, watchFunctionName, thingToWatchStr, watchOptions, initCb) {
+        //watchOptions.isDeep is/should be ignored in $watchCollection
+        var unWatch = scope[watchFunctionName](thingToWatchStr, function (newValue, oldValue) {
+          initCb(newValue, oldValue);
+          if (!watchOptions.doWatch)
+            unWatch();
+        }, watchOptions.isDeep);
+
+        return unWatch;
+      };
+
+      /*
+       @name: maybeWatch
+       @description: Utility to watch something once or forever.
+       @returns unWatch function
+       @param watchOptions - see markersWatchOptions and or derrivatives. This object is used
+       to set watching to once and its watch depth.
+       */
+      var _maybeWatch = function (scope, thingToWatchStr, watchOptions, initCb) {
+        return _maybe(scope, '$watch', thingToWatchStr, watchOptions, initCb);
+      };
+
+      /*
+       @name: _maybeWatchCollection
+       @description: Utility to watch something once or forever.
+       @returns unWatch function
+       @param watchOptions - see markersWatchOptions and or derrivatives. This object is used
+       to set watching to once and its watch depth.
+       */
+      var _maybeWatchCollection = function (scope, thingToWatchStr, watchOptions, initCb) {
+        return _maybe(scope, '$watchCollection', thingToWatchStr, watchOptions, initCb);
+      };
+
+      return {
+        maybeWatch: _maybeWatch,
+        maybeWatchCollection: _maybeWatchCollection,
+      };
+    });
+
+  angular.module('leaflet-directive').factory('nominatimService', ["$q", "$http", "leafletHelpers", "leafletMapDefaults", function ($q, $http, leafletHelpers, leafletMapDefaults) {
+    var isDefined = leafletHelpers.isDefined;
+
+    return {
+      query: function (address, mapId) {
+        var defaults = leafletMapDefaults.getDefaults(mapId);
+        var url = defaults.nominatim.server;
+        var df = $q.defer();
+
+        $http.get(url, {params: {format: 'json', limit: 1, q: address}}).success(function (data) {
+          if (data.length > 0 && isDefined(data[0].boundingbox)) {
+            df.resolve(data[0]);
+          } else {
+            df.reject('[Nominatim] Invalid address');
+          }
+        });
+
+        return df.promise;
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('bounds', ["$log", "$timeout", "$http", "leafletHelpers", "nominatimService", "leafletBoundsHelpers", function ($log, $timeout, $http, leafletHelpers, nominatimService, leafletBoundsHelpers) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: ['leaflet'],
+
+      link: function (scope, element, attrs, controller) {
+        var isDefined = leafletHelpers.isDefined;
+        var createLeafletBounds = leafletBoundsHelpers.createLeafletBounds;
+        var leafletScope = controller[0].getLeafletScope();
+        var mapController = controller[0];
+        var errorHeader = leafletHelpers.errorHeader + ' [Bounds] ';
+
+        var emptyBounds = function (bounds) {
+          return (bounds._southWest.lat === 0 && bounds._southWest.lng === 0 &&
+          bounds._northEast.lat === 0 && bounds._northEast.lng === 0);
+        };
+
+        mapController.getMap().then(function (map) {
+          leafletScope.$on('boundsChanged', function (event) {
+            var scope = event.currentScope;
+            var bounds = map.getBounds();
+
+            if (emptyBounds(bounds) || scope.settingBoundsFromScope) {
+              return;
+            }
+
+            scope.settingBoundsFromLeaflet = true;
+            var newScopeBounds = {
+              northEast: {
+                lat: bounds._northEast.lat,
+                lng: bounds._northEast.lng,
+              },
+              southWest: {
+                lat: bounds._southWest.lat,
+                lng: bounds._southWest.lng,
+              },
+              options: bounds.options,
+            };
+            if (!angular.equals(scope.bounds, newScopeBounds)) {
+              scope.bounds = newScopeBounds;
+            }
+
+            $timeout(function () {
+              scope.settingBoundsFromLeaflet = false;
+            });
+          });
+
+          var lastNominatimQuery;
+          leafletScope.$watch('bounds', function (bounds) {
+            if (scope.settingBoundsFromLeaflet)
+              return;
+            if (isDefined(bounds.address) && bounds.address !== lastNominatimQuery) {
+              scope.settingBoundsFromScope = true;
+              nominatimService.query(bounds.address, attrs.id).then(function (data) {
+                var b = data.boundingbox;
+                var newBounds = [[b[0], b[2]], [b[1], b[3]]];
+                map.fitBounds(newBounds);
+              }, function (errMsg) {
+
+                $log.error(errorHeader + ' ' + errMsg + '.');
+              });
+
+              lastNominatimQuery = bounds.address;
+              $timeout(function () {
+                scope.settingBoundsFromScope = false;
+              });
+
+              return;
+            }
+
+            var leafletBounds = createLeafletBounds(bounds);
+            if (leafletBounds && !map.getBounds().equals(leafletBounds)) {
+              scope.settingBoundsFromScope = true;
+              map.fitBounds(leafletBounds, bounds.options);
+              $timeout(function () {
+                scope.settingBoundsFromScope = false;
+              });
+            }
+          }, true);
+        });
+      },
+    };
+  }]);
+
+  var centerDirectiveTypes = ['center', 'lfCenter'];
+  var centerDirectives = {};
+
+  centerDirectiveTypes.forEach(function (directiveName) {
+    centerDirectives[directiveName] = ['$log', '$q', '$location', '$timeout', 'leafletMapDefaults', 'leafletHelpers',
+      'leafletBoundsHelpers', 'leafletMapEvents',
+      function ($log, $q, $location, $timeout, leafletMapDefaults, leafletHelpers,
+                leafletBoundsHelpers, leafletMapEvents) {
+
+        var isDefined = leafletHelpers.isDefined;
+        var isNumber = leafletHelpers.isNumber;
+        var isSameCenterOnMap = leafletHelpers.isSameCenterOnMap;
+        var safeApply = leafletHelpers.safeApply;
+        var isValidCenter = leafletHelpers.isValidCenter;
+        var isValidBounds = leafletBoundsHelpers.isValidBounds;
+        var isUndefinedOrEmpty = leafletHelpers.isUndefinedOrEmpty;
+        var errorHeader = leafletHelpers.errorHeader;
+
+        var shouldInitializeMapWithBounds = function (bounds, center) {
+          return isDefined(bounds) && isValidBounds(bounds) && isUndefinedOrEmpty(center);
+        };
+
+        var _leafletCenter;
+        return {
+          restrict: 'A',
+          scope: false,
+          replace: false,
+          require: 'leaflet',
+          controller: function () {
+            _leafletCenter = $q.defer();
+            this.getCenter = function () {
+              return _leafletCenter.promise;
+            };
+          },
+
+          link: function (scope, element, attrs, controller) {
+            var leafletScope = controller.getLeafletScope();
+            var centerModel = leafletScope[directiveName];
+
+            controller.getMap().then(function (map) {
+              var defaults = leafletMapDefaults.getDefaults(attrs.id);
+
+              if (attrs[directiveName].search('-') !== -1) {
+                $log.error(errorHeader + ' The "center" variable can\'t use a "-" on its key name: "' + attrs[directiveName] + '".');
+                map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
+                return;
+              } else if (shouldInitializeMapWithBounds(leafletScope.bounds, centerModel)) {
+                map.fitBounds(leafletBoundsHelpers.createLeafletBounds(leafletScope.bounds), leafletScope.bounds.options);
+                centerModel = map.getCenter();
+                safeApply(leafletScope, function (scope) {
+                  angular.extend(scope[directiveName], {
+                    lat: map.getCenter().lat,
+                    lng: map.getCenter().lng,
+                    zoom: map.getZoom(),
+                    autoDiscover: false,
+                  });
+                });
+
+                safeApply(leafletScope, function (scope) {
+                  var mapBounds = map.getBounds();
+                  scope.bounds = {
+                    northEast: {
+                      lat: mapBounds._northEast.lat,
+                      lng: mapBounds._northEast.lng,
+                    },
+                    southWest: {
+                      lat: mapBounds._southWest.lat,
+                      lng: mapBounds._southWest.lng,
+                    },
+                  };
+                });
+              } else if (!isDefined(centerModel)) {
+                $log.error(errorHeader + ' The "center" property is not defined in the main scope');
+                map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
+                return;
+              } else if (!(isDefined(centerModel.lat) && isDefined(centerModel.lng)) && !isDefined(centerModel.autoDiscover)) {
+                angular.copy(defaults.center, centerModel);
+              }
+
+              var urlCenterHash;
+              var mapReady;
+              if (attrs.urlHashCenter === 'yes') {
+                var extractCenterFromUrl = function () {
+                  var search = $location.search();
+                  var centerParam;
+                  if (isDefined(search.c)) {
+                    var cParam = search.c.split(':');
+                    if (cParam.length === 3) {
+                      centerParam = {
+                        lat: parseFloat(cParam[0]),
+                        lng: parseFloat(cParam[1]),
+                        zoom: parseInt(cParam[2], 10),
+                      };
+                    }
+                  }
+
+                  return centerParam;
+                };
+
+                urlCenterHash = extractCenterFromUrl();
+
+                leafletScope.$on('$locationChangeSuccess', function (event) {
+                  var scope = event.currentScope;
+
+                  //$log.debug("updated location...");
+                  var urlCenter = extractCenterFromUrl();
+                  if (isDefined(urlCenter) && !isSameCenterOnMap(urlCenter, map)) {
+                    //$log.debug("updating center model...", urlCenter);
+                    angular.extend(scope[directiveName], {
+                      lat: urlCenter.lat,
+                      lng: urlCenter.lng,
+                      zoom: urlCenter.zoom,
+                    });
+                  }
+                });
+              }
+
+              leafletScope.$watch(directiveName, function (center) {
+                if (leafletScope.settingCenterFromLeaflet)
+                  return;
+
+                //$log.debug("updated center model...");
+                // The center from the URL has priority
+                if (isDefined(urlCenterHash)) {
+                  angular.copy(urlCenterHash, center);
+                  urlCenterHash = undefined;
+                }
+
+                if (!isValidCenter(center) && center.autoDiscover !== true) {
+                  $log.warn(errorHeader + ' invalid \'center\'');
+
+                  //map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
+                  return;
+                }
+
+                if (center.autoDiscover === true) {
+                  if (!isNumber(center.zoom)) {
+                    map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
+                  }
+
+                  if (isNumber(center.zoom) && center.zoom > defaults.center.zoom) {
+                    map.locate({
+                      setView: true,
+                      maxZoom: center.zoom,
+                    });
+                  } else if (isDefined(defaults.maxZoom)) {
+                    map.locate({
+                      setView: true,
+                      maxZoom: defaults.maxZoom,
+                    });
+                  } else {
+                    map.locate({
+                      setView: true,
+                    });
+                  }
+
+                  return;
+                }
+
+                if (mapReady && isSameCenterOnMap(center, map)) {
+                  //$log.debug("no need to update map again.");
+                  return;
+                }
+
+                //$log.debug("updating map center...", center);
+                leafletScope.settingCenterFromScope = true;
+                map.setView([center.lat, center.lng], center.zoom);
+                leafletMapEvents.notifyCenterChangedToBounds(leafletScope, map);
+                $timeout(function () {
+                  leafletScope.settingCenterFromScope = false;
+
+                  //$log.debug("allow center scope updates");
+                });
+              }, true);
+
+              map.whenReady(function () {
+                mapReady = true;
+              });
+
+              map.on('moveend', function (/* event */) {
+                // Resolve the center after the first map position
+                _leafletCenter.resolve();
+                leafletMapEvents.notifyCenterUrlHashChanged(leafletScope, map, attrs, $location.search());
+
+                //$log.debug("updated center on map...");
+                if (isSameCenterOnMap(centerModel, map) || leafletScope.settingCenterFromScope) {
+                  //$log.debug("same center in model, no need to update again.");
+                  return;
+                }
+
+                leafletScope.settingCenterFromLeaflet = true;
+                safeApply(leafletScope, function (scope) {
+                  if (!leafletScope.settingCenterFromScope) {
+                    //$log.debug("updating center model...", map.getCenter(), map.getZoom());
+                    angular.extend(scope[directiveName], {
+                      lat: map.getCenter().lat,
+                      lng: map.getCenter().lng,
+                      zoom: map.getZoom(),
+                      autoDiscover: false,
+                    });
+                  }
+
+                  leafletMapEvents.notifyCenterChangedToBounds(leafletScope, map);
+                  $timeout(function () {
+                    leafletScope.settingCenterFromLeaflet = false;
+                  });
+                });
+              });
+
+              if (centerModel.autoDiscover === true) {
+                map.on('locationerror', function () {
+                  $log.warn(errorHeader + ' The Geolocation API is unauthorized on this page.');
+                  if (isValidCenter(centerModel)) {
+                    map.setView([centerModel.lat, centerModel.lng], centerModel.zoom);
+                    leafletMapEvents.notifyCenterChangedToBounds(leafletScope, map);
+                  } else {
+                    map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
+                    leafletMapEvents.notifyCenterChangedToBounds(leafletScope, map);
+                  }
+                });
+              }
+            });
+          },
+        };
+      },
+    ];
+  });
+
+  centerDirectiveTypes.forEach(function (dirType) {
+    angular.module('leaflet-directive').directive(dirType, centerDirectives[dirType]);
+  });
+
+  angular.module('leaflet-directive').directive('controls', ["$log", "leafletHelpers", "leafletControlHelpers", function ($log, leafletHelpers, leafletControlHelpers) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: '?^leaflet',
+
+      link: function (scope, element, attrs, controller) {
+        if (!controller) {
+          return;
+        }
+
+        var createControl = leafletControlHelpers.createControl;
+        var isValidControlType = leafletControlHelpers.isValidControlType;
+        var leafletScope = controller.getLeafletScope();
+        var isDefined = leafletHelpers.isDefined;
+        var isArray = leafletHelpers.isArray;
+        var leafletControls = {};
+        var errorHeader = leafletHelpers.errorHeader + ' [Controls] ';
+
+        controller.getMap().then(function (map) {
+
+          leafletScope.$watchCollection('controls', function (newControls) {
+
+            // Delete controls from the array
+            for (var name in leafletControls) {
+              if (!isDefined(newControls[name])) {
+                if (map.hasControl(leafletControls[name])) {
+                  map.removeControl(leafletControls[name]);
+                }
+
+                delete leafletControls[name];
+              }
+            }
+
+            for (var newName in newControls) {
+              var control;
+
+              var controlType = isDefined(newControls[newName].type) ? newControls[newName].type : newName;
+
+              if (!isValidControlType(controlType)) {
+                $log.error(errorHeader + ' Invalid control type: ' + controlType + '.');
+                return;
+              }
+
+              if (controlType !== 'custom') {
+                control = createControl(controlType, newControls[newName]);
+                map.addControl(control);
+                leafletControls[newName] = control;
+              } else {
+                var customControlValue = newControls[newName];
+                if (isArray(customControlValue)) {
+                  for (var i in customControlValue) {
+                    var customControl = customControlValue[i];
+                    map.addControl(customControl);
+                    leafletControls[newName] = !isDefined(leafletControls[newName]) ? [customControl] : leafletControls[newName].concat([customControl]);
+                  }
+                } else {
+                  map.addControl(customControlValue);
+                  leafletControls[newName] = customControlValue;
+                }
+              }
+            }
+
+          });
+
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('decorations', ["$log", "leafletHelpers", function ($log, leafletHelpers) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: 'leaflet',
+
+      link: function (scope, element, attrs, controller) {
+        var leafletScope = controller.getLeafletScope();
+        var PolylineDecoratorPlugin = leafletHelpers.PolylineDecoratorPlugin;
+        var isDefined = leafletHelpers.isDefined;
+        var leafletDecorations = {};
+
+        /* Creates an "empty" decoration with a set of coordinates, but no pattern. */
+        function createDecoration(options) {
+          if (isDefined(options) && isDefined(options.coordinates)) {
+            if (!PolylineDecoratorPlugin.isLoaded()) {
+              $log.error('[AngularJS - Leaflet] The PolylineDecorator Plugin is not loaded.');
+            }
+          }
+
+          return L.polylineDecorator(options.coordinates);
+        }
+
+        /* Updates the path and the patterns for the provided decoration, and returns the decoration. */
+        function setDecorationOptions(decoration, options) {
+          if (isDefined(decoration) && isDefined(options)) {
+            if (isDefined(options.coordinates) && isDefined(options.patterns)) {
+              decoration.setPaths(options.coordinates);
+              decoration.setPatterns(options.patterns);
+              return decoration;
+            }
+          }
+        }
+
+        controller.getMap().then(function (map) {
+          leafletScope.$watch('decorations', function (newDecorations) {
+            for (var name in leafletDecorations) {
+              if (!isDefined(newDecorations[name]) || !angular.equals(newDecorations[name], leafletDecorations)) {
+                map.removeLayer(leafletDecorations[name]);
+                delete leafletDecorations[name];
+              }
+            }
+
+            for (var newName in newDecorations) {
+              var decorationData = newDecorations[newName];
+              var newDecoration = createDecoration(decorationData);
+
+              if (isDefined(newDecoration)) {
+                leafletDecorations[newName] = newDecoration;
+                map.addLayer(newDecoration);
+                setDecorationOptions(newDecoration, decorationData);
+              }
+            }
+          }, true);
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('eventBroadcast', ["$log", "$rootScope", "leafletHelpers", "leafletMapEvents", "leafletIterators", function ($log, $rootScope, leafletHelpers, leafletMapEvents, leafletIterators) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: 'leaflet',
+
+      link: function (scope, element, attrs, controller) {
+        var isObject = leafletHelpers.isObject;
+        var isDefined = leafletHelpers.isDefined;
+        var leafletScope = controller.getLeafletScope();
+        var eventBroadcast = leafletScope.eventBroadcast;
+        var availableMapEvents = leafletMapEvents.getAvailableMapEvents();
+        var addEvents = leafletMapEvents.addEvents;
+
+        controller.getMap().then(function (map) {
+
+          var mapEvents = [];
+          var logic = 'broadcast';
+
+          // We have a possible valid object
+          if (!isDefined(eventBroadcast.map)) {
+            // We do not have events enable/disable do we do nothing (all enabled by default)
+            mapEvents = availableMapEvents;
+          } else if (!isObject(eventBroadcast.map)) {
+            // Not a valid object
+            $log.warn('[AngularJS - Leaflet] event-broadcast.map must be an object check your model.');
+          } else {
+            // We have a possible valid map object
+            // Event propadation logic
+            if (eventBroadcast.map.logic !== 'emit' && eventBroadcast.map.logic !== 'broadcast') {
+              // This is an error
+              $log.warn('[AngularJS - Leaflet] Available event propagation logic are: \'emit\' or \'broadcast\'.');
+            } else {
+              logic = eventBroadcast.map.logic;
+            }
+
+            if (!(isObject(eventBroadcast.map.enable) && eventBroadcast.map.enable.length >= 0)) {
+              $log.warn('[AngularJS - Leaflet] event-broadcast.map.enable must be an object check your model.');
+            } else {
+              // Enable events
+              leafletIterators.each(eventBroadcast.map.enable, function (eventName) {
+                // Do we have already the event enabled?
+                if (mapEvents.indexOf(eventName) === -1 && availableMapEvents.indexOf(eventName) !== -1) {
+                  mapEvents.push(eventName);
+                }
+              });
+            }
+
+          }
+
+          // as long as the map is removed in the root leaflet directive we
+          // do not need ot clean up the events as leaflet does it itself
+          addEvents(map, mapEvents, 'eventName', leafletScope, logic);
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive')
+    .directive('geojson', ["$log", "$rootScope", "leafletData", "leafletHelpers", "leafletWatchHelpers", "leafletDirectiveControlsHelpers", "leafletIterators", "leafletGeoJsonEvents", function ($log, $rootScope, leafletData, leafletHelpers,
+                                                                                                                                                                                                  leafletWatchHelpers, leafletDirectiveControlsHelpers, leafletIterators, leafletGeoJsonEvents) {
+      var _maybeWatch = leafletWatchHelpers.maybeWatch;
+      var _watchOptions = leafletHelpers.watchOptions;
+      var _extendDirectiveControls = leafletDirectiveControlsHelpers.extend;
+      var hlp = leafletHelpers;
+      var $it = leafletIterators;
+
+      return {
+        restrict: 'A',
+        scope: false,
+        replace: false,
+        require: 'leaflet',
+
+        link: function (scope, element, attrs, controller) {
+          var isDefined = leafletHelpers.isDefined;
+          var leafletScope = controller.getLeafletScope();
+          var leafletGeoJSON = {};
+          var _hasSetLeafletData = false;
+
+          controller.getMap().then(function (map) {
+            var watchOptions = leafletScope.geojsonWatchOptions || _watchOptions;
+
+            var _hookUpEvents = function (geojson, maybeName) {
+              var onEachFeature;
+
+              if (angular.isFunction(geojson.onEachFeature)) {
+                onEachFeature = geojson.onEachFeature;
+              } else {
+                onEachFeature = function (feature, layer) {
+                  if (leafletHelpers.LabelPlugin.isLoaded() && isDefined(feature.properties.description)) {
+                    layer.bindLabel(feature.properties.description);
+                  }
+
+                  leafletGeoJsonEvents.bindEvents(attrs.id, layer, null, feature,
+                    leafletScope, maybeName,
+                    {
+                      resetStyleOnMouseout: geojson.resetStyleOnMouseout,
+                      mapId: attrs.id,
+                    });
+                };
+              }
+
+              return onEachFeature;
+            };
+
+            var isNested = (hlp.isDefined(attrs.geojsonNested) &&
+            hlp.isTruthy(attrs.geojsonNested));
+
+            var _clean = function () {
+              if (!leafletGeoJSON)
+                return;
+              var _remove = function (lObject) {
+                if (isDefined(lObject) && map.hasLayer(lObject)) {
+                  map.removeLayer(lObject);
+                }
+              };
+
+              if (isNested) {
+                $it.each(leafletGeoJSON, function (lObject) {
+                  _remove(lObject);
+                });
+
+                return;
+              }
+
+              _remove(leafletGeoJSON);
+            };
+
+            var _addGeojson = function (model, maybeName) {
+              var geojson = angular.copy(model);
+              if (!(isDefined(geojson) && isDefined(geojson.data))) {
+                return;
+              }
+
+              var onEachFeature = _hookUpEvents(geojson, maybeName);
+
+              if (!isDefined(geojson.options)) {
+                //right here is why we use a clone / copy (we modify and thus)
+                //would kick of a watcher.. we need to be more careful everywhere
+                //for stuff like this
+                geojson.options = {
+                  style: geojson.style,
+                  filter: geojson.filter,
+                  onEachFeature: onEachFeature,
+                  pointToLayer: geojson.pointToLayer,
+                };
+              }
+
+              var lObject = L.geoJson(geojson.data, geojson.options);
+
+              if (maybeName && hlp.isString(maybeName)) {
+                leafletGeoJSON[maybeName] = lObject;
+              } else {
+                leafletGeoJSON = lObject;
+              }
+
+              lObject.addTo(map);
+
+              if (!_hasSetLeafletData) {//only do this once and play with the same ref forever
+                _hasSetLeafletData = true;
+                leafletData.setGeoJSON(leafletGeoJSON, attrs.id);
+              }
+            };
+
+            var _create = function (model) {
+              _clean();
+              if (isNested) {
+                if (!model || !Object.keys(model).length)
+                  return;
+                $it.each(model, function (m, name) {
+                  //name could be layerName and or groupName
+                  //for now it is not tied to a layer
+                  _addGeojson(m, name);
+                });
+
+                return;
+              }
+
+              _addGeojson(model);
+            };
+
+            _extendDirectiveControls(attrs.id, 'geojson', _create, _clean);
+
+            _maybeWatch(leafletScope, 'geojson', watchOptions, function (geojson) {
+              _create(geojson);
+            });
+          });
+        },
+      };
+    }]);
+
+  angular.module('leaflet-directive').directive('layercontrol', ["$filter", "$log", "leafletData", "leafletHelpers", function ($filter, $log, leafletData, leafletHelpers) {
+
+    return {
+      restrict: 'E',
+      scope: {
+        icons: '=?',
+        autoHideOpacity: '=?', // Hide other opacity controls when one is activated.
+        showGroups: '=?', // Hide other opacity controls when one is activated.
+        title: '@',
+        baseTitle: '@',
+        overlaysTitle: '@',
+      },
+      replace: true,
+      transclude: false,
+      require: '^leaflet',
+      controller: ["$scope", "$element", "$sce", function ($scope, $element, $sce) {
+        $log.debug('[Angular Directive - Layers] layers', $scope, $element);
+        var safeApply = leafletHelpers.safeApply;
+        var isDefined = leafletHelpers.isDefined;
+        angular.extend($scope, {
+          baselayer: '',
+          oldGroup: '',
+          layerProperties: {},
+          groupProperties: {},
+          rangeIsSupported: leafletHelpers.rangeIsSupported(),
+          changeBaseLayer: function (key, e) {
+            leafletHelpers.safeApply($scope, function (scp) {
+              scp.baselayer = key;
+              leafletData.getMap().then(function (map) {
+                leafletData.getLayers().then(function (leafletLayers) {
+                  if (map.hasLayer(leafletLayers.baselayers[key])) {
+                    return;
+                  }
+
+                  for (var i in scp.layers.baselayers) {
+                    scp.layers.baselayers[i].icon = scp.icons.unradio;
+                    if (map.hasLayer(leafletLayers.baselayers[i])) {
+                      map.removeLayer(leafletLayers.baselayers[i]);
+                    }
+                  }
+
+                  map.addLayer(leafletLayers.baselayers[key]);
+                  scp.layers.baselayers[key].icon = $scope.icons.radio;
+                });
+              });
+            });
+
+            e.preventDefault();
+          },
+
+          moveLayer: function (ly, newIndex, e) {
+            var delta = Object.keys($scope.layers.baselayers).length;
+            if (newIndex >= (1 + delta) && newIndex <= ($scope.overlaysArray.length + delta)) {
+              var oldLy;
+              for (var key in $scope.layers.overlays) {
+                if ($scope.layers.overlays[key].index === newIndex) {
+                  oldLy = $scope.layers.overlays[key];
+                  break;
+                }
+              }
+
+              if (oldLy) {
+                safeApply($scope, function () {
+                  oldLy.index = ly.index;
+                  ly.index = newIndex;
+                });
+              }
+            }
+
+            e.stopPropagation();
+            e.preventDefault();
+          },
+
+          initIndex: function (layer, idx) {
+            var delta = Object.keys($scope.layers.baselayers).length;
+            layer.index = isDefined(layer.index) ? layer.index : idx + delta + 1;
+          },
+
+          initGroup: function (groupName) {
+            $scope.groupProperties[groupName] = $scope.groupProperties[groupName] ? $scope.groupProperties[groupName] : {};
+          },
+
+          toggleOpacity: function (e, layer) {
+            if (layer.visible) {
+              if ($scope.autoHideOpacity && !$scope.layerProperties[layer.name].opacityControl) {
+                for (var k in $scope.layerProperties) {
+                  $scope.layerProperties[k].opacityControl = false;
+                }
+              }
+
+              $scope.layerProperties[layer.name].opacityControl = !$scope.layerProperties[layer.name].opacityControl;
+            }
+
+            e.stopPropagation();
+            e.preventDefault();
+          },
+
+          toggleLegend: function (layer) {
+            $scope.layerProperties[layer.name].showLegend = !$scope.layerProperties[layer.name].showLegend;
+          },
+
+          showLegend: function (layer) {
+            return layer.legend && $scope.layerProperties[layer.name].showLegend;
+          },
+
+          unsafeHTML: function (html) {
+            return $sce.trustAsHtml(html);
+          },
+
+          getOpacityIcon: function (layer) {
+            return layer.visible && $scope.layerProperties[layer.name].opacityControl ? $scope.icons.close : $scope.icons.open;
+          },
+
+          getGroupIcon: function (group) {
+            return group.visible ? $scope.icons.check : $scope.icons.uncheck;
+          },
+
+          changeOpacity: function (layer) {
+            var op = $scope.layerProperties[layer.name].opacity;
+            leafletData.getMap().then(function (map) {
+              leafletData.getLayers().then(function (leafletLayers) {
+                var ly;
+                for (var k in $scope.layers.overlays) {
+                  if ($scope.layers.overlays[k] === layer) {
+                    ly = leafletLayers.overlays[k];
+                    break;
+                  }
+                }
+
+                if (map.hasLayer(ly)) {
+                  if (ly.setOpacity) {
+                    ly.setOpacity(op / 100);
+                  }
+
+                  if (ly.getLayers && ly.eachLayer) {
+                    ly.eachLayer(function (lay) {
+                      if (lay.setOpacity) {
+                        lay.setOpacity(op / 100);
+                      }
+                    });
+                  }
+                }
+              });
+            });
+          },
+
+          changeGroupVisibility: function (groupName) {
+            if (!isDefined($scope.groupProperties[groupName])) {
+              return;
+            }
+
+            var visible = $scope.groupProperties[groupName].visible;
+            for (var k in $scope.layers.overlays) {
+              var layer = $scope.layers.overlays[k];
+              if (layer.group === groupName) {
+                layer.visible = visible;
+              }
+            }
+          },
+        });
+
+        var div = $element.get(0);
+        if (!L.Browser.touch) {
+          L.DomEvent.disableClickPropagation(div);
+          L.DomEvent.on(div, 'mousewheel', L.DomEvent.stopPropagation);
+        } else {
+          L.DomEvent.on(div, 'click', L.DomEvent.stopPropagation);
+        }
+      }],
+
+      template: '<div class="angular-leaflet-control-layers" ng-show="overlaysArray.length">' +
+      '<h4 ng-if="title">{{ title }}</h4>' +
+      '<div class="lf-baselayers">' +
+      '<h5 class="lf-title" ng-if="baseTitle">{{ baseTitle }}</h5>' +
+      '<div class="lf-row" ng-repeat="(key, layer) in baselayersArray">' +
+      '<label class="lf-icon-bl" ng-click="changeBaseLayer(key, $event)">' +
+      '<input class="leaflet-control-layers-selector" type="radio" name="lf-radio" ' +
+      'ng-show="false" ng-checked="baselayer === key" ng-value="key" /> ' +
+      '<i class="lf-icon lf-icon-radio" ng-class="layer.icon"></i>' +
+      '<div class="lf-text">{{layer.name}}</div>' +
+      '</label>' +
+      '</div>' +
+      '</div>' +
+      '<div class="lf-overlays">' +
+      '<h5 class="lf-title" ng-if="overlaysTitle">{{ overlaysTitle }}</h5>' +
+      '<div class="lf-container">' +
+      '<div class="lf-row" ng-repeat="layer in (o = (overlaysArray | orderBy:\'index\':order))" ng-init="initIndex(layer, $index)">' +
+      '<label class="lf-icon-ol-group" ng-if="showGroups &amp;&amp; layer.group &amp;&amp; layer.group != o[$index-1].group">' +
+      '<input class="lf-control-layers-selector" type="checkbox" ng-show="false" ' +
+      'ng-change="changeGroupVisibility(layer.group)" ng-model="groupProperties[layer.group].visible"/> ' +
+      '<i class="lf-icon lf-icon-check" ng-class="getGroupIcon(groupProperties[layer.group])"></i>' +
+      '<div class="lf-text">{{ layer.group }}</div>' +
+      '</label>' +
+      '<label class="lf-icon-ol">' +
+      '<input class="lf-control-layers-selector" type="checkbox" ng-show="false" ng-model="layer.visible"/> ' +
+      '<i class="lf-icon lf-icon-check" ng-class="layer.icon"></i>' +
+      '<div class="lf-text">{{layer.name}}</div>' +
+      '</label>' +
+      '<div class="lf-icons">' +
+      '<i class="lf-icon lf-up" ng-class="icons.up" ng-click="moveLayer(layer, layer.index - orderNumber, $event)"></i> ' +
+      '<i class="lf-icon lf-down" ng-class="icons.down" ng-click="moveLayer(layer, layer.index + orderNumber, $event)"></i> ' +
+      '<i class="lf-icon lf-toggle-legend" ng-class="icons.toggleLegend" ng-if="layer.legend" ng-click="toggleLegend(layer)"></i> ' +
+      '<i class="lf-icon lf-open" ng-class="getOpacityIcon(layer)" ng-click="toggleOpacity($event, layer)"></i>' +
+      '</div>' +
+      '<div class="lf-legend" ng-if="showLegend(layer)" ng-bind-html="unsafeHTML(layer.legend)"></div>' +
+      '<div class="lf-opacity clearfix" ng-if="layer.visible &amp;&amp; layerProperties[layer.name].opacityControl">' +
+      '<label ng-if="rangeIsSupported" class="pull-left" style="width: 50%">0</label>' +
+      '<label ng-if="rangeIsSupported" class="pull-left text-right" style="width: 50%">100</label>' +
+      '<input ng-if="rangeIsSupported" class="clearfix" type="range" min="0" max="100" class="lf-opacity-control" ' +
+      'ng-model="layerProperties[layer.name].opacity" ng-change="changeOpacity(layer)"/>' +
+      '<h6 ng-if="!rangeIsSupported">Range is not supported in this browser</h6>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>',
+      link: function (scope, element, attrs, controller) {
+        var isDefined = leafletHelpers.isDefined;
+        var leafletScope = controller.getLeafletScope();
+        var layers = leafletScope.layers;
+
+        scope.$watch('icons', function () {
+          var defaultIcons = {
+            uncheck: 'fa fa-square-o',
+            check: 'fa fa-check-square-o',
+            radio: 'fa fa-dot-circle-o',
+            unradio: 'fa fa-circle-o',
+            up: 'fa fa-angle-up',
+            down: 'fa fa-angle-down',
+            open: 'fa fa-angle-double-down',
+            close: 'fa fa-angle-double-up',
+            toggleLegend: 'fa fa-pencil-square-o',
+          };
+          if (isDefined(scope.icons)) {
+            angular.extend(defaultIcons, scope.icons);
+            angular.extend(scope.icons, defaultIcons);
+          } else {
+            scope.icons = defaultIcons;
+          }
+        });
+
+        // Setting layer stack order.
+        attrs.order = (isDefined(attrs.order) && (attrs.order === 'normal' || attrs.order === 'reverse')) ? attrs.order : 'normal';
+        scope.order = attrs.order === 'normal';
+        scope.orderNumber = attrs.order === 'normal' ? -1 : 1;
+
+        scope.layers = layers;
+        controller.getMap().then(function (map) {
+          leafletScope.$watch('layers.baselayers', function (newBaseLayers) {
+            var baselayersArray = {};
+            leafletData.getLayers().then(function (leafletLayers) {
+              var key;
+              for (key in newBaseLayers) {
+                var layer = newBaseLayers[key];
+                layer.icon = scope.icons[map.hasLayer(leafletLayers.baselayers[key]) ? 'radio' : 'unradio'];
+                baselayersArray[key] = layer;
+              }
+
+              scope.baselayersArray = baselayersArray;
+            });
+          });
+
+          leafletScope.$watch('layers.overlays', function (newOverlayLayers) {
+            var overlaysArray = [];
+            var groupVisibleCount = {};
+            leafletData.getLayers().then(function (leafletLayers) {
+              var key;
+              for (key in newOverlayLayers) {
+                var layer = newOverlayLayers[key];
+                layer.icon = scope.icons[(layer.visible ? 'check' : 'uncheck')];
+                overlaysArray.push(layer);
+                if (!isDefined(scope.layerProperties[layer.name])) {
+                  scope.layerProperties[layer.name] = {
+                    opacity: isDefined(layer.layerOptions.opacity) ? layer.layerOptions.opacity * 100 : 100,
+                    opacityControl: false,
+                    showLegend: true,
+                  };
+                }
+
+                if (isDefined(layer.group)) {
+                  if (!isDefined(scope.groupProperties[layer.group])) {
+                    scope.groupProperties[layer.group] = {
+                      visible: false,
+                    };
+                  }
+
+                  groupVisibleCount[layer.group] = isDefined(groupVisibleCount[layer.group]) ? groupVisibleCount[layer.group] : {
+                    count: 0,
+                    visibles: 0,
+                  };
+                  groupVisibleCount[layer.group].count++;
+                  if (layer.visible) {
+                    groupVisibleCount[layer.group].visibles++;
+                  }
+                }
+
+                if (isDefined(layer.index) && leafletLayers.overlays[key].setZIndex) {
+                  leafletLayers.overlays[key].setZIndex(newOverlayLayers[key].index);
+                }
+              }
+
+              for (key in groupVisibleCount) {
+                scope.groupProperties[key].visible = groupVisibleCount[key].visibles === groupVisibleCount[key].count;
+              }
+
+              scope.overlaysArray = overlaysArray;
+            });
+          }, true);
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('layers', ["$log", "$q", "leafletData", "leafletHelpers", "leafletLayerHelpers", "leafletControlHelpers", function ($log, $q, leafletData, leafletHelpers, leafletLayerHelpers, leafletControlHelpers) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: 'leaflet',
+      controller: ["$scope", function ($scope) {
+        $scope._leafletLayers = $q.defer();
+        this.getLayers = function () {
+          return $scope._leafletLayers.promise;
+        };
+      }],
+
+      link: function (scope, element, attrs, controller) {
+        var isDefined = leafletHelpers.isDefined;
+        var leafletLayers = {};
+        var leafletScope = controller.getLeafletScope();
+        var layers = leafletScope.layers;
+        var createLayer = leafletLayerHelpers.createLayer;
+        var safeAddLayer = leafletLayerHelpers.safeAddLayer;
+        var safeRemoveLayer = leafletLayerHelpers.safeRemoveLayer;
+        var updateLayersControl = leafletControlHelpers.updateLayersControl;
+        var isLayersControlVisible = false;
+
+        controller.getMap().then(function (map) {
+
+          // We have baselayers to add to the map
+          scope._leafletLayers.resolve(leafletLayers);
+          leafletData.setLayers(leafletLayers, attrs.id);
+
+          leafletLayers.baselayers = {};
+          leafletLayers.overlays = {};
+
+          var mapId = attrs.id;
+
+          // Setup all baselayers definitions
+          var oneVisibleLayer = false;
+          for (var layerName in layers.baselayers) {
+            var newBaseLayer = createLayer(layers.baselayers[layerName]);
+            if (!isDefined(newBaseLayer)) {
+              delete layers.baselayers[layerName];
+              continue;
+            }
+
+            leafletLayers.baselayers[layerName] = newBaseLayer;
+
+            // Only add the visible layer to the map, layer control manages the addition to the map
+            // of layers in its control
+            if (layers.baselayers[layerName].top === true) {
+              safeAddLayer(map, leafletLayers.baselayers[layerName]);
+              oneVisibleLayer = true;
+            }
+          }
+
+          // If there is no visible layer add first to the map
+          if (!oneVisibleLayer && Object.keys(leafletLayers.baselayers).length > 0) {
+            safeAddLayer(map, leafletLayers.baselayers[Object.keys(layers.baselayers)[0]]);
+          }
+
+          // Setup the Overlays
+          for (layerName in layers.overlays) {
+            //if (layers.overlays[layerName].type === 'cartodb') {
+            //
+            //}
+
+            var newOverlayLayer = createLayer(layers.overlays[layerName]);
+            if (!isDefined(newOverlayLayer)) {
+              delete layers.overlays[layerName];
+              continue;
+            }
+
+            leafletLayers.overlays[layerName] = newOverlayLayer;
+
+            // Only add the visible overlays to the map
+            if (layers.overlays[layerName].visible === true) {
+              safeAddLayer(map, leafletLayers.overlays[layerName]);
+            }
+          }
+
+          // Watch for the base layers
+          leafletScope.$watch('layers.baselayers', function (newBaseLayers, oldBaseLayers) {
+            if (angular.equals(newBaseLayers, oldBaseLayers)) {
+              isLayersControlVisible = updateLayersControl(map, mapId, isLayersControlVisible, newBaseLayers, layers.overlays, leafletLayers);
+              return true;
+            }
+
+            // Delete layers from the array
+            for (var name in leafletLayers.baselayers) {
+              if (!isDefined(newBaseLayers[name]) || newBaseLayers[name].doRefresh) {
+                // Remove from the map if it's on it
+                if (map.hasLayer(leafletLayers.baselayers[name])) {
+                  map.removeLayer(leafletLayers.baselayers[name]);
+                }
+
+                delete leafletLayers.baselayers[name];
+
+                if (newBaseLayers[name] && newBaseLayers[name].doRefresh) {
+                  newBaseLayers[name].doRefresh = false;
+                }
+              }
+            }
+
+            // add new layers
+            for (var newName in newBaseLayers) {
+              if (!isDefined(leafletLayers.baselayers[newName])) {
+                var testBaseLayer = createLayer(newBaseLayers[newName]);
+                if (isDefined(testBaseLayer)) {
+                  leafletLayers.baselayers[newName] = testBaseLayer;
+
+                  // Only add the visible layer to the map
+                  if (newBaseLayers[newName].top === true) {
+                    safeAddLayer(map, leafletLayers.baselayers[newName]);
+                  }
+                }
+              } else {
+                if (newBaseLayers[newName].top === true && !map.hasLayer(leafletLayers.baselayers[newName])) {
+                  safeAddLayer(map, leafletLayers.baselayers[newName]);
+                } else if (newBaseLayers[newName].top === false && map.hasLayer(leafletLayers.baselayers[newName])) {
+                  map.removeLayer(leafletLayers.baselayers[newName]);
+                }
+              }
+            }
+
+            //we have layers, so we need to make, at least, one active
+            var found = false;
+
+            // search for an active layer
+            for (var key in leafletLayers.baselayers) {
+              if (map.hasLayer(leafletLayers.baselayers[key])) {
+                found = true;
+                break;
+              }
+            }
+
+            // If there is no active layer make one active
+            if (!found && Object.keys(leafletLayers.baselayers).length > 0) {
+              safeAddLayer(map, leafletLayers.baselayers[Object.keys(leafletLayers.baselayers)[0]]);
+            }
+
+            // Only show the layers switch selector control if we have more than one baselayer + overlay
+            isLayersControlVisible = updateLayersControl(map, mapId, isLayersControlVisible, newBaseLayers, layers.overlays, leafletLayers);
+          }, true);
+
+          // Watch for the overlay layers
+          leafletScope.$watch('layers.overlays', function (newOverlayLayers, oldOverlayLayers) {
+            if (angular.equals(newOverlayLayers, oldOverlayLayers)) {
+              isLayersControlVisible = updateLayersControl(map, mapId, isLayersControlVisible, layers.baselayers, newOverlayLayers, leafletLayers);
+              return true;
+            }
+
+            // Delete layers from the array
+            for (var name in leafletLayers.overlays) {
+              if (!isDefined(newOverlayLayers[name]) || newOverlayLayers[name].doRefresh) {
+                // Remove from the map if it's on it
+                if (map.hasLayer(leafletLayers.overlays[name])) {
+                  // Safe remove when ArcGIS layers is loading.
+                  var options = isDefined(newOverlayLayers[name]) ?
+                    newOverlayLayers[name].layerOptions : null;
+                  safeRemoveLayer(map, leafletLayers.overlays[name], options);
+                }
+
+                // TODO: Depending on the layer type we will have to delete what's included on it
+                delete leafletLayers.overlays[name];
+
+                if (newOverlayLayers[name] && newOverlayLayers[name].doRefresh) {
+                  newOverlayLayers[name].doRefresh = false;
+                }
+              }
+            }
+
+            // add new overlays
+            for (var newName in newOverlayLayers) {
+              if (!isDefined(leafletLayers.overlays[newName])) {
+                var testOverlayLayer = createLayer(newOverlayLayers[newName]);
+                if (!isDefined(testOverlayLayer)) {
+                  // If the layer creation fails, continue to the next overlay
+                  continue;
+                }
+
+                leafletLayers.overlays[newName] = testOverlayLayer;
+                if (newOverlayLayers[newName].visible === true) {
+                  safeAddLayer(map, leafletLayers.overlays[newName]);
+                }
+              } else {
+                // check for the .visible property to hide/show overLayers
+                if (newOverlayLayers[newName].visible && !map.hasLayer(leafletLayers.overlays[newName])) {
+                  safeAddLayer(map, leafletLayers.overlays[newName]);
+                } else if (newOverlayLayers[newName].visible === false && map.hasLayer(leafletLayers.overlays[newName])) {
+                  // Safe remove when ArcGIS layers is loading.
+                  safeRemoveLayer(map, leafletLayers.overlays[newName], newOverlayLayers[newName].layerOptions);
+                }
+              }
+
+              //refresh heatmap data if present
+              if (newOverlayLayers[newName].visible && map._loaded && newOverlayLayers[newName].data && newOverlayLayers[newName].type === 'heatmap') {
+                leafletLayers.overlays[newName].setData(newOverlayLayers[newName].data);
+                leafletLayers.overlays[newName].update();
+              }
+            }
+
+            // Only add the layers switch selector control if we have more than one baselayer + overlay
+            isLayersControlVisible = updateLayersControl(map, mapId, isLayersControlVisible, layers.baselayers, newOverlayLayers, leafletLayers);
+          }, true);
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('legend', ["$log", "$http", "leafletHelpers", "leafletLegendHelpers", function ($log, $http, leafletHelpers, leafletLegendHelpers) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: 'leaflet',
+
+      link: function (scope, element, attrs, controller) {
+
+        var isArray = leafletHelpers.isArray;
+        var isDefined = leafletHelpers.isDefined;
+        var isFunction = leafletHelpers.isFunction;
+        var leafletScope = controller.getLeafletScope();
+        var legend = leafletScope.legend;
+
+        var legendClass;
+        var position;
+        var leafletLegend;
+        var type;
+
+        leafletScope.$watch('legend', function (newLegend) {
+
+          if (isDefined(newLegend)) {
+
+            legendClass = newLegend.legendClass ? newLegend.legendClass : 'legend';
+
+            position = newLegend.position || 'bottomright';
+
+            // default to arcgis
+            type = newLegend.type || 'arcgis';
+          }
+
+        }, true);
+
+        controller.getMap().then(function (map) {
+
+          leafletScope.$watch('legend', function (newLegend) {
+
+            if (!isDefined(newLegend)) {
+
+              if (isDefined(leafletLegend)) {
+                leafletLegend.removeFrom(map);
+                leafletLegend = null;
+              }
+
+              return;
+            }
+
+            if (!isDefined(newLegend.url) && (type === 'arcgis') && (!isArray(newLegend.colors) || !isArray(newLegend.labels) || newLegend.colors.length !== newLegend.labels.length)) {
+
+              $log.warn('[AngularJS - Leaflet] legend.colors and legend.labels must be set.');
+
+              return;
+            }
+
+            if (isDefined(newLegend.url)) {
+
+              $log.info('[AngularJS - Leaflet] loading legend service.');
+
+              return;
+            }
+
+            if (isDefined(leafletLegend)) {
+              leafletLegend.removeFrom(map);
+              leafletLegend = null;
+            }
+
+            leafletLegend = L.control({
+              position: position,
+            });
+            if (type === 'arcgis') {
+              leafletLegend.onAdd = leafletLegendHelpers.getOnAddArrayLegend(newLegend, legendClass);
+            }
+
+            leafletLegend.addTo(map);
+
+          });
+
+          leafletScope.$watch('legend.url', function (newURL) {
+
+            if (!isDefined(newURL)) {
+              return;
+            }
+
+            $http.get(newURL)
+              .success(function (legendData) {
+
+                if (isDefined(leafletLegend)) {
+
+                  leafletLegendHelpers.updateLegend(leafletLegend.getContainer(), legendData, type, newURL);
+
+                } else {
+
+                  leafletLegend = L.control({
+                    position: position,
+                  });
+                  leafletLegend.onAdd = leafletLegendHelpers.getOnAddLegend(legendData, legendClass, type, newURL);
+                  leafletLegend.addTo(map);
+                }
+
+                if (isDefined(legend.loadedData) && isFunction(legend.loadedData)) {
+                  legend.loadedData();
+                }
+              })
+              .error(function () {
+                $log.warn('[AngularJS - Leaflet] legend.url not loaded.');
+              });
+          });
+
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('markers',
+    ["$log", "$rootScope", "$q", "leafletData", "leafletHelpers", "leafletMapDefaults", "leafletMarkersHelpers", "leafletMarkerEvents", "leafletIterators", "leafletWatchHelpers", "leafletDirectiveControlsHelpers", function ($log, $rootScope, $q, leafletData, leafletHelpers, leafletMapDefaults,
+                                                                                                                                                                                                                                leafletMarkersHelpers, leafletMarkerEvents, leafletIterators, leafletWatchHelpers,
+                                                                                                                                                                                                                                leafletDirectiveControlsHelpers) {
+      //less terse vars to helpers
+      var isDefined = leafletHelpers.isDefined;
+      var errorHeader = leafletHelpers.errorHeader;
+      var Helpers = leafletHelpers;
+      var isString = leafletHelpers.isString;
+      var addMarkerWatcher = leafletMarkersHelpers.addMarkerWatcher;
+      var updateMarker = leafletMarkersHelpers.updateMarker;
+      var listenMarkerEvents = leafletMarkersHelpers.listenMarkerEvents;
+      var addMarkerToGroup = leafletMarkersHelpers.addMarkerToGroup;
+      var createMarker = leafletMarkersHelpers.createMarker;
+      var deleteMarker = leafletMarkersHelpers.deleteMarker;
+      var $it = leafletIterators;
+      var _markersWatchOptions = leafletHelpers.watchOptions;
+      var maybeWatch = leafletWatchHelpers.maybeWatch;
+      var extendDirectiveControls = leafletDirectiveControlsHelpers.extend;
+
+      var _getLMarker = function (leafletMarkers, name, maybeLayerName) {
+        if (!Object.keys(leafletMarkers).length) return;
+        if (maybeLayerName && isString(maybeLayerName)) {
+          if (!leafletMarkers[maybeLayerName] || !Object.keys(leafletMarkers[maybeLayerName]).length)
+            return;
+          return leafletMarkers[maybeLayerName][name];
+        }
+
+        return leafletMarkers[name];
+      };
+
+      var _setLMarker = function (lObject, leafletMarkers, name, maybeLayerName) {
+        if (maybeLayerName && isString(maybeLayerName)) {
+          if (!isDefined(leafletMarkers[maybeLayerName]))
+            leafletMarkers[maybeLayerName] = {};
+          leafletMarkers[maybeLayerName][name] = lObject;
+        } else
+          leafletMarkers[name] = lObject;
+        return lObject;
+      };
+
+      var _maybeAddMarkerToLayer = function (layerName, layers, model, marker, doIndividualWatch, map) {
+
+        if (!isString(layerName)) {
+          $log.error(errorHeader + ' A layername must be a string');
+          return false;
+        }
+
+        if (!isDefined(layers)) {
+          $log.error(errorHeader + ' You must add layers to the directive if the markers are going to use this functionality.');
+          return false;
+        }
+
+        if (!isDefined(layers.overlays) || !isDefined(layers.overlays[layerName])) {
+          $log.error(errorHeader + ' A marker can only be added to a layer of type "group"');
+          return false;
+        }
+
+        var layerGroup = layers.overlays[layerName];
+        if (!(layerGroup instanceof L.LayerGroup || layerGroup instanceof L.FeatureGroup)) {
+          $log.error(errorHeader + ' Adding a marker to an overlay needs a overlay of the type "group" or "featureGroup"');
+          return false;
+        }
+
+        // The marker goes to a correct layer group, so first of all we add it
+        layerGroup.addLayer(marker);
+
+        // The marker is automatically added to the map depending on the visibility
+        // of the layer, so we only have to open the popup if the marker is in the map
+        if (!doIndividualWatch && map.hasLayer(marker) && model.focus === true) {
+          marker.openPopup();
+        }
+
+        return true;
+      };
+
+      //TODO: move to leafletMarkersHelpers??? or make a new class/function file (leafletMarkersHelpers is large already)
+      var _addMarkers = function (mapId, markersToRender, oldModels, map, layers, leafletMarkers, leafletScope,
+                                  watchOptions, maybeLayerName, skips) {
+        for (var newName in markersToRender) {
+          if (skips[newName])
+            continue;
+
+          if (newName.search('-') !== -1) {
+            $log.error('The marker can\'t use a "-" on his key name: "' + newName + '".');
+            continue;
+          }
+
+          var model = Helpers.copy(markersToRender[newName]);
+          var pathToMarker = Helpers.getObjectDotPath(maybeLayerName ? [maybeLayerName, newName] : [newName]);
+          var maybeLMarker = _getLMarker(leafletMarkers, newName, maybeLayerName);
+          if (!isDefined(maybeLMarker)) {
+            //(nmccready) very important to not have model changes when lObject is changed
+            //this might be desirable in some cases but it causes two-way binding to lObject which is not ideal
+            //if it is left as the reference then all changes from oldModel vs newModel are ignored
+            //see _destroy (where modelDiff becomes meaningless if we do not copy here)
+            var marker = createMarker(model);
+            var layerName = (model ? model.layer : undefined) || maybeLayerName; //original way takes pref
+            if (!isDefined(marker)) {
+              $log.error(errorHeader + ' Received invalid data on the marker ' + newName + '.');
+              continue;
+            }
+
+            _setLMarker(marker, leafletMarkers, newName, maybeLayerName);
+
+            // Bind message
+            if (isDefined(model.message)) {
+              marker.bindPopup(model.message, model.popupOptions);
+            }
+
+            // Add the marker to a cluster group if needed
+            if (isDefined(model.group)) {
+              var groupOptions = isDefined(model.groupOption) ? model.groupOption : null;
+              addMarkerToGroup(marker, model.group, groupOptions, map);
+            }
+
+            // Show label if defined
+            if (Helpers.LabelPlugin.isLoaded() && isDefined(model.label) && isDefined(model.label.message)) {
+              marker.bindLabel(model.label.message, model.label.options);
+            }
+
+            // Check if the marker should be added to a layer
+            if (isDefined(model) && (isDefined(model.layer) || isDefined(maybeLayerName))) {
+
+              var pass = _maybeAddMarkerToLayer(layerName, layers, model, marker,
+                watchOptions.individual.doWatch, map);
+              if (!pass)
+                continue; //something went wrong move on in the loop
+            } else if (!isDefined(model.group)) {
+              // We do not have a layer attr, so the marker goes to the map layer
+              map.addLayer(marker);
+              if (!watchOptions.individual.doWatch && model.focus === true) {
+                marker.openPopup();
+              }
+            }
+
+            if (watchOptions.individual.doWatch) {
+              addMarkerWatcher(marker, pathToMarker, leafletScope, layers, map,
+                watchOptions.individual.isDeep);
+            }
+
+            listenMarkerEvents(marker, model, leafletScope, watchOptions.individual.doWatch, map);
+            leafletMarkerEvents.bindEvents(mapId, marker, pathToMarker, model, leafletScope, layerName);
+          } else {
+            var oldModel = isDefined(oldModel) ? oldModels[newName] : undefined;
+            updateMarker(model, oldModel, maybeLMarker, pathToMarker, leafletScope, layers, map);
+          }
+        }
+      };
+
+      var _seeWhatWeAlreadyHave = function (markerModels, oldMarkerModels, lMarkers, isEqual, cb) {
+        var hasLogged = false;
+        var equals = false;
+        var oldMarker;
+        var newMarker;
+
+        var doCheckOldModel = isDefined(oldMarkerModels);
+        for (var name in lMarkers) {
+          if (!hasLogged) {
+            $log.debug(errorHeader + '[markers] destroy: ');
+            hasLogged = true;
+          }
+
+          if (doCheckOldModel) {
+            //might want to make the option (in watch options) to disable deep checking
+            //ie the options to only check !== (reference check) instead of angular.equals (slow)
+            newMarker = markerModels[name];
+            oldMarker = oldMarkerModels[name];
+            equals = angular.equals(newMarker, oldMarker) && isEqual;
+          }
+
+          if (!isDefined(markerModels) || !Object.keys(markerModels).length || !isDefined(markerModels[name]) || !Object.keys(markerModels[name]).length ||
+            equals) {
+            if (cb && Helpers.isFunction(cb))
+              cb(newMarker, oldMarker, name);
+          }
+        }
+      };
+
+      var _destroy = function (markerModels, oldMarkerModels, lMarkers, map, layers) {
+        _seeWhatWeAlreadyHave(markerModels, oldMarkerModels, lMarkers, false,
+          function (newMarker, oldMarker, lMarkerName) {
+            $log.debug(errorHeader + '[marker] is deleting marker: ' + lMarkerName);
+            deleteMarker(lMarkers[lMarkerName], map, layers);
+            delete lMarkers[lMarkerName];
+          });
+      };
+
+      var _getNewModelsToSkipp = function (newModels, oldModels, lMarkers) {
+        var skips = {};
+        _seeWhatWeAlreadyHave(newModels, oldModels, lMarkers, true,
+          function (newMarker, oldMarker, lMarkerName) {
+            $log.debug(errorHeader + '[marker] is already rendered, marker: ' + lMarkerName);
+            skips[lMarkerName] = newMarker;
+          });
+
+        return skips;
+      };
+
+      return {
+        restrict: 'A',
+        scope: false,
+        replace: false,
+        require: ['leaflet', '?layers'],
+
+        link: function (scope, element, attrs, controller) {
+          var mapController = controller[0];
+          var leafletScope = mapController.getLeafletScope();
+
+          mapController.getMap().then(function (map) {
+            var leafletMarkers = {};
+            var getLayers;
+
+            // If the layers attribute is used, we must wait until the layers are created
+            if (isDefined(controller[1])) {
+              getLayers = controller[1].getLayers;
+            } else {
+              getLayers = function () {
+                var deferred = $q.defer();
+                deferred.resolve();
+                return deferred.promise;
+              };
+            }
+
+            var watchOptions = leafletScope.markersWatchOptions || _markersWatchOptions;
+
+            // backwards compat
+            if (isDefined(attrs.watchMarkers))
+              watchOptions.doWatch = watchOptions.individual.doWatch =
+                (!isDefined(attrs.watchMarkers) || Helpers.isTruthy(attrs.watchMarkers));
+
+            var isNested = (isDefined(attrs.markersNested) && Helpers.isTruthy(attrs.markersNested));
+
+            getLayers().then(function (layers) {
+              var _clean = function (models, oldModels) {
+                if (isNested) {
+                  $it.each(models, function (markerToMaybeDel, layerName) {
+                    var oldModel = isDefined(oldModel) ? oldModels[layerName] : undefined;
+                    _destroy(markerToMaybeDel, oldModel, leafletMarkers[layerName], map, layers);
+                  });
+
+                  return;
+                }
+
+                _destroy(models, oldModels, leafletMarkers, map, layers);
+              };
+
+              var _create = function (models, oldModels) {
+                _clean(models, oldModels);
+                var skips = null;
+                if (isNested) {
+                  $it.each(models, function (markersToAdd, layerName) {
+                    var oldModel = isDefined(oldModel) ? oldModels[layerName] : undefined;
+                    skips = _getNewModelsToSkipp(models[layerName], oldModel, leafletMarkers[layerName]);
+                    _addMarkers(attrs.id, markersToAdd, oldModels, map, layers, leafletMarkers, leafletScope,
+                      watchOptions, layerName, skips);
+                  });
+
+                  return;
+                }
+
+                skips = _getNewModelsToSkipp(models, oldModels, leafletMarkers);
+                _addMarkers(attrs.id, models, oldModels, map, layers, leafletMarkers, leafletScope,
+                  watchOptions, undefined, skips);
+              };
+
+              extendDirectiveControls(attrs.id, 'markers', _create, _clean);
+              leafletData.setMarkers(leafletMarkers, attrs.id);
+
+              maybeWatch(leafletScope, 'markers', watchOptions, function (newMarkers, oldMarkers) {
+                _create(newMarkers, oldMarkers);
+              });
+            });
+          });
+        },
+      };
+    }]);
+
+  angular.module('leaflet-directive').directive('maxbounds', ["$log", "leafletMapDefaults", "leafletBoundsHelpers", "leafletHelpers", function ($log, leafletMapDefaults, leafletBoundsHelpers, leafletHelpers) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: 'leaflet',
+
+      link: function (scope, element, attrs, controller) {
+        var leafletScope = controller.getLeafletScope();
+        var isValidBounds = leafletBoundsHelpers.isValidBounds;
+        var isNumber = leafletHelpers.isNumber;
+
+        controller.getMap().then(function (map) {
+          leafletScope.$watch('maxbounds', function (maxbounds) {
+            if (!isValidBounds(maxbounds)) {
+              // Unset any previous maxbounds
+              map.setMaxBounds();
+              return;
+            }
+
+            var leafletBounds = leafletBoundsHelpers.createLeafletBounds(maxbounds);
+            if (isNumber(maxbounds.pad)) {
+              leafletBounds = leafletBounds.pad(maxbounds.pad);
+            }
+
+            map.setMaxBounds(leafletBounds);
+            if (!attrs.center && !attrs.lfCenter) {
+              map.fitBounds(leafletBounds);
+            }
+          });
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('paths', ["$log", "$q", "leafletData", "leafletMapDefaults", "leafletHelpers", "leafletPathsHelpers", "leafletPathEvents", function ($log, $q, leafletData, leafletMapDefaults, leafletHelpers, leafletPathsHelpers, leafletPathEvents) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: ['leaflet', '?layers'],
+
+      link: function (scope, element, attrs, controller) {
+        var mapController = controller[0];
+        var isDefined = leafletHelpers.isDefined;
+        var isString = leafletHelpers.isString;
+        var leafletScope = mapController.getLeafletScope();
+        var paths = leafletScope.paths;
+        var createPath = leafletPathsHelpers.createPath;
+        var bindPathEvents = leafletPathEvents.bindPathEvents;
+        var setPathOptions = leafletPathsHelpers.setPathOptions;
+
+        mapController.getMap().then(function (map) {
+          var defaults = leafletMapDefaults.getDefaults(attrs.id);
+          var getLayers;
+
+          // If the layers attribute is used, we must wait until the layers are created
+          if (isDefined(controller[1])) {
+            getLayers = controller[1].getLayers;
+          } else {
+            getLayers = function () {
+              var deferred = $q.defer();
+              deferred.resolve();
+              return deferred.promise;
+            };
+          }
+
+          if (!isDefined(paths)) {
+            return;
+          }
+
+          getLayers().then(function (layers) {
+
+            var leafletPaths = {};
+            leafletData.setPaths(leafletPaths, attrs.id);
+
+            // Should we watch for every specific marker on the map?
+            var shouldWatch = (!isDefined(attrs.watchPaths) || attrs.watchPaths === 'true');
+
+            // Function for listening every single path once created
+            var watchPathFn = function (leafletPath, name) {
+              var clearWatch = leafletScope.$watch('paths["' + name + '"]', function (pathData, old) {
+                if (!isDefined(pathData)) {
+                  if (isDefined(old.layer)) {
+                    for (var i in layers.overlays) {
+                      var overlay = layers.overlays[i];
+                      overlay.removeLayer(leafletPath);
+                    }
+                  }
+
+                  map.removeLayer(leafletPath);
+                  clearWatch();
+                  return;
+                }
+
+                setPathOptions(leafletPath, pathData.type, pathData);
+              }, true);
+            };
+
+            leafletScope.$watchCollection('paths', function (newPaths) {
+
+              // Delete paths (by name) from the array
+              for (var name in leafletPaths) {
+                if (!isDefined(newPaths[name])) {
+                  map.removeLayer(leafletPaths[name]);
+                  delete leafletPaths[name];
+                }
+              }
+
+              // Create the new paths
+              for (var newName in newPaths) {
+                if (newName.search('\\$') === 0) {
+                  continue;
+                }
+
+                if (newName.search('-') !== -1) {
+                  $log.error('[AngularJS - Leaflet] The path name "' + newName + '" is not valid. It must not include "-" and a number.');
+                  continue;
+                }
+
+                if (!isDefined(leafletPaths[newName])) {
+                  var pathData = newPaths[newName];
+                  var newPath = createPath(newName, newPaths[newName], defaults);
+
+                  // bind popup if defined
+                  if (isDefined(newPath) && isDefined(pathData.message)) {
+                    newPath.bindPopup(pathData.message, pathData.popupOptions);
+                  }
+
+                  // Show label if defined
+                  if (leafletHelpers.LabelPlugin.isLoaded() && isDefined(pathData.label) && isDefined(pathData.label.message)) {
+                    newPath.bindLabel(pathData.label.message, pathData.label.options);
+                  }
+
+                  // Check if the marker should be added to a layer
+                  if (isDefined(pathData) && isDefined(pathData.layer)) {
+
+                    if (!isString(pathData.layer)) {
+                      $log.error('[AngularJS - Leaflet] A layername must be a string');
+                      continue;
+                    }
+
+                    if (!isDefined(layers)) {
+                      $log.error('[AngularJS - Leaflet] You must add layers to the directive if the markers are going to use this functionality.');
+                      continue;
+                    }
+
+                    if (!isDefined(layers.overlays) || !isDefined(layers.overlays[pathData.layer])) {
+                      $log.error('[AngularJS - Leaflet] A path can only be added to a layer of type "group"');
+                      continue;
+                    }
+
+                    var layerGroup = layers.overlays[pathData.layer];
+                    if (!(layerGroup instanceof L.LayerGroup || layerGroup instanceof L.FeatureGroup)) {
+                      $log.error('[AngularJS - Leaflet] Adding a path to an overlay needs a overlay of the type "group" or "featureGroup"');
+                      continue;
+                    }
+
+                    // Listen for changes on the new path
+                    leafletPaths[newName] = newPath;
+
+                    // The path goes to a correct layer group, so first of all we add it
+                    layerGroup.addLayer(newPath);
+
+                    if (shouldWatch) {
+                      watchPathFn(newPath, newName);
+                    } else {
+                      setPathOptions(newPath, pathData.type, pathData);
+                    }
+                  } else if (isDefined(newPath)) {
+                    // Listen for changes on the new path
+                    leafletPaths[newName] = newPath;
+                    map.addLayer(newPath);
+
+                    if (shouldWatch) {
+                      watchPathFn(newPath, newName);
+                    } else {
+                      setPathOptions(newPath, pathData.type, pathData);
+                    }
+                  }
+
+                  bindPathEvents(attrs.id, newPath, newName, pathData, leafletScope);
+                }
+              }
+            });
+          });
+        });
+      },
+    };
+  }]);
+
+  angular.module('leaflet-directive').directive('tiles', ["$log", "leafletData", "leafletMapDefaults", "leafletHelpers", function ($log, leafletData, leafletMapDefaults, leafletHelpers) {
+
+    return {
+      restrict: 'A',
+      scope: false,
+      replace: false,
+      require: 'leaflet',
+
+      link: function (scope, element, attrs, controller) {
+        var isDefined = leafletHelpers.isDefined;
+        var leafletScope = controller.getLeafletScope();
+        var tiles = leafletScope.tiles;
+
+        if (!isDefined(tiles) || !isDefined(tiles.url)) {
+          $log.warn('[AngularJS - Leaflet] The \'tiles\' definition doesn\'t have the \'url\' property.');
+          return;
+        }
+
+        controller.getMap().then(function (map) {
+          var defaults = leafletMapDefaults.getDefaults(attrs.id);
+          var tileLayerObj;
+          leafletScope.$watch('tiles', function (tiles, oldtiles) {
+            var tileLayerOptions = defaults.tileLayerOptions;
+            var tileLayerUrl = defaults.tileLayer;
+
+            // If no valid tiles are in the scope, remove the last layer
+            if (!isDefined(tiles.url) && isDefined(tileLayerObj)) {
+              map.removeLayer(tileLayerObj);
+              return;
+            }
+
+            // No leafletTiles object defined yet
+            if (!isDefined(tileLayerObj)) {
+              if (isDefined(tiles.options)) {
+                angular.copy(tiles.options, tileLayerOptions);
+              }
+
+              if (isDefined(tiles.url)) {
+                tileLayerUrl = tiles.url;
+              }
+
+              if (tiles.type === 'wms') {
+                tileLayerObj = L.tileLayer.wms(tileLayerUrl, tileLayerOptions);
+              } else {
+                tileLayerObj = L.tileLayer(tileLayerUrl, tileLayerOptions);
+              }
+
+              tileLayerObj.addTo(map);
+              leafletData.setTiles(tileLayerObj, attrs.id);
+              return;
+            }
+
+            // If the options of the tilelayer is changed, we need to redraw the layer
+            if (isDefined(tiles.url) && isDefined(tiles.options) &&
+              (tiles.type !== oldtiles.type || !angular.equals(tiles.options, tileLayerOptions))) {
+              map.removeLayer(tileLayerObj);
+              tileLayerOptions = defaults.tileLayerOptions;
+              angular.copy(tiles.options, tileLayerOptions);
+              tileLayerUrl = tiles.url;
+
+              if (tiles.type === 'wms') {
+                tileLayerObj = L.tileLayer.wms(tileLayerUrl, tileLayerOptions);
+              } else {
+                tileLayerObj = L.tileLayer(tileLayerUrl, tileLayerOptions);
+              }
+
+              tileLayerObj.addTo(map);
+              leafletData.setTiles(tileLayerObj, attrs.id);
+              return;
+            }
+
+            // Only the URL of the layer is changed, update the tiles object
+            if (isDefined(tiles.url)) {
+              tileLayerObj.setUrl(tiles.url);
+            }
+          }, true);
+        });
+      },
+    };
+  }]);
+
+  /*
+   Create multiple similar directives for watchOptions to support directiveControl
+   instead. (when watches are disabled)
+   NgAnnotate does not work here due to the functional creation
+   */
+  ['markers', 'geojson'].forEach(function (name) {
+    angular.module('leaflet-directive').directive(name + 'WatchOptions', [
+      '$log', '$rootScope', '$q', 'leafletData', 'leafletHelpers',
+      function ($log, $rootScope, $q, leafletData, leafletHelpers) {
+
+        var isDefined = leafletHelpers.isDefined,
+          errorHeader = leafletHelpers.errorHeader,
+          isObject = leafletHelpers.isObject,
+          _watchOptions = leafletHelpers.watchOptions;
+
+        return {
+          restrict: 'A',
+          scope: false,
+          replace: false,
+          require: ['leaflet'],
+
+          link: function (scope, element, attrs, controller) {
+            var mapController = controller[0],
+              leafletScope = mapController.getLeafletScope();
+
+            mapController.getMap().then(function () {
+              if (isDefined(scope[name + 'WatchOptions'])) {
+                if (isObject(scope[name + 'WatchOptions']))
+                  angular.extend(_watchOptions, scope[name + 'WatchOptions']);
+                else
+                  $log.error(errorHeader + '[' + name + 'WatchOptions] is not an object');
+                leafletScope[name + 'WatchOptions'] = _watchOptions;
+              }
+            });
+          },
+        };
+      },]);
+  });
+
+  angular.module('leaflet-directive')
+    .factory('LeafletEventsHelpersFactory', ["$rootScope", "$q", "$log", "leafletHelpers", function ($rootScope, $q, $log, leafletHelpers) {
+      var safeApply = leafletHelpers.safeApply;
+      var isDefined = leafletHelpers.isDefined;
+      var isObject = leafletHelpers.isObject;
+      var isArray = leafletHelpers.isArray;
+      var errorHeader = leafletHelpers.errorHeader;
+
+      var EventsHelper = function (rootBroadcastName, lObjectType) {
+        this.rootBroadcastName = rootBroadcastName;
+        $log.debug('LeafletEventsHelpersFactory: lObjectType: ' + lObjectType + 'rootBroadcastName: ' + rootBroadcastName);
+
+        //used to path/key out certain properties based on the type , "markers", "geojson"
+        this.lObjectType = lObjectType;
+      };
+
+      EventsHelper.prototype.getAvailableEvents = function () {
+        return [];
+      };
+
+      /*
+       argument: name: Note this can be a single string or dot notation
+       Example:
+       markerModel : {
+       m1: { lat:_, lon: _}
+       }
+       //would yield name of
+       name = "m1"
+
+       If nested:
+       markerModel : {
+       cars: {
+       m1: { lat:_, lon: _}
+       }
+       }
+       //would yield name of
+       name = "cars.m1"
+       */
+      EventsHelper.prototype.genDispatchEvent = function (maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName, extra) {
+        var _this = this;
+
+        maybeMapId = maybeMapId || '';
+        if (maybeMapId)
+          maybeMapId = '.' + maybeMapId;
+
+        return function (e) {
+          var broadcastName = _this.rootBroadcastName + maybeMapId + '.' + eventName;
+          $log.debug(broadcastName);
+          _this.fire(leafletScope, broadcastName, logic, e, e.target || lObject, model, name, layerName, extra);
+        };
+      };
+
+      EventsHelper.prototype.fire = function (scope, broadcastName, logic, event, lObject, model, modelName, layerName) {
+        // Safely broadcast the event
+        safeApply(scope, function () {
+          var toSend = {
+            leafletEvent: event,
+            leafletObject: lObject,
+            modelName: modelName,
+            model: model,
+          };
+          if (isDefined(layerName))
+            angular.extend(toSend, {layerName: layerName});
+
+          if (logic === 'emit') {
+            scope.$emit(broadcastName, toSend);
+          } else {
+            $rootScope.$broadcast(broadcastName, toSend);
+          }
+        });
+      };
+
+      EventsHelper.prototype.bindEvents = function (maybeMapId, lObject, name, model, leafletScope, layerName, extra) {
+        var events = [];
+        var logic = 'emit';
+        var _this = this;
+
+        if (!isDefined(leafletScope.eventBroadcast)) {
+          // Backward compatibility, if no event-broadcast attribute, all events are broadcasted
+          events = this.getAvailableEvents();
+        } else if (!isObject(leafletScope.eventBroadcast)) {
+          // Not a valid object
+          $log.error(errorHeader + 'event-broadcast must be an object check your model.');
+        } else {
+          // We have a possible valid object
+          if (!isDefined(leafletScope.eventBroadcast[_this.lObjectType])) {
+            // We do not have events enable/disable do we do nothing (all enabled by default)
+            events = this.getAvailableEvents();
+          } else if (!isObject(leafletScope.eventBroadcast[_this.lObjectType])) {
+            // Not a valid object
+            $log.warn(errorHeader + 'event-broadcast.' + [_this.lObjectType] + ' must be an object check your model.');
+          } else {
+            // We have a possible valid map object
+            // Event propadation logic
+            if (isDefined(leafletScope.eventBroadcast[this.lObjectType].logic)) {
+              // We take care of possible propagation logic
+              if (leafletScope.eventBroadcast[_this.lObjectType].logic !== 'emit' &&
+                leafletScope.eventBroadcast[_this.lObjectType].logic !== 'broadcast')
+                $log.warn(errorHeader + 'Available event propagation logic are: \'emit\' or \'broadcast\'.');
+            }
+
+            // Enable / Disable
+            var eventsEnable = false;
+            var eventsDisable = false;
+            if (isDefined(leafletScope.eventBroadcast[_this.lObjectType].enable) &&
+              isArray(leafletScope.eventBroadcast[_this.lObjectType].enable))
+              eventsEnable = true;
+            if (isDefined(leafletScope.eventBroadcast[_this.lObjectType].disable) &&
+              isArray(leafletScope.eventBroadcast[_this.lObjectType].disable))
+              eventsDisable = true;
+
+            if (eventsEnable && eventsDisable) {
+              // Both are active, this is an error
+              $log.warn(errorHeader + 'can not enable and disable events at the same time');
+            } else if (!eventsEnable && !eventsDisable) {
+              // Both are inactive, this is an error
+              $log.warn(errorHeader + 'must enable or disable events');
+            } else {
+              // At this point the object is OK, lets enable or disable events
+              if (eventsEnable) {
+                // Enable events
+                leafletScope.eventBroadcast[this.lObjectType].enable.forEach(function (eventName) {
+                  // Do we have already the event enabled?
+                  if (events.indexOf(eventName) !== -1) {
+                    // Repeated event, this is an error
+                    $log.warn(errorHeader + 'This event ' + eventName + ' is already enabled');
+                  } else {
+                    // Does the event exists?
+                    if (_this.getAvailableEvents().indexOf(eventName) === -1) {
+                      // The event does not exists, this is an error
+                      $log.warn(errorHeader + 'This event ' + eventName + ' does not exist');
+                    } else {
+                      // All ok enable the event
+                      events.push(eventName);
+                    }
+                  }
+                });
+              } else {
+                // Disable events
+                events = this.getAvailableEvents();
+                leafletScope.eventBroadcast[_this.lObjectType].disable.forEach(function (eventName) {
+                  var index = events.indexOf(eventName);
+                  if (index === -1) {
+                    // The event does not exist
+                    $log.warn(errorHeader + 'This event ' + eventName + ' does not exist or has been already disabled');
+
+                  } else {
+                    events.splice(index, 1);
+                  }
+                });
+              }
+            }
+          }
+        }
+
+        events.forEach(function (eventName) {
+          lObject.on(eventName, _this.genDispatchEvent(maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName, extra));
+        });
+
+        return logic;
+      };
+
+      return EventsHelper;
+    }])
+    .service('leafletEventsHelpers', ["LeafletEventsHelpersFactory", function (LeafletEventsHelpersFactory) {
+      return new LeafletEventsHelpersFactory();
+    }]);
+
+  angular.module('leaflet-directive')
+    .factory('leafletGeoJsonEvents', ["$rootScope", "$q", "$log", "leafletHelpers", "LeafletEventsHelpersFactory", "leafletData", function ($rootScope, $q, $log, leafletHelpers,
+                                                                                                                                            LeafletEventsHelpersFactory, leafletData) {
+      var safeApply = leafletHelpers.safeApply;
+      var EventsHelper = LeafletEventsHelpersFactory;
+
+      var GeoJsonEvents = function () {
+        EventsHelper.call(this, 'leafletDirectiveGeoJson', 'geojson');
+      };
+
+      GeoJsonEvents.prototype = new EventsHelper();
+
+      GeoJsonEvents.prototype.genDispatchEvent = function (maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName, extra) {
+        var base = EventsHelper.prototype.genDispatchEvent.call(this, maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName);
+        var _this = this;
+
+        return function (e) {
+          if (eventName === 'mouseout') {
+            if (extra.resetStyleOnMouseout) {
+              leafletData.getGeoJSON(extra.mapId)
+                .then(function (leafletGeoJSON) {
+                  //this is broken on nested needs to traverse or user layerName (nested)
+                  var lobj = layerName ? leafletGeoJSON[layerName] : leafletGeoJSON;
+                  lobj.resetStyle(e.target);
+                });
+
+            }
+
+            safeApply(leafletScope, function () {
+              $rootScope.$broadcast(_this.rootBroadcastName + '.mouseout', e);
+            });
+          }
+
+          base(e); //common
+        };
+      };
+
+      GeoJsonEvents.prototype.getAvailableEvents = function () {
+        return [
+          'click',
+          'dblclick',
+          'mouseover',
+          'mouseout',
+        ];
+      };
+
+      return new GeoJsonEvents();
+    }]);
+
+  angular.module('leaflet-directive')
+    .factory('leafletLabelEvents', ["$rootScope", "$q", "$log", "leafletHelpers", "LeafletEventsHelpersFactory", function ($rootScope, $q, $log, leafletHelpers, LeafletEventsHelpersFactory) {
+      var Helpers = leafletHelpers;
+      var EventsHelper = LeafletEventsHelpersFactory;
+
+      var LabelEvents = function () {
+        EventsHelper.call(this, 'leafletDirectiveLabel', 'markers');
+      };
+
+      LabelEvents.prototype = new EventsHelper();
+
+      LabelEvents.prototype.genDispatchEvent = function (maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName) {
+        var markerName = name.replace('markers.', '');
+        return EventsHelper.prototype
+          .genDispatchEvent.call(this, maybeMapId, eventName, logic, leafletScope, lObject, markerName, model, layerName);
+      };
+
+      LabelEvents.prototype.getAvailableEvents = function () {
+        return [
+          'click',
+          'dblclick',
+          'mousedown',
+          'mouseover',
+          'mouseout',
+          'contextmenu',
+        ];
+      };
+
+      LabelEvents.prototype.genEvents = function (maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName) {
+        var _this = this;
+        var labelEvents = this.getAvailableEvents();
+        var scopeWatchName = Helpers.getObjectArrayPath('markers.' + name);
+        labelEvents.forEach(function (eventName) {
+          lObject.label.on(eventName, _this.genDispatchEvent(
+            maybeMapId, eventName, logic, leafletScope, lObject.label, scopeWatchName, model, layerName));
+        });
+      };
+
+      LabelEvents.prototype.bindEvents = function () {
+      };
+
+      return new LabelEvents();
+    }]);
+
+  angular.module('leaflet-directive')
+    .factory('leafletMapEvents', ["$rootScope", "$q", "$log", "leafletHelpers", "leafletEventsHelpers", "leafletIterators", function ($rootScope, $q, $log, leafletHelpers, leafletEventsHelpers, leafletIterators) {
+      var isDefined = leafletHelpers.isDefined;
+      var fire = leafletEventsHelpers.fire;
+
+      var _getAvailableMapEvents = function () {
+        return [
+          'click',
+          'dblclick',
+          'mousedown',
+          'mouseup',
+          'mouseover',
+          'mouseout',
+          'mousemove',
+          'contextmenu',
+          'focus',
+          'blur',
+          'preclick',
+          'load',
+          'unload',
+          'viewreset',
+          'movestart',
+          'move',
+          'moveend',
+          'dragstart',
+          'drag',
+          'dragend',
+          'zoomstart',
+          'zoomanim',
+          'zoomend',
+          'zoomlevelschange',
+          'resize',
+          'autopanstart',
+          'layeradd',
+          'layerremove',
+          'baselayerchange',
+          'overlayadd',
+          'overlayremove',
+          'locationfound',
+          'locationerror',
+          'popupopen',
+          'popupclose',
+          'draw:created',
+          'draw:edited',
+          'draw:deleted',
+          'draw:drawstart',
+          'draw:drawstop',
+          'draw:editstart',
+          'draw:editstop',
+          'draw:deletestart',
+          'draw:deletestop',
+        ];
+      };
+
+      var _genDispatchMapEvent = function (scope, eventName, logic, maybeMapId) {
+        if (maybeMapId)
+          maybeMapId = maybeMapId + '.';
+        return function (e) {
+          // Put together broadcast name
+          var broadcastName = 'leafletDirectiveMap.' + maybeMapId + eventName;
+          $log.debug(broadcastName);
+
+          // Safely broadcast the event
+          fire(scope, broadcastName, logic, e, e.target, scope);
+        };
+      };
+
+      var _notifyCenterChangedToBounds = function (scope) {
+        scope.$broadcast('boundsChanged');
+      };
+
+      var _notifyCenterUrlHashChanged = function (scope, map, attrs, search) {
+        if (!isDefined(attrs.urlHashCenter)) {
+          return;
+        }
+
+        var center = map.getCenter();
+        var centerUrlHash = (center.lat).toFixed(4) + ':' + (center.lng).toFixed(4) + ':' + map.getZoom();
+        if (!isDefined(search.c) || search.c !== centerUrlHash) {
+          //$log.debug("notified new center...");
+          scope.$emit('centerUrlHash', centerUrlHash);
+        }
+      };
+
+      var _addEvents = function (map, mapEvents, contextName, scope, logic) {
+        leafletIterators.each(mapEvents, function (eventName) {
+          var context = {};
+          context[contextName] = eventName;
+          map.on(eventName, _genDispatchMapEvent(scope, eventName, logic, map._container.id || ''), context);
+        });
+      };
+
+      return {
+        getAvailableMapEvents: _getAvailableMapEvents,
+        genDispatchMapEvent: _genDispatchMapEvent,
+        notifyCenterChangedToBounds: _notifyCenterChangedToBounds,
+        notifyCenterUrlHashChanged: _notifyCenterUrlHashChanged,
+        addEvents: _addEvents,
+      };
+    }]);
+
+  angular.module('leaflet-directive')
+    .factory('leafletMarkerEvents', ["$rootScope", "$q", "$log", "leafletHelpers", "LeafletEventsHelpersFactory", "leafletLabelEvents", function ($rootScope, $q, $log, leafletHelpers, LeafletEventsHelpersFactory, leafletLabelEvents) {
+      var safeApply = leafletHelpers.safeApply;
+      var isDefined = leafletHelpers.isDefined;
+      var Helpers = leafletHelpers;
+      var lblHelp = leafletLabelEvents;
+      var EventsHelper = LeafletEventsHelpersFactory;
+
+      var MarkerEvents = function () {
+        EventsHelper.call(this, 'leafletDirectiveMarker', 'markers');
+      };
+
+      MarkerEvents.prototype = new EventsHelper();
+
+      MarkerEvents.prototype.genDispatchEvent = function (maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName) {
+        var handle = EventsHelper.prototype
+          .genDispatchEvent.call(this, maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName);
+        return function (e) {
+          // Broadcast old marker click name for backwards compatibility
+          if (eventName === 'click') {
+            safeApply(leafletScope, function () {
+              $rootScope.$broadcast('leafletDirectiveMarkersClick', name);
+            });
+          } else if (eventName === 'dragend') {
+            safeApply(leafletScope, function () {
+              model.lat = lObject.getLatLng().lat;
+              model.lng = lObject.getLatLng().lng;
+            });
+
+            if (model.message && model.focus === true) {
+              lObject.openPopup();
+            }
+          }
+
+          handle(e); //common
+        };
+      };
+
+      MarkerEvents.prototype.getAvailableEvents = function () {
+        return [
+          'click',
+          'dblclick',
+          'mousedown',
+          'mouseover',
+          'mouseout',
+          'contextmenu',
+          'dragstart',
+          'drag',
+          'dragend',
+          'move',
+          'remove',
+          'popupopen',
+          'popupclose',
+          'touchend',
+          'touchstart',
+          'touchmove',
+          'touchcancel',
+          'touchleave',
+        ];
+      };
+
+      MarkerEvents.prototype.bindEvents = function (maybeMapId, lObject, name, model, leafletScope, layerName) {
+        var logic = EventsHelper.prototype.bindEvents.call(this, maybeMapId, lObject, name, model, leafletScope, layerName);
+
+        if (Helpers.LabelPlugin.isLoaded() && isDefined(lObject.label)) {
+          lblHelp.genEvents(maybeMapId, name, logic, leafletScope, lObject, model, layerName);
+        }
+      };
+
+      return new MarkerEvents();
+    }]);
+
+  angular.module('leaflet-directive')
+    .factory('leafletPathEvents', ["$rootScope", "$q", "$log", "leafletHelpers", "leafletLabelEvents", "leafletEventsHelpers", function ($rootScope, $q, $log, leafletHelpers, leafletLabelEvents, leafletEventsHelpers) {
+      var isDefined = leafletHelpers.isDefined;
+      var isObject = leafletHelpers.isObject;
+      var Helpers = leafletHelpers;
+      var errorHeader = leafletHelpers.errorHeader;
+      var lblHelp = leafletLabelEvents;
+      var fire = leafletEventsHelpers.fire;
+
+      /*
+       TODO (nmccready) This EventsHelper needs to be derrived from leafletEventsHelpers to elminate copy and paste code.
+       */
+
+      var _genDispatchPathEvent = function (maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName) {
+        maybeMapId = maybeMapId || '';
+
+        if (maybeMapId)
+          maybeMapId = '.' + maybeMapId;
+
+        return function (e) {
+          var broadcastName = 'leafletDirectivePath' + maybeMapId + '.' + eventName;
+          $log.debug(broadcastName);
+          fire(leafletScope, broadcastName, logic, e, e.target || lObject, model, name, layerName);
+        };
+      };
+
+      var _bindPathEvents = function (maybeMapId, lObject, name, model, leafletScope) {
+        var pathEvents = [];
+        var i;
+        var eventName;
+        var logic = 'broadcast';
+
+        if (!isDefined(leafletScope.eventBroadcast)) {
+          // Backward compatibility, if no event-broadcast attribute, all events are broadcasted
+          pathEvents = _getAvailablePathEvents();
+        } else if (!isObject(leafletScope.eventBroadcast)) {
+          // Not a valid object
+          $log.error(errorHeader + 'event-broadcast must be an object check your model.');
+        } else {
+          // We have a possible valid object
+          if (!isDefined(leafletScope.eventBroadcast.path)) {
+            // We do not have events enable/disable do we do nothing (all enabled by default)
+            pathEvents = _getAvailablePathEvents();
+          } else if (isObject(leafletScope.eventBroadcast.paths)) {
+            // Not a valid object
+            $log.warn(errorHeader + 'event-broadcast.path must be an object check your model.');
+          } else {
+            // We have a possible valid map object
+            // Event propadation logic
+            if (leafletScope.eventBroadcast.path.logic !== undefined && leafletScope.eventBroadcast.path.logic !== null) {
+              // We take care of possible propagation logic
+              if (leafletScope.eventBroadcast.path.logic !== 'emit' && leafletScope.eventBroadcast.path.logic !== 'broadcast') {
+                // This is an error
+                $log.warn(errorHeader + 'Available event propagation logic are: \'emit\' or \'broadcast\'.');
+              } else if (leafletScope.eventBroadcast.path.logic === 'emit') {
+                logic = 'emit';
+              }
+            }
+
+            // Enable / Disable
+            var pathEventsEnable = false;
+            var pathEventsDisable = false;
+            if (leafletScope.eventBroadcast.path.enable !== undefined && leafletScope.eventBroadcast.path.enable !== null) {
+              if (typeof leafletScope.eventBroadcast.path.enable === 'object') {
+                pathEventsEnable = true;
+              }
+            }
+
+            if (leafletScope.eventBroadcast.path.disable !== undefined && leafletScope.eventBroadcast.path.disable !== null) {
+              if (typeof leafletScope.eventBroadcast.path.disable === 'object') {
+                pathEventsDisable = true;
+              }
+            }
+
+            if (pathEventsEnable && pathEventsDisable) {
+              // Both are active, this is an error
+              $log.warn(errorHeader + 'can not enable and disable events at the same time');
+            } else if (!pathEventsEnable && !pathEventsDisable) {
+              // Both are inactive, this is an error
+              $log.warn(errorHeader + 'must enable or disable events');
+            } else {
+              // At this point the path object is OK, lets enable or disable events
+              if (pathEventsEnable) {
+                // Enable events
+                for (i = 0; i < leafletScope.eventBroadcast.path.enable.length; i++) {
+                  eventName = leafletScope.eventBroadcast.path.enable[i];
+
+                  // Do we have already the event enabled?
+                  if (pathEvents.indexOf(eventName) !== -1) {
+                    // Repeated event, this is an error
+                    $log.warn(errorHeader + 'This event ' + eventName + ' is already enabled');
+                  } else {
+                    // Does the event exists?
+                    if (_getAvailablePathEvents().indexOf(eventName) === -1) {
+                      // The event does not exists, this is an error
+                      $log.warn(errorHeader + 'This event ' + eventName + ' does not exist');
+                    } else {
+                      // All ok enable the event
+                      pathEvents.push(eventName);
+                    }
+                  }
+                }
+              } else {
+                // Disable events
+                pathEvents = _getAvailablePathEvents();
+                for (i = 0; i < leafletScope.eventBroadcast.path.disable.length; i++) {
+                  eventName = leafletScope.eventBroadcast.path.disable[i];
+                  var index = pathEvents.indexOf(eventName);
+                  if (index === -1) {
+                    // The event does not exist
+                    $log.warn(errorHeader + 'This event ' + eventName + ' does not exist or has been already disabled');
+
+                  } else {
+                    pathEvents.splice(index, 1);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        for (i = 0; i < pathEvents.length; i++) {
+          eventName = pathEvents[i];
+          lObject.on(eventName, _genDispatchPathEvent(maybeMapId, eventName, logic, leafletScope, pathEvents, name));
+        }
+
+        if (Helpers.LabelPlugin.isLoaded() && isDefined(lObject.label)) {
+          lblHelp.genEvents(maybeMapId, name, logic, leafletScope, lObject, model);
+        }
+      };
+
+      var _getAvailablePathEvents = function () {
+        return [
+          'click',
+          'dblclick',
+          'mousedown',
+          'mouseover',
+          'mouseout',
+          'contextmenu',
+          'add',
+          'remove',
+          'popupopen',
+          'popupclose',
+        ];
+      };
+
+      return {
+        getAvailablePathEvents: _getAvailablePathEvents,
+        bindPathEvents: _bindPathEvents,
+      };
+    }]);
+
+}(angular));
+
+'use strict';
+
+(function(app){
+  app.controller('MainCtrl', ['$scope', '$rootScope', 'User', 'Cart', '$localStorage', '$location', function ($scope, $rootScope, User, Cart, $localStorage, $location) {
+
+    $scope.title = 'Home Tab';
+    $scope.authenticated = User.isAuthenticated();
+    $scope.username = User.getUsername();
+    $scope.role = User.getUserRole();
+
+    $scope.$watch(function () {
+      return User.isAuthenticated();
+    }, function (newVal) {
+      $scope.authenticated = newVal;
+    });
+
+    $rootScope.$on('user-login', function(){
+      $scope.username = User.getUsername();
+      $scope.role = User.getUserRole();
+    });
+
+    $scope.logout = function(){
+      User.logout();
+    };
+
+    $scope.isAdmin = function(){
+      return User.isAuthenticated() && User.isAdmin();
+    };
+
+    $scope.$watch(Cart.getItemCount, function(newValue){
+      $scope.cartItemCount = newValue;
+    });
+
+    if($localStorage.seed){
+      $location.path('/login/oauth').replace();
+    }
+
+  }]);
+})(angular.module('myshopApp'));
+
+
+
+'use strict';
+
+(function (app) {
+  app.controller('AboutCtrl', [function () {
+
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+/**
+ * @ngdoc function
+ * @name myshopApp.controller:HomeCtrl
+ * @description
+ * # HomeCtrl
+ * Controller of the myshopApp
+ */
+angular.module('myshopApp')
+  .controller('HomeCtrl', function () {
+    this.awesomeThings = [
+      'HTML5 Boilerplate',
+      'AngularJS',
+      'Karma'
+    ];
+  });
+
+'use strict';
+
+(function (app) {
+  app.controller('LoginCtrl', ['$scope', '$location', '$localStorage', 'User', function ($scope, $location, $localStorage, User) {
+
+    $scope.caption = 'Dich kenn ich doch!';
+    $scope.username = '';
+    $scope.password = '';
+
+    $scope.login = function () {
+
+      $scope.$broadcast('show-errors-check-validity');
+
+      if ($scope.loginForm.$valid) {
+
+        User.login($scope.username, $scope.password).then(
+          function success() {
+            //User.setAuthenticated(true);
+            $location.path('/').replace();
+          },
+          function error() {
+          }
+        );
+      }
+    };
+
+    $scope.register = function () {
+      $location.path('/register').replace();
+    };
+
+    $scope.useGithub = function () {
+
+      var clientId = '2cd8ce35fb2392ce6d04';
+      var redirect_uri = 'https://webinfo-myshop.herokuapp.com/';
+      var scope = 'user:email';
+      var state = '968d6b12-ce2a-4c54-9a7d-994407c7be75';
+      $localStorage.seed = state;
+
+      window.location = 'https://github.com/login/oauth/authorize' +
+        '?client_id=' + clientId +
+        '&redirect_uri=' + redirect_uri +
+        '&scope=' + scope +
+        '&state=' + state;
+    }
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  app.controller('RegisterCtrl', ['$scope', '$location', 'User', '$window', function ($scope, $location, User, $window) {
+
+    $scope.caption = 'Wer warsch jetzt du?';
+
+    var defaultuser = {
+      username: '',
+      password: '',
+      address: {
+        street: '',
+        zip_code: '',
+        city: ''
+      },
+      position: {
+        long: 0.0,
+        lat: 0.0
+      },
+    };
+    $scope.user = defaultuser;
+
+    //locate
+    if ($window.navigator.geolocation) {
+      $window.navigator.geolocation.getCurrentPosition(
+        function successCallback(pos) {
+          $scope.user.position.long = pos.coords.longitude;
+          $scope.user.position.lat = pos.coords.latitude;
+        },
+        function errorCallback(error) {
+          console.log("Position konnte nicht ermittelt werden:");
+          console.log(error);
+        }
+      )
+    }
+
+    $scope.registerUser = function () {
+
+      $scope.$broadcast('show-errors-check-validity');
+
+      if ($scope.registerForm.$valid) {
+        User.register($scope.user).then(
+          function successCallback() {
+            $scope.user = defaultuser;
+            $location.path('/login').replace();
+          },
+          function errorCallback(response) {
+            console.log('Something went wrong' + response.status);
+          });
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+
+  app.controller('ProductsCtrl', ['$scope', 'Products', 'User','Cart', function ($scope, Products, User, Cart) {
+
+    $scope.caption = 'Das könnte Ihnen gefallen:';
+    $scope.userCanCreateCategory = User.canCreateCategory();
+    $scope.userCanCreateProduct = User.canCreateProduct();
+    $scope.userCanCreateComment = User.canCreateComment();
+
+    $scope.userCanEditProduct = function (product) {
+      return User.canEditProduct(product);
+    };
+
+    Products.query().then(
+      function successCallback(response) {
+        $scope.products = response.data;
+      },
+      function errorCallback() { }
+    );
+
+    $scope.$on('myshop-active-category-changed', function (event, category) {
+
+      // Load only products from category
+      if (category) {
+        Products.fromCategory(category).then(
+          function successCallback(response) {
+            $scope.products = response.data;
+          },
+          function errorCallback() {
+
+          }
+        );
+
+        // Load all products
+      } else {
+
+        Products.query().then(
+          function successCallback(response) {
+            $scope.products = response.data;
+          },
+          function errorCallback() {
+
+          }
+        );
+      }
+    });
+
+    $scope.removeProduct = function(product){
+      var ndx = $scope.products.indexOf(product);
+
+      if(ndx > -1){
+        Products.delete(product).then(
+          function successCallback(){
+            $scope.products.splice(ndx, 1);
+          },
+          function errorCallback(){
+
+          }
+        );
+
+      }
+
+    };
+
+    $scope.addToCart = function(product){
+      Cart.add(product, 1);
+    }
+
+  }]);
+
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  app.controller('CategoriesCtrl', ['$scope', 'Categories', function ($scope, Categories) {
+
+    $scope.category = {};
+
+    Categories.query().then(
+      function successCallback(response) {
+        $scope.categories = response.data;
+      },
+      function errorCallback() {
+
+      }
+    );
+
+    $scope.save = function () {
+
+      $scope.$broadcast('show-errors-check-validity');
+
+      if ($scope.categoryForm.$valid) {
+
+        if ($scope.category.id) {
+
+          // Update existing category
+          Categories.update($scope.category).then(
+            function successCallback() {
+              $scope.category = {};
+            },
+            function errorCallback() {
+            }
+          );
+        } else {
+
+          // Add new category
+          Categories.new($scope.category).then(
+            function successCallback(response) {
+
+              $scope.categories.push(response.data);
+              $scope.category = {};
+            },
+            function errorCallback() {
+              $scope.category = {};
+            }
+          );
+        }
+      }
+    };
+
+    $scope.edit = function (category) {
+      $scope.category = category;
+    };
+
+    $scope.remove = function (category) {
+
+      var ndx = $scope.categories.indexOf(category);
+
+      if (ndx > -1) {
+
+        Categories.remove(category).then(
+
+          function successCallback() {
+            $scope.categories.splice(ndx, 1);
+          },
+
+          function errorCallback() {
+          }
+        );
+      }
+    };
+
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app){
+  app.controller('ProductNewCtrl', ['$scope', '$location', 'Categories', 'Products', 'User',function ($scope, $location, Categories, Products, User){
+    $scope.caption = 'Neues Produkt anlegen';
+    $scope.product= {};
+
+    Categories.query().then(
+      function successCallback(response){
+        $scope.categories = response.data;
+      },
+      function errorCallback(){
+
+      }
+    );
+
+
+    $scope.save = function(){
+
+      $scope.$broadcast('show-errors-check-validity');
+
+      if ($scope.productForm.$valid) {
+
+        $scope.product.category = $scope.category.name;
+        $scope.product.categoryID = $scope.category.id;
+        $scope.product.author = User.getUsername();
+        $scope.product.authorID = User.getID();
+
+        Products.new($scope.product).then(
+          function success(){
+            $scope.product= {};
+            $scope.category = {};
+           $location.path('/products').replace();
+          },
+          function error(){
+
+          }
+        );
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  app.controller('ProductEditCtrl', ['$scope', '$location', '$routeParams', 'Categories', 'Products', function ($scope, $location, $routeParams, Categories, Products) {
+
+    $scope.caption = 'Produkt bearbeiten';
+    $scope.product = {};
+    $scope.category = {};
+
+    // Load Product data
+    Products.get($routeParams.id).then(
+      function successCallback(response) {
+        $scope.product = response.data;
+        $scope.category = {id: response.data.categoryID, name: response.data.category};
+      },
+      function errorCallback() {
+
+      }
+    );
+
+    // Load categories
+    Categories.query().then(
+      function successCallback(response) {
+        $scope.categories = response.data;
+      },
+      function errorCallback() {
+
+      }
+    );
+
+
+    $scope.save = function () {
+
+      $scope.$broadcast('show-errors-check-validity');
+
+      if ($scope.productForm.$valid) {
+
+        $scope.product.category = $scope.category.name;
+        $scope.product.categoryID = $scope.category.id;
+
+        Products.update($scope.product).then(
+          function success() {
+            $location.path('/products').replace();
+          },
+          function error() {}
+        );
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  app.controller('UsersCtrl', ['$scope', 'User', function ($scope, User) {
+
+    $scope.loading = true;
+    $scope.user = undefined;
+    $scope.users = [];
+    $scope.roles = [];
+
+    init();
+
+    //// Demo data
+    //$scope.users = [
+    //  {
+    //    id: 1,
+    //    alias: "Tim",
+    //    role: "admin"
+    //  },
+    //  {
+    //    id: 2,
+    //    alias: "Ben",
+    //    role: "user"
+    //  }];
+    //$scope.roles = [
+    //  "admin",
+    //  "guest",
+    //  "user"
+    //];
+
+    function init() {
+      // Load users
+      User.all().then(
+        function success(response) {
+          $scope.users = response.data;
+        },
+        function error(response) {
+          console.log(response);
+        }
+      );
+
+      // load user roles
+      User.roles().then(
+        function success(response) {
+          $scope.roles = response.data;
+        },
+        function error(response) {
+          console.log(response);
+        });
+    }
+
+    $scope.edit = function (user) {
+      $scope.user = user;
+      $scope.oldRole = $scope.user.role;
+    };
+
+    $scope.save = function () {
+      User.changeRole($scope.user).then(
+        function successCallback() {
+          $scope.user = undefined;
+        },
+        function errorCallBack(response) {
+          console.log(response);
+        });
+    };
+
+    $scope.cancel = function () {
+      $scope.user.role = $scope.oldRole;
+      $scope.oldRole = undefined;
+      $scope.user = undefined;
+    };
+
+    $scope.remove = function (user) {
+
+      var ndx = $scope.users.indexOf(user);
+      if (ndx > -1) {
+
+        User.remove(user).then(
+          function success() {
+            $scope.users.splice(ndx, 1);
+          },
+          function error(response) {
+            $scope.error = "Failed to delete user " + user.alias;
+          });
+      }
+    };
+  }]);
+})(angular.module('myshopApp'));
+
+(function (app) {
+  app.controller('CartCtrl', ['$scope', 'Cart', '$window', function ($scope, Cart, $window) {
+
+    $scope.items = [];
+    $scope.items = Cart.getItems();
+
+    $scope.removeEntry = function (entry) {
+      var ndx = $scope.items.indexOf(entry);
+
+      if (ndx > -1) {
+        Cart.remove(entry);
+        //$scope.items.splice(ndx, 1);
+      }
+    };
+
+    $scope.toggleEditState = function (entry) {
+
+      if (entry.edit) {
+        entry.edit = undefined;
+
+      } else {
+        entry.edit = true;
+      }
+    };
+
+    $scope.getTotal = function () {
+      var sum = 0.0;
+      $scope.items.forEach(function (entry) {
+        sum += entry.amount * entry.item.price;
+      })
+
+      return sum;
+    };
+
+    $scope.clearCart = function () {
+      Cart.clear();
+    };
+
+    $scope.checkout = function () {
+      Cart.checkout().then(
+        function success(response) {
+          console.log(response);
+          var url = response.headers('Location');
+          console.log(url);
+          $window.location.href = url;
+        },
+        function error(response) {
+          console.log(response);
+        });
+    };
+
+    $scope.redirect = function () {
+      $window.open("http://wikitravel.org");
+    };
+
+  }]);
+})(angular.module('myshopApp'));
+
+'use strict';
+
+(function (app) {
+  app.controller('OauthCtrl', ['$scope', '$localStorage', '$http', '$location', 'User', function ($scope, $localStorage, $http, $location, User) {
+
+    var seed = $localStorage.seed;
+    var code = getParameterByName('code');
+    var state = getParameterByName('state');
+    console.log('seed: ' + seed);
+    console.log('state: ' + state);
+    console.log('code: ' + code);
+
+    if (seed && state && code && (seed === state)) {
+
+      User.loginWithGitHub(code, state).then(
+        function success() {
+          delete $localStorage.seed;
+          window.location = window.location.origin;
+        }
+      );
+    }
+    else {
+      console.log('no seed');
+    }
+
+    function getParameterByName(name) {
+      name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+  }]);
+})(angular.module('myshopApp'));
+
+
+
+'use strict';
+
+(function (app) {
+  app.controller('UserCtrl', ['$scope', 'User', function ($scope, User) {
+
+    $scope.name = User.getUsername();
+
+    $scope.defaults = {
+      scrollWheelZoom: false
+    };
+
+    $scope.center = {
+      lat: 47.269203,
+      lng: 11.402229,
+      zoom: 12
+    };
+
+    $scope.layers = {
+      baselayers: {
+        googleTerrain: {
+          name: 'Google Terrain',
+          layerType: 'TERRAIN',
+          type: 'google'
+        },
+        googleHybrid: {
+          name: 'Google Hybrid',
+          layerType: 'HYBRID',
+          type: 'google'
+        },
+        googleRoadmap: {
+          name: 'Google Streets',
+          layerType: 'ROADMAP',
+          type: 'google'
+        }
+      }
+    };
+
+    $scope.markers = {
+      osloMarker: {
+        lat: 47.269203,
+        lng: 11.402229,
+        message: "Your Homebase!",
+        focus: false,
+        draggable: false
+      }
+    };
+
+  }]);
+})(angular.module('myshopApp'));
