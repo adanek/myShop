@@ -252,7 +252,7 @@ module.exports = function (grunt) {
         flow: {
           html: {
             steps: {
-              js: ['concat'],
+              js: ['concat', 'uglify'],
               css: ['cssmin']
             },
             post: {}
@@ -472,6 +472,7 @@ module.exports = function (grunt) {
     'postcss',
     'ngtemplates',
     'concat',
+    'uglify',
     'ngAnnotate',
     'copy:dist',
     'cdnify',
