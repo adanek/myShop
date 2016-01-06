@@ -53,7 +53,7 @@ public class Category {
         pos.latitude = 47.263472;    //default
         pos.longitude = 11.345929;   //default
         
-        cat.or = getShops(cat.name, pos);
+        cat.or = getShops(cat.searchtoken, pos);
         
         return cat;
     }
