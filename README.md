@@ -1,19 +1,19 @@
 # Task 8:
-
+ 
 Abgabedatum - 11.01.2016 bis 20:00 Uhr
 
 ## Doing
 
-Bitte beachten, dass der Einsatz von Libraries/Frameworks erlaubt (und sogar erwünscht) ist.
+Bitte beachten, dass der Einsatz von Libraries/Frameworks erlaubt (und sogar erwï¿½nscht) ist.
 
 ### SocialMedia Integration
 
 #### OAuth 2 
-Der bestehende Webshop muss um die Möglichkeit erweitert werden, Authentifizierung per OAuth vorzunehmen.    
+Der bestehende Webshop muss um die Mï¿½glichkeit erweitert werden, Authentifizierung per OAuth vorzunehmen.    
 Der OAuth-Server kann dabei entweder ein SocialMedia-Dienst sein (Facebook, Google+) oder aber ein eigener OAuth2-Server
 
 #### Share auf Facebook/Twitter/Google+ und Co.
-Items im Webshop müssen über eine beliebige SocialMedia Plattform empfohlen werden können.
+Items im Webshop mï¿½ssen ï¿½ber eine beliebige SocialMedia Plattform empfohlen werden kï¿½nnen.
 
 ### Interaktive Karten
 
@@ -21,18 +21,18 @@ Items im Webshop müssen über eine beliebige SocialMedia Plattform empfohlen werd
 Der Benutzer sollen eine Adresse erhalten (falls schon eine Liefer-/Rechnungsadresse vorhanden ist, kann diese verwendet werden).   
 Die Daten des Benutzers sollen dann auf einer Profil-Seite dargestellt werden.   
 Neben der Darstellung der Adresse in Textform soll sie mit Hilfe eines Markers auf einer interaktiven Karte dargestellt sein.   
-Der Längen- und Breitengrad soll dabei über einen reverse geocoding dienst gefunden werden (empfohlen: OSM Nomination bzw. Google Maps Geocoding API).   
-Um uneindeutigen Ergebnissen in den Griff zu bekommen, soll im Benutzerprofil direkt Längen- und Breitengrad hinterlegt werden (zusätzlich zur Textform).
+Der Lï¿½ngen- und Breitengrad soll dabei ï¿½ber einen reverse geocoding dienst gefunden werden (empfohlen: OSM Nomination bzw. Google Maps Geocoding API).   
+Um uneindeutigen Ergebnissen in den Griff zu bekommen, soll im Benutzerprofil direkt Lï¿½ngen- und Breitengrad hinterlegt werden (zusï¿½tzlich zur Textform).
 
-#### Shops-in-der-Nähe Mashup
+#### Shops-in-der-Nï¿½he Mashup
 Je Item-Kategorie soll eine Katgorie-Site erstellt werden.   
-Neben einer Verlinkung zu den Items (etwa am unteren Teil der Website oder als eigenständiger Link) soll eine Karte angezeigt werden, welche Shops in der Nähe zeigt, welche Produkte der jeweiligen Kategorie führen.   
-Damit dies gelingen kann, werden zwei Dinge benötigt:   
+Neben einer Verlinkung zu den Items (etwa am unteren Teil der Website oder als eigenstï¿½ndiger Link) soll eine Karte angezeigt werden, welche Shops in der Nï¿½he zeigt, welche Produkte der jeweiligen Kategorie fï¿½hren.   
+Damit dies gelingen kann, werden zwei Dinge benï¿½tigt:   
  - Ermitteln der aktuellen Position
  - Shops ermitteln und darstellen
-Das Ermitteln der aktuellen Position kann mittels HTML5 erfolgen. Falls der Benutzer die Positionsbestimmung ausgeschaltet hat bzw. die Bestätigung ablehnt, darf eine hinterlegte Location verwendet werden (bspw. Innsbruck).   
-Shops, welche eine bestimmte Produktkategorie führen (und deren Lage) können über OpenStreetMap-Overpass-API gefunden werden.   
-Ein Beispielaufruf für alle Bäckerein in Innsbruck könnte dabei so aussehen:   
+Das Ermitteln der aktuellen Position kann mittels HTML5 erfolgen. Falls der Benutzer die Positionsbestimmung ausgeschaltet hat bzw. die Bestï¿½tigung ablehnt, darf eine hinterlegte Location verwendet werden (bspw. Innsbruck).   
+Shops, welche eine bestimmte Produktkategorie fï¿½hren (und deren Lage) kï¿½nnen ï¿½ber OpenStreetMap-Overpass-API gefunden werden.   
+Ein Beispielaufruf fï¿½r alle Bï¿½ckerein in Innsbruck kï¿½nnte dabei so aussehen:   
 
     http://overpass-api.de/api/interpreter?data=[out:json];node(47.210812,11.30205,47.359219,11.45538)[shop=bakery];out;
 
