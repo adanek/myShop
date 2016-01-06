@@ -1,63 +1,48 @@
-#Anleitung   
-   
-Produktivlink:
-webinfo-myshop.herokuapp.com/
+# Task 8:
 
-Um die Tests auszufï¿½hren:
-gradle test
-
-# Task 7:
-
-Abgabedatum - 14.12.2015 bis 20:00 Uhr
+Abgabedatum - 11.01.2016 bis 20:00 Uhr
 
 ## Doing
 
-Bitte beachten, dass der Einsatz von Libraries/Frameworks erlaubt (und sogar erwï¿½nscht) ist.
+Bitte beachten, dass der Einsatz von Libraries/Frameworks erlaubt (und sogar erwünscht) ist.
 
-### Web-Applikation-Frontend
+### SocialMedia Integration
 
-Die entwickelte Web-Applikation wird um ein Front-End erweitert.   
-Folgende Funktionalitï¿½ten sollen damit umsetzbar sein:
- * Benutzer-Resgistrierung
- * Login/Logout
- * Ansicht der div. Warengruppen
- * Ansicht der Items in einer Warengruppe
- * Detail-Ansicht eines Items inkl. Kommentaren
+#### OAuth 2 
+Der bestehende Webshop muss um die Möglichkeit erweitert werden, Authentifizierung per OAuth vorzunehmen.    
+Der OAuth-Server kann dabei entweder ein SocialMedia-Dienst sein (Facebook, Google+) oder aber ein eigener OAuth2-Server
 
-Fï¿½r bestimmte Benutzer (Admins) soll auï¿½erdem folgendes mï¿½glich sein:
- * Benutzer lï¿½schen
- * Benutzer sollen zu admins ernannt werden kï¿½nnen (bzw. soll dieses Recht auch entzogen werden kï¿½nnen).
- * Gruppen/Items/Kommentare lï¿½schen
+#### Share auf Facebook/Twitter/Google+ und Co.
+Items im Webshop müssen über eine beliebige SocialMedia Plattform empfohlen werden können.
 
-Die Funktionalitï¿½ten fï¿½r einen Admin kï¿½nnen entweder in einem eigenen UI erfolgen, kï¿½nnen aber auch mit der "nicht-admin-UI" integriert werden.   
-Es dï¿½rfen auch unterschiedliche Technologien pro UI verwendet werden (etwa User-UI per JSP und Admin-UI per AngularJS2 oder User-UI pre AngularJS2 und Admin-UI per JSF oder beides per AngularJS2 jedoch einmal per ES6 und einmal per TS oder...).   
-Super wï¿½re aber, wenn min. einmal AngularJS2 verwendet werden wï¿½rde :-)
+### Interaktive Karten
 
-### Warenkob-Funktionalitï¿½t
-Im Front-End soll es mï¿½glich sein, bestimmte Items in einen Warenkorb zu legen.   
-In diesem soll die Anzahl von Items verï¿½ndert werden kï¿½nnen.   
-Ebenso sollen Items wieder aus dem Warenkorb entfernt werden kï¿½nnen (falls mal eines unabsichtlich angeklickt wurde).   
-Wird ein Warenkorb bestellt, so soll die Bezahlung ï¿½ber PayPal erfolgen.   
-Dazu muss die PayPal-API verwendet werden (ACHTUNG: Bitte nur im Testing-Mode arbeiten).
+#### Benutzerprofil
+Der Benutzer sollen eine Adresse erhalten (falls schon eine Liefer-/Rechnungsadresse vorhanden ist, kann diese verwendet werden).   
+Die Daten des Benutzers sollen dann auf einer Profil-Seite dargestellt werden.   
+Neben der Darstellung der Adresse in Textform soll sie mit Hilfe eines Markers auf einer interaktiven Karte dargestellt sein.   
+Der Längen- und Breitengrad soll dabei über einen reverse geocoding dienst gefunden werden (empfohlen: OSM Nomination bzw. Google Maps Geocoding API).   
+Um uneindeutigen Ergebnissen in den Griff zu bekommen, soll im Benutzerprofil direkt Längen- und Breitengrad hinterlegt werden (zusätzlich zur Textform).
 
-### Testing
-ï¿½berlege, wie die geforderte Funktionalitï¿½t getestet werden kann.
-Implementiere min. folgende Tests:
- * Erfolgreiche Benutzerregistrierung
- * Fehlerhafte Benutzerregistrierung (etwa nicht ï¿½bereinstimmende Passwï¿½rter)
- * Benutzer lï¿½schen
- * Benutzer zu Admin ernennen
- * Admin-Recht entziehen (was passiert, wenn nur 1 Admin im System und dieses Recht diesem entzogen wird)?
- * Erfolgreiche Bestellung eines Warenkorbs
- * Fehlerhafte Bestellung eiens Warenkorbs (was kann hier schief laufen?)
+#### Shops-in-der-Nähe Mashup
+Je Item-Kategorie soll eine Katgorie-Site erstellt werden.   
+Neben einer Verlinkung zu den Items (etwa am unteren Teil der Website oder als eigenständiger Link) soll eine Karte angezeigt werden, welche Shops in der Nähe zeigt, welche Produkte der jeweiligen Kategorie führen.   
+Damit dies gelingen kann, werden zwei Dinge benötigt:   
+ - Ermitteln der aktuellen Position
+ - Shops ermitteln und darstellen
+Das Ermitteln der aktuellen Position kann mittels HTML5 erfolgen. Falls der Benutzer die Positionsbestimmung ausgeschaltet hat bzw. die Bestätigung ablehnt, darf eine hinterlegte Location verwendet werden (bspw. Innsbruck).   
+Shops, welche eine bestimmte Produktkategorie führen (und deren Lage) können über OpenStreetMap-Overpass-API gefunden werden.   
+Ein Beispielaufruf für alle Bäckerein in Innsbruck könnte dabei so aussehen:   
 
-## Reading:
+    http://overpass-api.de/api/interpreter?data=[out:json];node(47.210812,11.30205,47.359219,11.45538)[shop=bakery];out;
 
-### Testen
-[NodeJS](https://nodejs.org/)
-[AngularJS 2](https://angular.io/)
-[AngularJS 2 Resources] (https://angular.io/docs/js/latest/resources.html)
-[PayPal API](https://developer.paypal.com/docs/api/overview/)
+# Reading:
 
-
+[Facebook Share-Button Doku](https://developers.facebook.com/docs/plugins/share-button)   
+[Leaflet](http://leafletjs.com/)   
+[OAuth2 Server (PHP)](http://oauth2.thephpleague.com/)   
+[OAuth2 Video (~12min step-by-step)](https://www.youtube.com/watch?v=io_r-0e3Qcw)   
+[OpenLayers](http://openlayers.org/)   
+[OSM Nomination](http://wiki.openstreetmap.org/wiki/Nominatim)   
+[OSM Shop-Kategorien](http://wiki.openstreetmap.org/wiki/DE:Key:shop)
 

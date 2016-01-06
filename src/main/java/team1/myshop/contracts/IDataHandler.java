@@ -6,6 +6,7 @@ import data.model.Category;
 import data.model.Item;
 import data.model.ItemComment;
 import data.model.SavedUser;
+import team1.myshop.web.model.Address;
 
 public interface IDataHandler {
 
@@ -25,7 +26,7 @@ public interface IDataHandler {
 	// change user
 	SavedUser changeUser(int userID, int role) throws IllegalArgumentException, IllegalStateException;
 
-	SavedUser createUser(String alias, String password, int role) throws IllegalStateException;
+	SavedUser createUser(String alias, String password, int role, Address address) throws IllegalStateException;
 
 	Category createCategory(String name) throws IllegalStateException;
 

@@ -176,7 +176,7 @@ public class UserService extends ServiceBase {
             return null;
         }
 
-        SavedUser user = dh.createUser(credentials.name, credentials.hash, 2); // to-do
+        SavedUser user = dh.createUser(credentials.name, credentials.hash, 2, credentials.address);
 
         // user create failed
         if (user == null) {

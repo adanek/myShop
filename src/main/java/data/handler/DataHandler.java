@@ -23,6 +23,7 @@ import data.model.Item;
 import data.model.ItemComment;
 import data.model.SavedUser;
 import team1.myshop.contracts.IDataHandler;
+import team1.myshop.web.model.Address;
 
 public class DataHandler implements IDataHandler {
 
@@ -437,7 +438,7 @@ public class DataHandler implements IDataHandler {
 	 * java.lang.String, int)
 	 */
 	@Override
-	public SavedUser createUser(String alias, String password, int role) throws IllegalStateException {
+	public SavedUser createUser(String alias, String password, int role, Address address) throws IllegalStateException {
 
 		// create user instance
 		SavedUser user = new SavedUser();
@@ -448,6 +449,12 @@ public class DataHandler implements IDataHandler {
 		}
 
 		user.setRole(role);
+		user.setZip(address.zip);
+		user.setStreet(address.street);
+		user.setCity(address.city);
+		user.setCountry(address.country);
+		user.setLatitude(address.latitude);
+		user.setLongitude(address.longitude);
 
 		try {
 			user.setPassword(PasswordHash.getSaltedHash(password));
