@@ -30,7 +30,14 @@
         };
 
         this.setActiveCategory = function (category) {
-          $scope.activeCategory = $scope.activeCategory === category.id ? undefined : category.id;
+
+          if($scope.activeCategory){
+            $scope.activeCategory = $scope.activeCategory.id === category.id ? undefined : category;
+          }
+          else {
+            $scope.activeCategory = category;
+          }
+
           $scope.$emit('myshop-active-category-changed', $scope.activeCategory);
         };
       }]

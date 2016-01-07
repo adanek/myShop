@@ -12,8 +12,8 @@
         return $http.get('api/items');
       },
 
-      fromCategory: function (categotryId) {
-        return $http.get('api/items/category/' + categotryId);
+      fromCategory: function (categotry) {
+        return $http.get('api/items/category/' + categotry.id);
       },
 
       delete: function(product){
