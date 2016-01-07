@@ -1,4 +1,10 @@
-<h1>This is your page! {{ name }}</h1>
+<h1>This is your page! {{ user.alias }}</h1>
+
+<address>
+  <strong>{{ user.address.street }}</strong><br>
+  {{ user.address.zip_code }} {{ user.address.city }} <br>
+  {{ user.address.country }}
+</address>
 
 <div class="map">
   <leaflet lf-center="center" defaults="defaults" layers="layers" markers="markers" style="width: 100%; height: 480px"></leaflet>
