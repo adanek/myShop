@@ -11,7 +11,8 @@
       address: {
         street: '',
         zip_code: '',
-        city: ''
+        city: '',
+        country: ''
       },
       position: {
         long: 0.0,

@@ -153,6 +153,7 @@
           zip: user.address.zip_code,
           city: user.address.city,
           street: user.address.street,
+          country: user.address.country,
           longitude: user.position.long,
           latitude: user.position.lat
         }
