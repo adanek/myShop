@@ -8,7 +8,6 @@ public class Address {
 	public String country;
 	public double longitude;
 	public double latitude;
-	public double longitude_calc;
-	public double latitude_calc;
+	public OsloMarker marker;
 	
 }
