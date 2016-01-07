@@ -66,15 +66,24 @@ public class CategoryService extends ServiceBase {
     @GET
     @Path("/shops/{searchtoken}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<OsloMarker> getShops(@PathParam("searchtoken") String searchtoken, String tokenString, 
+    public Collection<OsloMarker> getShops(@PathParam("searchtoken") String searchtoken,
     		                               @Context HttpServletRequest request, @Context HttpServletResponse response){
     	
     	this.initialize();
     	
-    	ShopRequest sr = JsonParser.parse(tokenString, ShopRequest.class);
-    	
+    	//ShopRequest sr = JsonParser.parse(tokenString, ShopRequest.class);
+        final String st = request.getParameter("searchtoken");
+        final double lat = Double.parseDouble(request.getParameter("latitude"));
+        final double lng = Double.parseDouble(request.getParameter("longitude"));
+
+        ShopRequest sr = new ShopRequest();
+        sr.searchtoken = st;
+        sr.position = new Position();
+        sr.position.latitude = lat;
+        sr.position.longitude = lng;
+
         // Validate data
-        if (sr == null || sr.searchtoken != searchtoken) {
+        if (sr == null || !sr.searchtoken.equals(searchtoken)) {
             http.cancelRequest(response, SC_BAD_REQUEST);
             return null;
         }

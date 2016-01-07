@@ -23,9 +23,9 @@
 
       getShops: function(category, pos){
         var querystring=
-          '?searchtoken:' + category.searchtoken +
-          '&longitude:'+ pos.longitude +
-          '$latitude:'+ pos.latitude;
+          '?searchtoken=' + category.searchtoken +
+          '&longitude='+ pos.longitude +
+          '&latitude='+ pos.latitude;
 
         return $http.get('/api/categories/shops/' + category.searchtoken + querystring);
       }

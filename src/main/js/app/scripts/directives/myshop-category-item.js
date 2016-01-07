@@ -13,11 +13,14 @@
       require: '^myshopCategorySelect',
       link: function (scope, element, attrs, myshopCategorySelectCtrl) {
         scope.makeActive = function () {
-            myshopCategorySelectCtrl.setActiveCategory(scope.category);
+          myshopCategorySelectCtrl.setActiveCategory(scope.category);
         };
 
         scope.categoryActive = function () {
-          return myshopCategorySelectCtrl.getActiveCategory() === scope.category.id;
+          if (myshopCategorySelectCtrl.getActiveCategory()) {
+            return myshopCategorySelectCtrl.getActiveCategory().id === scope.category.id;
+          }
+          return false;
         };
       }
     };

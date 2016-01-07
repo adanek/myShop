@@ -10,6 +10,101 @@
     $scope.userCanCreateProduct = User.canCreateProduct();
     $scope.userCanCreateComment = User.canCreateComment();
 
+
+    var markers = [
+      {
+        "lat": 47.2655023,
+        "lng": 11.3948637,
+        "message": "3 Handy Shop",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2651858,
+        "lng": 11.3969495,
+        "message": "Foto Lamprechter",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.265906,
+        "lng": 11.3952855,
+        "message": "Foto Lamprechter",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2664658,
+        "lng": 11.402551,
+        "message": "Hartlauer",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2312649,
+        "lng": 11.2797852,
+        "message": "Elektro Kaufmann",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2596743,
+        "lng": 11.3966554,
+        "message": "Tangl",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2362934,
+        "lng": 11.310654,
+        "message": "Grundig",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2362785,
+        "lng": 11.3107323,
+        "message": "Elektrocenter",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2696559,
+        "lng": 11.3930849,
+        "message": "arcustik",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2585417,
+        "lng": 11.2717825,
+        "message": "Elektro Thaler",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.262529,
+        "lng": 11.3943243,
+        "message": "Worldwide Electronics",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.261119,
+        "lng": 11.3953588,
+        "message": "Futuretec",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2596729,
+        "lng": 11.4108254,
+        "message": "Hausberger Elektrotechnik",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2764852,
+        "lng": 11.3986942,
+        "message": "IBM Ã–sterreich Internationale BÃ¼romaschinen GmbH",
+        "focus": false,
+        "draggable": false
+      }, {
+        "lat": 47.2594919,
+        "lng": 11.3968204,
+        "message": "Bohnissimo",
+        "focus": false,
+        "draggable": false
+      }
+    ];
+
     $scope.userCanEditProduct = function (product) {
       return User.canEditProduct(product);
     };
@@ -37,8 +132,8 @@
 
         // Load shops
         Categories.getShops(category, $scope.pos).then(
-          function successCallback(data) {
-            $scope.map.markers = data;
+          function successCallback(response) {
+            $scope.map.markers = response.data;
           },
           function errorCallback() {
             $scope.map.markers = [];
