@@ -49,9 +49,15 @@ public class UserInfo {
 			
 			if(result.size() > 0){
 				GeocoderResult location = result.get(0);
-				addr.latitude_calc  = location.getGeometry().getLocation().getLat().doubleValue();
-				addr.longitude_calc = location.getGeometry().getLocation().getLng().doubleValue();
-
+				
+				OsloMarker marker = new OsloMarker();
+				
+				marker.lat = location.getGeometry().getLocation().getLat().doubleValue();
+				marker.lng = location.getGeometry().getLocation().getLng().doubleValue();
+				marker.focus = true;
+				marker.message = "Your Hometown!";
+				
+				addr.marker = marker;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
