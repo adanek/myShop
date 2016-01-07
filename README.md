@@ -3,7 +3,7 @@
 Abgabedatum - 11.01.2016 bis 20:00 Uhr
 
 ## Doing
-
+ 
 Bitte beachten, dass der Einsatz von Libraries/Frameworks erlaubt (und sogar erw�nscht) ist.
 
 ### SocialMedia Integration
