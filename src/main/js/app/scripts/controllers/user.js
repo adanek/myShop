@@ -35,14 +35,10 @@
       }
     };
 
+    var home = User.getUserInfo().address.marker;
+    console.log(home);
     $scope.markers = {
-      osloMarker: {
-        lat: 47.269203,
-        lng: 11.402229,
-        message: "Your Homebase!",
-        focus: false,
-        draggable: false
-      }
+      home: home
     };
 
   }]);

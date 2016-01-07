@@ -49,6 +49,10 @@
       }
     };
 
+    srv.getUserInfo = function(){
+      return user;
+    }
+
     srv.isAuthenticated = function () {
       return authenticated;
     };
