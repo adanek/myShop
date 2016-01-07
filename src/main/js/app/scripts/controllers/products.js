@@ -35,7 +35,8 @@
           }
         );
 
-        $http.get('/api/categories/shops/' + $scope.activeCategory.searchtoken).then(
+        // Load shops
+        $http.get('/api/categories/shops/' + category.searchtoken).then(
           function successCallback(data) {
             $scope.map.markers = data;
           },
