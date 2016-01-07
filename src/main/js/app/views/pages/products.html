@@ -33,6 +33,8 @@
 
       <myshop-product-details></myshop-product-details>
 
+
+
       <footer>
         <a class="btn btn-info" ng-click="addToCart(product)">
           <span class="glyphicon glyphicon-plus"></span>
@@ -54,6 +56,10 @@
       <hr>
 
     </section>
+
+    <h2>Andere Shops in deiner Nähe:</h2>
+    <leaflet lf-center="map.center" defaults="map.defaults" layers="map.layers" markers="map.markers" style="width: 100%; height: 480px"></leaflet>
+
   </section>
 </section>
 
