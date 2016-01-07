@@ -2,7 +2,7 @@
 
 (function (app) {
 
-  app.controller('ProductsCtrl', ['$scope', 'Products', 'User', 'Cart', '$http', '$window', function ($scope, Products, User, Cart, $http, $window) {
+  app.controller('ProductsCtrl', ['$scope', 'Products', 'User', 'Cart', 'Categories', '$window', function ($scope, Products, User, Cart, Categories, $window) {
 
 
     $scope.caption = 'Das könnte Ihnen gefallen:';
@@ -36,7 +36,7 @@
         );
 
         // Load shops
-        $http.get('/api/categories/shops/' + category.searchtoken).then(
+        Categories.getShops(category, $scope.pos).then(
           function successCallback(data) {
             $scope.map.markers = data;
           },
@@ -116,9 +116,16 @@
         function successCallback(pos) {
           $scope.map.center.lng = pos.coords.longitude;
           $scope.map.center.lat = pos.coords.latitude;
+          $scope.pos = pos.coords;
         },
         function errorCallback(error) {
           console.log(error);
+          $scope.pos = {
+
+            // Default wert wenn pos nicht verfügbar
+            longitude: 11.404804,
+            latitude: 47.269436
+          }
         });
     }
   }]);
