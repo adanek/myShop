@@ -4,7 +4,7 @@
   app.controller('UserCtrl', ['$scope', 'User', function ($scope, User) {
 
     $scope.name = User.getUsername();
-
+    $scope.user = User.getUserInfo();
     $scope.defaults = {
       scrollWheelZoom: false
     };
